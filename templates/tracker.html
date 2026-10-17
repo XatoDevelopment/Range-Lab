@@ -1,0 +1,3279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Bankroll Lab — RangeLab</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/profile.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   SPLASH PERSONALIZADO — Bankroll Lab (💰)
+   ═══════════════════════════════════════════════════════ */
+body.tool-tracker #splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(ellipse at center, #0c1222 0%, #05080f 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  transition: opacity 0.5s ease, visibility 0.5s;
+}
+body.tool-tracker #splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+
+body.tool-tracker .splash-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #34d399, #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  color: #07090f;
+  box-shadow: 0 0 70px rgba(52, 211, 153, 0.5);
+  animation: splashPulse 1.8s ease-in-out infinite;
+}
+@keyframes splashPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 70px rgba(52, 211, 153, 0.5); }
+  50% { transform: scale(1.06); box-shadow: 0 0 90px rgba(52, 211, 153, 0.7); }
+}
+
+body.tool-tracker .splash-title {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, #34d399, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+
+body.tool-tracker .splash-sub {
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: -8px;
+}
+
+body.tool-tracker .splash-credits {
+  font-size: 12px;
+  color: var(--text-2);
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+body.tool-tracker .splash-loader {
+  width: 220px;
+  height: 4px;
+  background: var(--bg-2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+body.tool-tracker .splash-loader::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, #34d399, #22d3ee, transparent);
+  animation: splashLoad 1.4s ease-in-out infinite;
+}
+@keyframes splashLoad {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIX: Layout completo en desktop (no estrecho)
+   ═══════════════════════════════════════════════════════ */
+@media (min-width: 900px) {
+  body.tool-tracker .app {
+    max-width: 1280px !important;
+    padding: 0 28px !important;
+    padding-top: calc(70px + var(--safe-top)) !important;
+  }
+  body.tool-tracker .app-header {
+    padding: 14px 28px !important;
+    padding-top: calc(14px + var(--safe-top)) !important;
+  }
+  body.tool-tracker .app-header .brand-title {
+    font-size: 16px !important;
+  }
+
+  body.tool-tracker .stats-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 10px !important;
+  }
+  body.tool-tracker .stat-box {
+    padding: 14px 10px !important;
+  }
+  body.tool-tracker .stat-value {
+    font-size: 1.25rem !important;
+  }
+
+  body.tool-tracker .card {
+    padding: 22px 22px !important;
+    border-radius: 16px !important;
+  }
+
+  body.tool-tracker .bankroll-card {
+    padding: 30px 24px 24px !important;
+  }
+  body.tool-tracker .bankroll-amount {
+    font-size: 3.4rem !important;
+  }
+
+  body.tool-tracker .chart-wrapper {
+    height: 260px !important;
+  }
+
+  body.tool-tracker .row-2 {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  body.tool-tracker .history-item {
+    padding: 14px 18px !important;
+    border-radius: 14px !important;
+  }
+  body.tool-tracker .history-name {
+    font-size: 0.95rem !important;
+  }
+  body.tool-tracker .history-amount {
+    font-size: 1.05rem !important;
+  }
+
+  body.tool-tracker .filter-chip {
+    padding: 9px 16px !important;
+    font-size: 0.85rem !important;
+  }
+
+  body.tool-tracker .desktop-nav {
+    margin-bottom: 22px !important;
+    padding: 8px !important;
+  }
+  body.tool-tracker .desktop-nav .dn-item {
+    padding: 14px 12px !important;
+    font-size: 0.95rem !important;
+  }
+
+  body.tool-tracker .range-toggle-btn {
+    padding: 15px 18px !important;
+  }
+  body.tool-tracker input[type="search"] {
+    padding: 12px 16px !important;
+    font-size: 0.95rem !important;
+  }
+
+  body.tool-tracker #dashFilters,
+  body.tool-tracker #histFilters {
+    gap: 8px !important;
+  }
+}
+
+@media (min-width: 1300px) {
+  body.tool-tracker .app {
+    max-width: 1400px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIX: Drawer de izquierda a derecha + fondo sólido
+   ═══════════════════════════════════════════════════════ */
+body.tool-tracker .menu-overlay {
+  background: rgba(0, 0, 0, 0.82) !important;
+  
+  
+}
+
+body.tool-tracker .side-menu {
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  bottom: 0 !important;
+  border-right: 1px solid var(--border) !important;
+  border-left: none !important;
+  box-shadow: 0 -18px 60px rgba(0, 0, 0, 0.45) !important;
+  transform: translateY(104%) !important;
+}
+
+body.tool-tracker .menu-overlay.show .side-menu {
+  transform: translateY(0) !important;
+}
+
+html[data-theme="light"] body.tool-tracker .side-menu {
+  background: var(--card, #ffffff) !important;
+}
+
+body.tool-tracker .side-menu .menu-header {
+  border-bottom: 1px solid var(--border) !important;
+}
+
+body.tool-tracker .side-menu .menu-footer {
+  border-top: 1px solid var(--border) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIX: Header — brand + chips legibles (app-header)
+   ═══════════════════════════════════════════════════════ */
+body.tool-tracker .app-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+}
+
+body.tool-tracker .app-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+body.tool-tracker .app-header #menuBtn {
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+
+/* Chips legibles: siempre mostrar texto en móvil y desktop */
+body.tool-tracker .conn-indicator {
+  display: flex !important;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+body.tool-tracker .conn-indicator .ctext {
+  display: inline !important;
+}
+
+body.tool-tracker .user-chip {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+body.tool-tracker .user-chip .uname {
+  display: inline !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* En móvil: un solo indicador (user-chip con udot = conexión) */
+@media (max-width: 900px) {
+  body.tool-tracker .conn-indicator { display: none !important; }
+  body.tool-tracker .user-chip {
+    padding: 6px 10px;
+    font-size: 11px;
+    max-width: 130px;
+  }
+  body.tool-tracker .user-chip .uname { display: inline !important; }
+}
+@media (max-width: 420px) {
+  body.tool-tracker .app-header {
+    gap: 6px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    padding-top: calc(10px + var(--safe-top)) !important;
+  }
+  body.tool-tracker .app-header #menuBtn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+  body.tool-tracker .app-header .brand-mark {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 16px !important;
+  }
+  body.tool-tracker .app-header .brand-title {
+    font-size: 13px !important;
+  }
+  body.tool-tracker .app-header .brand-sub {
+    font-size: 9px !important;
+  }
+  body.tool-tracker .user-chip {
+    padding: 5px 8px;
+    font-size: 10px;
+    max-width: 100px;
+  }
+  body.tool-tracker .user-chip .udot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Desktop: chips más grandes y cómodos */
+@media (min-width: 900px) {
+  body.tool-tracker .app-header #menuBtn {
+    width: 42px !important;
+    height: 42px !important;
+  }
+  body.tool-tracker .conn-indicator {
+    padding: 8px 14px;
+    font-size: 11px;
+  }
+  body.tool-tracker .user-chip {
+    padding: 8px 14px;
+    font-size: 12px;
+    max-width: 200px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   FREEROLL TOGGLE — sustituye a los botones Depositar/Retirar
+   ═══════════════════════════════════════════════════════ */
+body.tool-tracker .freeroll-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+body.tool-tracker .freeroll-toggle:hover {
+  border-color: var(--blue);
+}
+body.tool-tracker .freeroll-toggle input {
+  display: none;
+}
+body.tool-tracker .freeroll-toggle .fr-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+body.tool-tracker .freeroll-toggle input:checked + .fr-box {
+  background: linear-gradient(135deg, #34d399, #059669);
+  border-color: #34d399;
+  color: #07090f;
+}
+body.tool-tracker .freeroll-toggle .fr-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+body.tool-tracker .freeroll-toggle input:checked ~ .fr-label {
+  color: var(--text);
+}
+body.tool-tracker .freeroll-toggle .fr-hint {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-left: auto;
+}
+</style>
+
+<link rel="stylesheet" href="/static/css/rangelab-menus.css">
+</head>
+<body class="tool-tracker rl-loading">
+
+<!-- SPLASH -->
+<div id="splash">
+    <div class="splash-logo">💰</div>
+    <div class="splash-title">Bankroll <span>Lab</span></div>
+    <div class="splash-sub">RangeLab Suite · Torneos · ROI</div>
+    <div class="splash-credits">Cargando herramienta…</div>
+    <div class="splash-loader"></div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+    <header class="app-header">
+        <div class="brand">
+            <button class="icon-btn" id="menuBtn" onclick="openMenu()" title="Menú" data-i18n-title="nav.menu" data-i18n-aria="nav.menu" aria-label="Menú">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+            <div class="brand-mark">💰</div>
+            <div class="brand-text">
+                <div class="brand-title">Bankroll <span>Lab</span></div>
+                <div class="brand-sub"><span data-i18n="tr.subtitle">Torneos · ROI · RangeLab</span></div>
+            </div>
+        </div>
+        <div class="header-actions">
+      <button class="theme-toggle" type="button" title="Tema claro/oscuro" data-i18n-title="common.theme" data-i18n-aria="common.theme" aria-label="Cambiar tema claro/oscuro">
+                <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+                <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            </button>
+            <div class="conn-indicator" id="connIndicator" title="Estado del servidor" data-i18n-title="nav.serverStatus">
+                <span class="dot"></span>
+                <span class="ctext">—</span>
+            </div>
+            <div class="user-chip" id="userChip" title="Sesión actual" data-i18n-title="nav.session">
+                <span class="udot"></span>
+                <span class="uname" id="userName">—</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <!-- DESKTOP NAV -->
+        <div class="desktop-nav">
+            <button class="dn-item active" data-tab="dashboard" onclick="switchTab('dashboard', this)">
+                <span class="dn-icon">📊</span><span>Dashboard</span>
+            </button>
+            <button class="dn-item" data-tab="add" onclick="switchTab('add', this)">
+                <span class="dn-icon">➕</span><span>Registrar Torneo</span>
+            </button>
+            <button class="dn-item" data-tab="history" onclick="switchTab('history', this)">
+                <span class="dn-icon">📜</span><span data-i18n="tr.history">Historial</span>
+            </button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="tab-content active" id="tab-dashboard">
+            <div class="filters" id="dashFilters" style="margin-bottom:12px;flex-wrap:nowrap;overflow-x:auto;">
+                <div class="filter-chip active" data-dash-filter="all" onclick="setDashFilter('all', this)">Todos</div>
+                <div class="filter-chip" data-dash-filter="today" onclick="setDashFilter('today', this)">Hoy</div>
+                <div class="filter-chip" data-dash-filter="week" onclick="setDashFilter('week', this)">7 días</div>
+                <div class="filter-chip" data-dash-filter="thisMonth" onclick="setDashFilter('thisMonth', this)">Este mes</div>
+                <div class="filter-chip" data-dash-filter="custom" onclick="toggleDashDatePicker(this)" title="Rango de fechas" data-i18n-title="tr.dateRange">📅 Rango</div>
+            </div>
+            <div id="dashDateRow" style="display:none;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+                <input type="date" id="dashDateFrom" style="background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;">
+                <span style="color:var(--text-3);font-size:12px;">→</span>
+                <input type="date" id="dashDateTo" style="background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;">
+                <button class="btn btn-small" type="button" onclick="applyDashRange()" style="padding:6px 12px;font-size:12px;">Aplicar</button>
+                <button class="btn btn-secondary btn-small" type="button" onclick="clearDashRange()" style="padding:6px 12px;font-size:12px;">Limpiar</button>
+            </div>
+            <div id="dashPeriodLabel" style="display:none;font-size:12px;color:var(--text-3);margin-bottom:10px;font-weight:600;"></div>
+
+            <div class="card bankroll-card">
+                <div class="bankroll-label">Capital Actual</div>
+                <div class="bankroll-amount" id="bankrollDisplay">$0.00</div>
+                <div class="bankroll-change" id="bankrollChange"></div>
+
+                <div class="bankroll-mini-stats">
+                    <div class="mini-stat">
+                        <div class="mini-stat-icon dep">⬇️</div>
+                        <div class="mini-stat-info">
+                            <div class="mini-stat-label">Depositado</div>
+                            <div class="mini-stat-value" id="totalDeposited">$0.00</div>
+                        </div>
+                    </div>
+                    <div class="mini-stat">
+                        <div class="mini-stat-icon wd">⬆️</div>
+                        <div class="mini-stat-info">
+                            <div class="mini-stat-label">Retirado</div>
+                            <div class="mini-stat-value" id="totalWithdrawn">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <label class="freeroll-toggle" title="Marcado: mostrar freerolls en las estadísticas. Sin marcar: ocultarlos de las stats (siguen en el capital).">
+                    <input type="checkbox" id="freerollToggle" onchange="toggleFreerollFilter(this.checked)" checked>
+                    <span class="fr-box">✓</span>
+                    <span class="fr-label">Freeroll</span>
+                    <span class="fr-hint" id="freerollHint">Visibles</span>
+                </label>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box"><div class="stat-value blue" id="statTourneys">0</div><div class="stat-label">Torneos</div></div>
+                <div class="stat-box"><div class="stat-value green" id="statMaxPrize">$0</div><div class="stat-label">Mayor Premio</div></div>
+                <div class="stat-box"><div class="stat-value" id="statProfit">$0</div><div class="stat-label">Ganancias Totales</div></div>
+                <div class="stat-box"><div class="stat-value" id="statBuyin">$0</div><div class="stat-label">Total Buy-in</div></div>
+                <div class="stat-box"><div class="stat-value" id="statITM">0%</div><div class="stat-label">ITM</div></div>
+                <div class="stat-box"><div class="stat-value" id="statROI">0%</div><div class="stat-label">ROI</div></div>
+                <div class="stat-box"><div class="stat-value" id="statAvgBuyin">$0</div><div class="stat-label">Prom. Buy-in</div></div>
+                <div class="stat-box"><div class="stat-value" id="statAvgProfit">$0</div><div class="stat-label">Ganancia Prom.</div></div>
+                <div class="stat-box"><div class="stat-value" id="statWinrate">0%</div><div class="stat-label">Winrate</div></div>
+                <div class="stat-box"><div class="stat-value" id="statStreak">—</div><div class="stat-label">Racha</div></div>
+                <div class="stat-box"><div class="stat-value" id="statBest">$0</div><div class="stat-label">Mejor sesión</div></div>
+                <div class="stat-box"><div class="stat-value" id="statWorst">$0</div><div class="stat-label">Peor sesión</div></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header"><h3>📈 Evolución del Bankroll</h3><span id="chartFilterHint" style="font-size:11px;color:var(--text-3);font-weight:600;"></span></div>
+                <div class="chart-wrapper"><canvas id="bankrollChart"></canvas></div>
+            </div>
+
+            <div class="footer-credits">
+                Creado por <strong>RangeSoft®</strong>
+                <span class="version">Bankroll Lab · © 2026</span>
+            </div>
+        </div>
+
+        <!-- AÑADIR TORNEO -->
+        <div class="tab-content" id="tab-add">
+            <div class="card">
+                <div class="section-header"><h2 id="formTitle" data-i18n="tr.registerTournament">Registrar Torneo</h2></div>
+                <input type="hidden" id="editIndex" value="-1">
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>Sala / Room</label>
+                        <select id="tourneySite" onchange="onTourneySiteChange()">
+                            <option value="CoinPoker">CoinPoker</option>
+                            <option value="ACR">ACR</option>
+                            <option value="__other__">Otro…</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre del torneo</label>
+                        <input type="text" id="tourneyName" placeholder="Ej: Sunday Million">
+                    </div>
+                </div>
+                <div class="form-group" id="tourneySiteCustomWrap" style="display:none;">
+                    <label>Nombre de la sala</label>
+                    <input type="text" id="tourneySiteCustom" placeholder="Ej: GGPoker, WPN…" autocomplete="off">
+                </div>
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>Coste entrada ($)</label>
+                        <input type="number" id="tourneyCost" placeholder="0 = freeroll" step="0.01" min="0" inputmode="decimal">
+                    </div>
+                    <div class="form-group">
+                        <label>Reentradas</label>
+                        <input type="number" id="tourneyRebuys" placeholder="0" value="0" min="0" inputmode="numeric">
+                    </div>
+                </div>
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>Ganancia ($)</label>
+                        <input type="number" id="tourneyWin" placeholder="0" value="0" step="0.01" inputmode="decimal">
+                    </div>
+                    <div class="form-group">
+                        <label>Posición</label>
+                        <input type="number" id="tourneyPos" min="1" step="1" placeholder="Posición (ej: 3)">
+                    </div>
+                </div>
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="tourneyType">
+                            <option value="Freeroll">Freeroll</option>
+                            <option value="GTD">GTD</option>
+                            <option value="Bounty">Bounty</option>
+                            <option value="Mystery">Mystery</option>
+                            <option value="PKO">PKO</option>
+                            <option value="Satélite">Satélite</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Velocidad</label>
+                        <select id="tourneySpeed">
+                            <option value="Regular">Regular</option>
+                            <option value="Turbo">Turbo</option>
+                            <option value="Hyper">Hyper</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row-2">
+                    <div class="form-group">
+                        <label>Jugadores</label>
+                        <input type="number" id="tourneyPlayers" placeholder="Ej: 500" inputmode="numeric">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" id="tourneyDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notas</label>
+                    <textarea id="tourneyNotes" placeholder="Bad beat, error propio, etc."></textarea>
+                </div>
+                <button class="btn" onclick="saveTournament()" id="saveBtn">💾 Guardar Torneo</button>
+                <button class="btn btn-secondary btn-small" onclick="cancelEdit()" id="cancelBtn" style="display:none; width:100%; margin-top:8px;">Cancelar edición</button>
+            </div>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="tab-content" id="tab-history">
+            <div class="section-header">
+                <h2 data-i18n="tr.history">Historial</h2>
+                <div class="hist-header-actions">
+                    <button class="btn btn-secondary btn-small" onclick="exportHistoryCSV()" title="Exportar CSV">📤 CSV</button>
+                    <button class="btn btn-secondary btn-small" onclick="clearHistory()">Borrar todo</button>
+                </div>
+            </div>
+
+            <div class="hist-toolbar">
+                <input type="search" id="histSearch" placeholder="🔍 Buscar por nombre, sala, notas, tipo…"
+                    oninput="onHistSearch()">
+                <button type="button" class="hist-filter-btn" id="histFilterBtn" onclick="openHistFilterModal()">
+                    <span class="hfb-icon">⚙️</span>
+                    <span class="hfb-label">Filtrar</span>
+                    <span class="hfb-badge" id="histFilterBadge" style="display:none;">0</span>
+                </button>
+            </div>
+
+            <div class="hist-active-filters" id="histActiveFilters"></div>
+
+            <div id="histSummaryBar" style="display:none;font-size:12px;color:var(--text-3);margin:8px 0;font-weight:600;"></div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="/" class="nav-item" style="text-decoration:none;">
+            <span class="icon">🏠</span><span>Portal</span>
+        </a>
+        <button class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard', this)">
+            <span class="icon">📊</span><span data-i18n="tr.home">Inicio</span>
+        </button>
+        <button class="nav-item" data-tab="add" onclick="switchTab('add', this)">
+            <span class="icon">➕</span><span>Añadir</span>
+        </button>
+        <button class="nav-item" data-tab="history" onclick="switchTab('history', this)">
+            <span class="icon">📜</span><span data-i18n="tr.history">Historial</span>
+        </button>
+        <button class="nav-item" type="button" onclick="openMenu()">
+            <span class="icon">☰</span><span>Menú</span>
+        </button>
+    </div>
+</div>
+
+<!-- HAMBURGER MENU OVERLAY (drawer style, consistent with other tools) -->
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenuIfOverlay(event)">
+    <div class="side-menu" onclick="event.stopPropagation()">
+        <div class="menu-header">
+            <div class="menu-header-brand">
+                <div class="menu-logo">💰</div>
+                <div class="menu-brand-text">
+                    <div class="menu-brand-title">Bankroll <span>Lab</span></div>
+                    <div class="menu-brand-sub"><span data-i18n="tr.subtitle">Torneos · ROI · RangeLab</span></div>
+                </div>
+            </div>
+            <button class="menu-close" onclick="closeMenu()" aria-label="Cerrar menú" data-i18n-aria="nav.closeMenu">✕</button>
+        </div>
+        <div class="menu-items">
+            <button class="menu-item" onclick="window.location.href='/'; closeMenu();">
+                <span class="mi-icon">🏠</span>
+                <span class="mi-text">
+                    <span data-i18n="nav.backPortal">Volver al portal</span>
+                    <div class="mi-sub" data-i18n="nav.backPortalDesc">RangeLab Suite</div>
+                </span>
+            </button>
+            <div class="menu-divider"></div>
+            <button class="menu-item" onclick="openWallet('deposit'); closeMenu();">
+                <span class="mi-icon">⬇️</span>
+                <span class="mi-text">
+                    <span data-i18n="tr.deposit">Depositar</span>
+                    <div class="mi-sub"><span data-i18n="tr.depositDesc">Añadir fondos al bankroll</span></div>
+                </span>
+            </button>
+            <button class="menu-item" onclick="openWallet('withdraw'); closeMenu();">
+                <span class="mi-icon">⬆️</span>
+                <span class="mi-text">
+                    <span data-i18n="tr.withdraw">Retirar</span>
+                    <div class="mi-sub"><span data-i18n="tr.withdrawDesc">Sacar fondos del bankroll</span></div>
+                </span>
+            </button>
+            <div class="menu-divider"></div>
+            <button class="menu-item" onclick="toggleTheme(); closeMenu();">
+                <span class="mi-icon" id="menuThemeIcon">🌙</span>
+                <span class="mi-text">
+                    Cambiar tema
+                    <div class="mi-sub" id="menuThemeSub">Modo oscuro</div>
+                </span>
+            </button>
+            <button class="menu-item" onclick="refreshFromServer(); closeMenu();">
+                <span class="mi-icon">🔄</span>
+                <span class="mi-text">
+                    Sincronizar
+                    <div class="mi-sub">Recargar datos del servidor</div>
+                </span>
+            </button>
+            <button class="menu-item" onclick="openBackupModal(); closeMenu();">
+                <span class="mi-icon">⚙️</span>
+                <span class="mi-text">
+                    Datos y Backup
+                    <div class="mi-sub">Exportar / Importar JSON</div>
+                </span>
+            </button>
+            <button class="menu-item" onclick="openResetModal(); closeMenu();">
+                <span class="mi-icon">🔄</span>
+                <span class="mi-text">
+                    Reiniciar todo
+                    <div class="mi-sub">Borrar historial y capital (empezar de cero)</div>
+                </span>
+            </button>
+            <div class="menu-divider"></div>
+            <div class="lang-menu-row">
+              <span class="lmr-label">
+                <span class="lmr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+                <span data-i18n="common.language">Idioma</span>
+              </span>
+              <div class="rl-lang-toggle" role="group" aria-label="Language">
+                <button type="button" data-lang-set="es" title="Español">ES</button>
+                <button type="button" data-lang-set="en" title="English">EN</button>
+              </div>
+            </div>
+            <div class="menu-divider"></div>
+            <button class="menu-item" onclick="openHelpModal(); closeMenu();">
+                <span class="mi-icon">❓</span>
+                <span class="mi-text">
+                    Ayuda
+                    <div class="mi-sub">Cómo usar la app</div>
+                </span>
+            </button>
+            <div class="menu-divider"></div>
+            <button class="menu-item" onclick="logout(); closeMenu();">
+                <span class="mi-icon">🚪</span>
+                <span class="mi-text">
+                    Cerrar sesión
+                    <div class="mi-sub" id="logoutUser">—</div>
+                </span>
+            </button>
+        </div>
+        <div class="menu-footer">
+            Bankroll Lab · <strong>RangeLab</strong><br>
+            <span class="rl-site-footer">Creado por RangeSoft® · © 2026</span>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- WELCOME MODAL -->
+<div class="modal-overlay" id="welcomeModal">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="welcome-content">
+            <div class="welcome-icon">👋</div>
+            <div class="welcome-title">¡Bienvenido!</div>
+            <div class="welcome-desc">
+                Para empezar, dinos cuál es tu capital inicial de póker. <br>
+                Después podrás <strong style="color:var(--green);">depositar</strong> o <strong style="color:var(--red);">retirar</strong> cuando quieras.
+            </div>
+            <div class="welcome-input-wrap">
+                <span class="currency">$</span>
+                <input type="number" id="welcomeAmount" placeholder="0.00" step="0.01" inputmode="decimal" autocomplete="off">
+            </div>
+            <button class="btn" onclick="confirmWelcome()" style="background: linear-gradient(135deg, var(--blue), var(--blue-dark));">
+                🚀 Empezar
+            </button>
+            <div style="margin: 18px 0 10px; display:flex; align-items:center; gap:10px; color:var(--text-muted); font-size:0.78rem;">
+                <span style="flex:1; height:1px; background:var(--border);"></span>
+                <span>o</span>
+                <span style="flex:1; height:1px; background:var(--border);"></span>
+            </div>
+            <button class="btn btn-secondary" onclick="document.getElementById('welcomeImportFile').click()" style="margin-top:0;">
+                📥 Importar backup JSON
+            </button>
+            <input type="file" id="welcomeImportFile" accept=".json,application/json" style="display:none;" onchange="importData(event, { fromWelcome: true })">
+            <p style="color:var(--text-muted); font-size:0.75rem; margin-top:10px; line-height:1.45;">
+                Si ya tienes un archivo de Bankroll Lab exportado, cárgalo aquí y recuperamos torneos, depósitos y capital.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- IMPORT CHOICE MODAL (sumar vs reemplazar) -->
+<div class="modal-overlay" id="importChoiceModal">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <h2>📥 Importar backup</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 12px;">
+            Ya tienes datos en Bankroll Lab. ¿Cómo quieres importar el archivo?
+        </p>
+        <div id="importChoiceSummary" style="background:var(--bg-2, rgba(255,255,255,0.04)); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:16px; font-size:0.82rem; color:var(--text-muted); line-height:1.5;"></div>
+        <button class="btn" style="background: linear-gradient(135deg, var(--blue), var(--blue-dark));" onclick="confirmImportChoice('merge')">
+            ➕ Sumar a lo existente
+        </button>
+        <p style="color:var(--text-muted); font-size:0.75rem; margin:6px 0 14px; line-height:1.4;">
+            Añade solo entradas nuevas. Se detectan y omiten duplicados (mismo torneo o mismo movimiento).
+        </p>
+        <button class="btn" style="background: linear-gradient(135deg, var(--red), #c62828);" onclick="confirmImportChoice('replace')">
+            🔄 Quitar todo e importar de cero
+        </button>
+        <p style="color:var(--text-muted); font-size:0.75rem; margin:6px 0 14px; line-height:1.4;">
+            Borra torneos, depósitos y retiros actuales y carga solo lo del archivo.
+        </p>
+        <button class="btn btn-secondary" onclick="cancelImportChoice()" style="margin-top:4px;">
+            Cancelar
+        </button>
+    </div>
+</div>
+
+<!-- WALLET MODAL -->
+<div class="modal-overlay" id="walletModal">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="wallet-modal-header">
+            <div class="wallet-modal-icon" id="walletIcon">⬇️</div>
+            <div class="wallet-modal-title" id="walletTitle">Depositar</div>
+            <div class="wallet-modal-sub" id="walletSub">Añade fondos a tu bankroll</div>
+        </div>
+
+        <div class="wallet-balance-preview" id="walletPreview">
+            <div class="wallet-balance-label">Nuevo capital</div>
+            <div class="wallet-balance-value" id="walletNewBalance">$0.00</div>
+        </div>
+
+        <div class="wallet-amount-input">
+            <span class="currency">$</span>
+            <input type="number" id="walletAmount" placeholder="0.00" step="0.01" inputmode="decimal" autocomplete="off">
+        </div>
+
+        <div class="quick-amounts" id="quickAmounts"></div>
+
+        <div class="form-group" style="margin-top:12px; margin-bottom:4px;">
+            <label style="font-size:0.78rem; color:var(--text-muted);">Notas <span style="opacity:0.7;">(opcional)</span></label>
+            <textarea id="walletNotes" placeholder="Ej: transfer desde bank, bono, cashout ACR…" maxlength="500" rows="2" style="min-height:48px;"></textarea>
+        </div>
+
+        <button class="wallet-confirm-btn" id="walletConfirmBtn" onclick="confirmWallet()" disabled>
+            Confirmar
+        </button>
+        <button class="wallet-cancel-btn" onclick="closeWallet()">Cancelar</button>
+    </div>
+</div>
+
+<!-- EDIT TRANSACTION NOTES MODAL -->
+<div class="modal-overlay" id="txNotesModal">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="wallet-modal-header">
+            <div class="wallet-modal-icon" id="txNotesIcon">📝</div>
+            <div class="wallet-modal-title" id="txNotesTitle">Notas del movimiento</div>
+            <div class="wallet-modal-sub" id="txNotesSub">Depósito / Retiro</div>
+        </div>
+        <div class="form-group" style="margin-top:8px; margin-bottom:4px;">
+            <label style="font-size:0.78rem; color:var(--text-muted);">Notas <span style="opacity:0.7;">(opcional)</span></label>
+            <textarea id="txNotesInput" placeholder="Ej: transfer desde bank, bono, cashout ACR…" maxlength="500" rows="3" style="min-height:72px;"></textarea>
+        </div>
+        <button class="wallet-confirm-btn deposit" id="txNotesSaveBtn" onclick="saveTxNotes()">
+            💾 Guardar notas
+        </button>
+        <button class="wallet-cancel-btn" onclick="closeTxNotes()">Cancelar</button>
+    </div>
+</div>
+
+<!-- BACKUP MODAL -->
+<div class="modal-overlay" id="backupModal">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <h2>⚙️ Datos y Backup</h2>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+            Exporta tus datos a JSON o importa un archivo. Los datos viven en el servidor, no en tu navegador.
+        </p>
+        <button class="btn" onclick="exportData()">📤 Exportar datos (JSON)</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()" style="margin-top:8px;">📥 Importar datos</button>
+        <input type="file" id="importFile" accept=".json,application/json" style="display:none;" onchange="importData(event)">
+        <button class="btn btn-secondary" onclick="closeModal('backupModal')" style="margin-top:8px;">Cerrar</button>
+        <div style="text-align:center; margin-top:18px; padding-top:14px; border-top:1px solid var(--border); color: var(--text-muted); font-size:0.68rem;">
+            Bankroll Lab · Creado por <strong style="color: var(--blue);">RangeSoft®</strong> · © 2026
+        </div>
+    </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="modal-overlay" id="resetModal">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <h2>🔄 Reiniciar todo</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 16px;">
+            Esto <strong style="color:var(--red);">borrará TODOS tus datos</strong> del servidor:
+        </p>
+        <ul style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.7; margin: 0 0 16px 18px; padding: 0;">
+            <li>📜 Todo el historial de torneos</li>
+            <li>💸 Todos los depósitos y retiros</li>
+            <li>💰 El capital actual (volverá a $0.00)</li>
+        </ul>
+        <p style="color: var(--red); font-size: 0.82rem; font-weight: 700; margin-bottom: 16px;">
+            ⚠️ Esta acción NO se puede deshacer.
+        </p>
+        <button class="btn" style="background: linear-gradient(135deg, var(--red), #c62828);" onclick="confirmReset()">
+            🔄 Sí, reiniciar todo
+        </button>
+        <button class="btn btn-secondary" onclick="closeModal('resetModal')" style="margin-top:8px;">
+            Cancelar
+        </button>
+    </div>
+</div>
+
+<!-- HIST FILTER MODAL -->
+<div class="modal-overlay" id="histFilterModal" onclick="onHistFilterOverlayClick(event)">
+    <div class="modal hist-filter-modal" role="dialog" aria-modal="true" aria-labelledby="histFilterTitle" onclick="event.stopPropagation()">
+        <div class="modal-handle"></div>
+        <div class="hist-filter-header">
+            <h2 id="histFilterTitle">⚙️ Filtrar historial</h2>
+            <button type="button" class="hist-filter-close" onclick="closeHistFilterModal()" aria-label="Cerrar">✕</button>
+        </div>
+
+        <div class="hist-filter-tabs" role="tablist">
+            <button type="button" class="hist-ftab active" data-ftab="period" onclick="switchHistFilterTab('period', this)" role="tab">📅 Periodo</button>
+            <button type="button" class="hist-ftab" data-ftab="type" onclick="switchHistFilterTab('type', this)" role="tab">📋 Tipo</button>
+            <button type="button" class="hist-ftab" data-ftab="site" onclick="switchHistFilterTab('site', this)" role="tab">🏠 Sala</button>
+        </div>
+
+        <div class="hist-filter-body">
+            <!-- Tab Periodo -->
+            <div class="hist-ftab-panel active" id="histFtab-period" role="tabpanel">
+                <div class="hist-fsection-label">Atajos</div>
+                <div class="hist-fchips" id="histPeriodChips">
+                    <button type="button" class="filter-chip active" data-period="all" onclick="pickHistPeriod('all', this)">Todos</button>
+                    <button type="button" class="filter-chip" data-period="today" onclick="pickHistPeriod('today', this)">Hoy</button>
+                    <button type="button" class="filter-chip" data-period="week" onclick="pickHistPeriod('week', this)">7 días</button>
+                    <button type="button" class="filter-chip" data-period="month" onclick="pickHistPeriod('month', this)">30 días</button>
+                    <button type="button" class="filter-chip" data-period="thisMonth" onclick="pickHistPeriod('thisMonth', this)">Este mes</button>
+                    <button type="button" class="filter-chip" data-period="lastMonth" onclick="pickHistPeriod('lastMonth', this)">Mes pasado</button>
+                    <button type="button" class="filter-chip" data-period="thisYear" onclick="pickHistPeriod('thisYear', this)">Este año</button>
+                    <button type="button" class="filter-chip" data-period="range" onclick="pickHistPeriod('range', this)">📅 Personalizado</button>
+                </div>
+                <div class="hist-custom-range" id="histCustomRange" style="display:none;">
+                    <div class="hist-fsection-label">Rango personalizado</div>
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label>Desde</label>
+                            <input type="date" id="rangeFrom">
+                        </div>
+                        <div class="form-group">
+                            <label>Hasta</label>
+                            <input type="date" id="rangeTo">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Tipo -->
+            <div class="hist-ftab-panel" id="histFtab-type" role="tabpanel">
+                <div class="hist-fsection-label">Tipo de movimiento</div>
+                <div class="hist-fchips" id="histTypeChips">
+                    <button type="button" class="filter-chip active" data-htype="all" onclick="pickHistType('all', this)">Todos</button>
+                    <button type="button" class="filter-chip" data-htype="tourney" onclick="pickHistType('tourney', this)">Torneos</button>
+                    <button type="button" class="filter-chip" data-htype="deposit" onclick="pickHistType('deposit', this)">Depósitos</button>
+                    <button type="button" class="filter-chip" data-htype="withdraw" onclick="pickHistType('withdraw', this)">Retiros</button>
+                </div>
+            </div>
+
+            <!-- Tab Sala -->
+            <div class="hist-ftab-panel" id="histFtab-site" role="tabpanel">
+                <div class="hist-fsection-label">Sala / Room</div>
+                <div class="hist-fchips" id="siteFilters">
+                    <button type="button" class="filter-chip active" data-site-filter="all" onclick="pickHistSite('all', this)">Todas las salas</button>
+                    <button type="button" class="filter-chip" data-site-filter="CoinPoker" onclick="pickHistSite('CoinPoker', this)">CoinPoker</button>
+                    <button type="button" class="filter-chip" data-site-filter="ACR" onclick="pickHistSite('ACR', this)">ACR</button>
+                    <span id="customSiteFilterChips"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hist-filter-footer">
+            <button type="button" class="btn btn-secondary" onclick="clearAllHistFilters()">🗑️ Limpiar</button>
+            <button type="button" class="btn" onclick="applyHistFiltersFromModal()">✅ Aplicar</button>
+        </div>
+    </div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpModal">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <h2>❓ Ayuda</h2>
+        <div class="help-section">
+            <h4>📊 Dashboard</h4>
+            <p>Capital, depósitos/retiros, ROI, ITM, winrate, rachas y mejor/peor sesión. Los chips (Hoy, 7 días, Este mes, 📅 Rango) filtran solo las stats y el gráfico; no afectan al historial. El toggle <strong>FREEROLL</strong>: marcado = se muestran en las estadísticas; sin marcar = se ocultan de las stats de rentabilidad (ROI, ITM, winrate…) pero siguen sumando al capital real.</p>
+        </div>
+        <div class="help-section">
+            <h4>➕ Añadir torneo</h4>
+            <p>Registra nombre, buy-in, reentradas, premio, posición, tipo, velocidad, <strong>sala (ACR / CoinPoker / otra)</strong>, jugadores, fecha y notas. Las salas personalizadas se guardan y aparecen en el desplegable la próxima vez. El capital se actualiza en el servidor. Si el coste es 0, el tipo se marca como <strong>Freeroll</strong> automáticamente.</p>
+        </div>
+        <div class="help-section">
+            <h4>📜 Historial</h4>
+            <p>Pulsa <strong>Filtrar</strong> para abrir el panel: Periodo (hoy, 7/30 días, rango personalizado), Tipo (torneos, depósitos, retiros) y Sala. Los filtros se combinan y no se pierden. Buscador por nombre, sala o notas. Exporta el listado filtrado a CSV. Editar o eliminar entradas.</p>
+        </div>
+        <div class="help-section">
+            <h4>🔄 Reiniciar todo</h4>
+            <p>Borra todo el historial y el capital, dejando la app como nueva. Se encuentra en el menú lateral. Requiere doble confirmación.</p>
+        </div>
+        <div class="help-section">
+            <h4>📥 Importar / Exportar JSON</h4>
+            <p>Desde el menú <strong>Datos y Backup</strong> puedes exportar un JSON con torneos, movimientos y capital. Al importar: si no hay datos (o desde la pantalla de bienvenida) se carga de cero; si ya hay datos, eliges <strong>sumar sin duplicados</strong> o <strong>reemplazar todo</strong>.</p>
+        </div>
+        <div class="help-section">
+            <h4>☁️ Sincronización</h4>
+            <p>Tus datos se guardan de forma segura. Puedes acceder desde cualquier dispositivo con tu cuenta y todo estará sincronizado.</p>
+        </div>
+        <button class="btn btn-secondary" onclick="closeModal('helpModal')" style="margin-top:8px;">Cerrar</button>
+    </div>
+</div>
+
+<script src="/static/js/api-client.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════ */
+let state = {
+    bankroll: 0,
+    initialBankroll: 0,
+    tournaments: [],
+    transactions: [],
+    theme: 'dark',
+    /* historial: periodo y tipo son independientes y se combinan */
+    histPeriod: 'all',   /* all | today | week | month | thisMonth | lastMonth | thisYear | range */
+    histType: 'all',     /* all | tourney | deposit | withdraw */
+    filter: 'all',       /* legacy alias; se sincroniza con histPeriod/histType */
+    siteFilter: 'all',
+    rangeFrom: '',
+    rangeTo: '',
+    histSearch: '',
+    welcomeShown: false,
+    dashFilter: 'all',
+    dashFrom: '',
+    dashTo: '',
+    excludeFreerolls: false
+};
+
+/* borradores del modal de filtros (se aplican al pulsar Aplicar) */
+let _histDraft = { period: 'all', type: 'all', site: 'all', rangeFrom: '', rangeTo: '' };
+
+let currentWalletMode = 'deposit';
+let currentUser = null;
+let chartInstance = null;
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════════════════ */
+function setLoading(on) {
+    document.getElementById('loadingOverlay').classList.toggle('show', on);
+    if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(on);
+    else document.body.classList.toggle('rl-loading', !!on);
+}
+
+function setConnStatus(status, text) {
+    const el = document.getElementById('connIndicator');
+    if (el) {
+      el.classList.remove('online', 'offline');
+      if (status) el.classList.add(status);
+      const ct = el.querySelector('.ctext');
+      if (ct) ct.textContent = text || 'Conn';
+    }
+    const udot = document.querySelector('.user-chip .udot');
+    if (udot) {
+      udot.style.background = status === 'online' ? 'var(--green)' : (status === 'offline' ? 'var(--red)' : 'var(--text-3)');
+      udot.style.boxShadow = status === 'online' ? '0 0 8px var(--green)' : 'none';
+    }
+    const chip = document.querySelector('.user-chip');
+    if (chip) {
+      chip.classList.remove('online', 'offline');
+      if (status) chip.classList.add(status);
+      chip.title = status === 'online' ? 'Conectado · Sesión actual' : (status === 'offline' ? 'Sesión actual' : 'Sesión actual');
+    }
+}
+
+function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SERVER SYNC
+   ═══════════════════════════════════════════════════════════ */
+async function loadUser() {
+    try {
+        const me = await FeltLabAPI.auth.me();
+        if (!me.authenticated) {
+            window.location.href = '/login';
+            return false;
+        }
+        currentUser = me.user;
+        document.getElementById('userName').textContent = me.user.display_name || me.user.username;
+        document.getElementById('logoutUser').textContent = '@' + me.user.username;
+        return true;
+    } catch (e) {
+        console.error('Error cargando usuario:', e);
+        return false;
+    }
+}
+
+function applyTrackerPayload(payload) {
+    if (!payload) return;
+    if (payload.bankroll != null) state.bankroll = Number(payload.bankroll) || 0;
+    if (payload.initialBankroll != null) state.initialBankroll = Number(payload.initialBankroll) || 0;
+    if (payload.theme) state.theme = payload.theme;
+    if (payload.welcomeShown != null) state.welcomeShown = !!payload.welcomeShown;
+    if (Array.isArray(payload.tournaments)) {
+        state.tournaments = payload.tournaments.map(t => ({
+            id: t.id,
+            name: t.name,
+            cost: Number(t.cost) || 0,
+            baseCost: Number(t.baseCost != null ? t.baseCost : (t.base_cost != null ? t.base_cost : t.cost)) || 0,
+            rebuys: t.rebuys || 0,
+            win: Number(t.win) || 0,
+            pos: t.pos != null ? t.pos : t.position,
+            type: t.type,
+            speed: t.speed,
+            site: t.site || '',
+            players: t.players,
+            date: toDateStr(t.date) || toDateStr(t.created_at) || '',
+            notes: t.notes || ''
+        }));
+    }
+    if (Array.isArray(payload.transactions)) {
+        state.transactions = payload.transactions.map(tx => ({
+            id: tx.id,
+            type: tx.type,
+            amount: Number(tx.amount) || 0,
+            date: toDateStr(tx.date) || todayStr(),
+            notes: tx.notes || ''
+        }));
+    }
+    try { refreshSiteOptions(); refreshCustomSiteFilterChips(); } catch (_) {}
+}
+
+function cacheTrackerState() {
+    if (!window.RangeLabSkeleton) return;
+    RangeLabSkeleton.saveCache('tracker', {
+        bankroll: state.bankroll,
+        initialBankroll: state.initialBankroll,
+        theme: state.theme,
+        welcomeShown: state.welcomeShown,
+        tournaments: state.tournaments,
+        transactions: state.transactions
+    });
+}
+
+async function loadStateFromServer() {
+    setConnStatus('', 'Sync');
+    // Mostrar caché al instante (también sin red)
+    if (window.RangeLabSkeleton) {
+        const cached = RangeLabSkeleton.loadCache('tracker');
+        if (cached) {
+            applyTrackerPayload(cached);
+            try { updateUI(); } catch (_) {}
+        }
+    }
+    try {
+        const [serverState, tournaments, transactions] = await Promise.all([
+            FeltLabAPI.tracker.getState(),
+            FeltLabAPI.tracker.listTournaments(),
+            FeltLabAPI.tracker.listTransactions()
+        ]);
+
+        state.bankroll = serverState.bankroll;
+        state.initialBankroll = serverState.initial_bankroll;
+        state.theme = serverState.theme || 'dark';
+        state.welcomeShown = !!serverState.welcome_shown;
+
+        state.tournaments = tournaments.map(t => ({
+            id: t.id,
+            name: t.name,
+            cost: Number(t.cost) || 0,
+            baseCost: Number(t.base_cost != null ? t.base_cost : t.cost) || 0,
+            rebuys: t.rebuys || 0,
+            win: Number(t.win) || 0,
+            pos: t.position,
+            type: t.type,
+            speed: t.speed,
+            site: t.site || '',
+            players: t.players,
+            date: toDateStr(t.date) || toDateStr(t.created_at) || '',
+            notes: t.notes
+        }));
+        refreshSiteOptions();
+        refreshCustomSiteFilterChips();
+
+        state.transactions = transactions.map(tx => ({
+            id: tx.id,
+            type: tx.type,
+            amount: Number(tx.amount) || 0,
+            date: toDateStr(tx.date) || todayStr(),
+            notes: tx.notes || ''
+        }));
+
+        cacheTrackerState();
+        setConnStatus('online', 'Online');
+        if (window.RangeLabSkeleton) RangeLabSkeleton.setOffline(false);
+        return true;
+    } catch (e) {
+        console.error('Error cargando datos:', e);
+        setConnStatus('offline', 'Offline');
+        if (window.RangeLabSkeleton) RangeLabSkeleton.setOffline(true);
+        const cached = window.RangeLabSkeleton && RangeLabSkeleton.loadCache('tracker');
+        if (cached) {
+            applyTrackerPayload(cached);
+            /* offline silencioso */
+            return true; // UI usable offline
+        }
+        showToast('Error de conexión con el servidor', 'error');
+        return false;
+    }
+}
+
+async function refreshFromServer() {
+    setLoading(true);
+    const ok = await loadStateFromServer();
+    if (ok) {
+        applyTheme();
+        updateUI();
+        showToast('Datos sincronizados ✓', 'success');
+    }
+    setLoading(false);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MENU
+   ═══════════════════════════════════════════════════════════ */
+function openMenu() {
+    document.getElementById('menuOverlay').classList.add('show');
+    updateMenuThemeLabels();
+}
+function closeMenu() {
+    document.getElementById('menuOverlay').classList.remove('show');
+}
+function closeMenuIfOverlay(e) {
+    if (e.target.id === 'menuOverlay') closeMenu();
+}
+
+function updateMenuThemeLabels() {
+    const icon = document.getElementById('menuThemeIcon');
+    const sub = document.getElementById('menuThemeSub');
+    if (state.theme === 'dark') {
+        icon.textContent = '☀️';
+        sub.textContent = 'Cambiar a modo claro';
+    } else {
+        icon.textContent = '🌙';
+        sub.textContent = 'Cambiar a modo oscuro';
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════ */
+async function init() {
+    if (window.RangeLabSkeleton) {
+        RangeLabSkeleton.setLoading(true);
+        RangeLabSkeleton.registerSW('/sw.js');
+    } else {
+        document.body.classList.add('rl-loading');
+    }
+
+    const ok = await loadUser();
+    if (!ok) return;
+
+    await loadStateFromServer();
+    applyTheme();
+    loadFreerollPref();
+
+    document.getElementById('tourneyDate').valueAsDate = new Date();
+    updateUI();
+    if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+    else document.body.classList.remove('rl-loading');
+
+    setTimeout(() => {
+        document.getElementById('splash').classList.add('hide');
+    if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+        document.getElementById('app').classList.add('visible');
+        setTimeout(() => {
+            const s = document.getElementById('splash');
+            if (s) s.remove();
+            updateChart();
+        }, 700);
+
+        if (!state.welcomeShown) {
+            setTimeout(() => {
+                document.getElementById('welcomeModal').classList.add('show');
+                setTimeout(() => document.getElementById('welcomeAmount').focus(), 400);
+            }, 200);
+        }
+    }, 900);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WELCOME
+   ═══════════════════════════════════════════════════════════ */
+async function confirmWelcome() {
+    const input = document.getElementById('welcomeAmount');
+    const val = parseFloat(input.value);
+    if (isNaN(val) || val < 0) {
+        showToast('Ingresa un número válido', 'error');
+        return;
+    }
+    try {
+        setLoading(true);
+        await FeltLabAPI.tracker.setState({
+            bankroll: val,
+            initial_bankroll: val,
+            welcome_shown: true
+        });
+        state.bankroll = val;
+        state.initialBankroll = val;
+        state.welcomeShown = true;
+        updateUI();
+        document.getElementById('welcomeModal').classList.remove('show');
+        showToast('¡Listo! Capital inicial: $' + val.toFixed(2), 'success');
+    } catch (e) {
+        showToast('Error al guardar: ' + e.message, 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THEME
+   ═══════════════════════════════════════════════════════════ */
+function applyTheme() {
+    /* El tema (claro/oscuro) es único para toda la suite — ver /static/js/theme.js.
+       Bankroll Lab ya no mantiene su propio tema aislado: solo lee el actual. */
+    state.theme = (window.RangeLabTheme ? window.RangeLabTheme.current() : document.documentElement.getAttribute('data-theme')) || 'dark';
+    document.documentElement.setAttribute('data-theme', state.theme);
+    updateMenuThemeLabels();
+}
+
+async function toggleTheme() {
+    if (window.RangeLabTheme) {
+        window.RangeLabTheme.toggle();
+        state.theme = window.RangeLabTheme.current();
+    } else {
+        state.theme = state.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', state.theme);
+    }
+    updateMenuThemeLabels();
+    updateChart();
+    try {
+        await FeltLabAPI.tracker.setState({ theme: state.theme });
+    } catch (e) {
+        console.warn('No se pudo guardar el tema:', e);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABS
+   ═══════════════════════════════════════════════════════════ */
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.toggle('active', n.dataset.tab === tab);
+    });
+    document.querySelectorAll('.desktop-nav .dn-item').forEach(n => {
+        n.classList.toggle('active', n.dataset.tab === tab);
+    });
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (tab === 'dashboard') {
+        requestAnimationFrame(() => requestAnimationFrame(() => updateChart()));
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WALLET
+   ═══════════════════════════════════════════════════════════ */
+function openWallet(mode) {
+    currentWalletMode = mode;
+    const modal = document.getElementById('walletModal');
+    const icon = document.getElementById('walletIcon');
+    const title = document.getElementById('walletTitle');
+    const sub = document.getElementById('walletSub');
+    const confirmBtn = document.getElementById('walletConfirmBtn');
+    const preview = document.getElementById('walletPreview');
+    const input = document.getElementById('walletAmount');
+
+    input.value = '';
+    const notesEl = document.getElementById('walletNotes');
+    if (notesEl) notesEl.value = '';
+    updateWalletPreview();
+
+    if (mode === 'deposit') {
+        icon.textContent = '⬇️';
+        icon.className = 'wallet-modal-icon deposit';
+        title.textContent = 'Depositar';
+        sub.textContent = 'Añade fondos a tu bankroll';
+        confirmBtn.textContent = '💵 Confirmar Depósito';
+        confirmBtn.className = 'wallet-confirm-btn deposit';
+        preview.className = 'wallet-balance-preview deposit';
+    } else {
+        icon.textContent = '⬆️';
+        icon.className = 'wallet-modal-icon withdraw';
+        title.textContent = 'Retirar';
+        sub.textContent = 'Retira fondos de tu bankroll';
+        confirmBtn.textContent = '💸 Confirmar Retiro';
+        confirmBtn.className = 'wallet-confirm-btn withdraw';
+        preview.className = 'wallet-balance-preview withdraw';
+    }
+
+    const amounts = [10, 20, 50, 100, 200, 500];
+    const quickContainer = document.getElementById('quickAmounts');
+    quickContainer.innerHTML = '';
+    amounts.forEach(a => {
+        const btn = document.createElement('div');
+        btn.className = 'quick-amount ' + mode;
+        btn.textContent = (mode === 'deposit' ? '+' : '-') + '$' + a;
+        btn.onclick = () => {
+            input.value = a;
+            updateWalletPreview();
+        };
+        quickContainer.appendChild(btn);
+    });
+
+    modal.classList.add('show');
+    setTimeout(() => input.focus(), 300);
+}
+
+function closeWallet() {
+    document.getElementById('walletModal').classList.remove('show');
+}
+
+function updateWalletPreview() {
+    const input = document.getElementById('walletAmount');
+    const val = parseFloat(input.value) || 0;
+    const preview = document.getElementById('walletPreview');
+    const newBalanceEl = document.getElementById('walletNewBalance');
+    const confirmBtn = document.getElementById('walletConfirmBtn');
+
+    let newBalance = state.bankroll;
+    if (currentWalletMode === 'deposit') newBalance += val;
+    else newBalance -= val;
+
+    newBalanceEl.textContent = '$' + newBalance.toFixed(2);
+
+    if (val > 0) {
+        preview.classList.add('changed');
+        confirmBtn.disabled = false;
+    } else {
+        preview.classList.remove('changed');
+        confirmBtn.disabled = true;
+    }
+
+    if (currentWalletMode === 'withdraw' && val > state.bankroll) {
+        confirmBtn.disabled = true;
+        newBalanceEl.textContent = '$' + newBalance.toFixed(2) + ' ⚠️';
+    }
+}
+
+document.getElementById('walletAmount').addEventListener('input', updateWalletPreview);
+
+async function confirmWallet() {
+    const input = document.getElementById('walletAmount');
+    const val = parseFloat(input.value);
+    if (isNaN(val) || val <= 0) {
+        showToast('Ingresa un monto válido', 'error');
+        return;
+    }
+
+    if (currentWalletMode === 'withdraw' && val > state.bankroll) {
+        showToast('No tienes suficiente capital', 'error');
+        return;
+    }
+
+    const notes = (document.getElementById('walletNotes')?.value || '').trim();
+
+    setLoading(true);
+    try {
+        await FeltLabAPI.tracker.createTransaction({
+            type: currentWalletMode,
+            amount: val,
+            notes: notes || undefined
+        });
+
+        if (currentWalletMode === 'deposit') {
+            state.bankroll += val;
+            showToast(`Depósito de $${val.toFixed(2)} ✅`, 'success');
+        } else {
+            state.bankroll -= val;
+            showToast(`Retiro de $${val.toFixed(2)} ✅`, 'success');
+        }
+
+        await loadStateFromServer();
+        updateUI();
+        closeWallet();
+    } catch (e) {
+        showToast('Error: ' + (e.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOURNAMENTS
+   ═══════════════════════════════════════════════════════════ */
+async function saveTournament() {
+    const name = document.getElementById('tourneyName').value.trim();
+    const cost = parseFloat(document.getElementById('tourneyCost').value);
+    const rebuys = parseInt(document.getElementById('tourneyRebuys').value) || 0;
+    const win = parseFloat(document.getElementById('tourneyWin').value) || 0;
+    const pos = document.getElementById('tourneyPos').value.trim();
+    const type = document.getElementById('tourneyType').value;
+    const speed = document.getElementById('tourneySpeed').value;
+    const site = resolveTourneysite();
+    const players = parseInt(document.getElementById('tourneyPlayers').value) || 0;
+    const date = toDateStr(document.getElementById('tourneyDate').value) || todayStr();
+    const notes = document.getElementById('tourneyNotes').value.trim();
+    const editIdx = parseInt(document.getElementById('editIndex').value);
+
+    if (isNaN(cost) || cost < 0) {
+        showToast('Ingresa un coste de entrada válido (0 = freeroll)', 'error');
+        return;
+    }
+    if (!site) {
+        showToast('Indica la sala (ACR, CoinPoker u otra)', 'error');
+        return;
+    }
+
+    const totalCost = cost * (1 + rebuys);
+    const payload = {
+        name: name || 'Torneo sin nombre',
+        cost: totalCost,
+        base_cost: cost,
+        rebuys: rebuys,
+        win: win,
+        position: pos,
+        type: type,
+        speed: speed,
+        site: site,
+        players: players,
+        date: date,
+        notes: notes
+    };
+    rememberCustomSite(site);
+
+    setLoading(true);
+    try {
+        if (editIdx >= 0) {
+            const t = state.tournaments[editIdx];
+            await FeltLabAPI.tracker.updateTournament(t.id, payload);
+            showToast('Torneo actualizado ✅', 'success');
+            cancelEdit();
+        } else {
+            await FeltLabAPI.tracker.createTournament(payload);
+            showToast('Torneo guardado ✅', 'success');
+        }
+        resetForm();
+
+        await loadStateFromServer();
+        updateUI();
+        switchTab('dashboard');
+    } catch (e) {
+        showToast('Error: ' + (e.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+function editTournament(idx) {
+    const t = state.tournaments[idx];
+    if (!t) return;
+    document.getElementById('tourneyName').value = t.name;
+    document.getElementById('tourneyCost').value = t.baseCost || t.cost;
+    document.getElementById('tourneyRebuys').value = t.rebuys || 0;
+    document.getElementById('tourneyWin').value = t.win;
+    document.getElementById('tourneyPos').value = t.pos || '';
+    document.getElementById('tourneyType').value = t.type || 'GTD';
+    document.getElementById('tourneySpeed').value = t.speed || 'Regular';
+    setTourneysiteValue(t.site || '');
+    document.getElementById('tourneyPlayers').value = t.players || '';
+    document.getElementById('tourneyDate').value = toDateStr(t.date) || todayStr();
+    document.getElementById('tourneyNotes').value = t.notes || '';
+    document.getElementById('editIndex').value = idx;
+    document.getElementById('formTitle').textContent = 'Editar Torneo';
+    document.getElementById('saveBtn').textContent = '💾 Actualizar Torneo';
+    document.getElementById('cancelBtn').style.display = 'block';
+    switchTab('add');
+}
+
+function cancelEdit() {
+    resetForm();
+    document.getElementById('editIndex').value = -1;
+    document.getElementById('formTitle').textContent = 'Registrar Torneo';
+    document.getElementById('saveBtn').textContent = '💾 Guardar Torneo';
+    document.getElementById('cancelBtn').style.display = 'none';
+}
+
+function resetForm() {
+    ['tourneyName','tourneyCost','tourneyWin','tourneyPos','tourneyPlayers','tourneyNotes'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('tourneyRebuys').value = '0';
+    document.getElementById('tourneyWin').value = '0';
+    document.getElementById('tourneyType').value = 'GTD';
+    document.getElementById('tourneySpeed').value = 'Regular';
+    setTourneysiteValue('CoinPoker');
+    document.getElementById('tourneyDate').valueAsDate = new Date();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SALA / SITE (ACR · CoinPoker · personalizadas)
+   ═══════════════════════════════════════════════════════════ */
+const DEFAULT_SITES = ['CoinPoker', 'ACR'];
+const CUSTOM_SITES_KEY = 'rangelab-custom-sites';
+
+function getCustomSites() {
+    try {
+        const raw = localStorage.getItem(CUSTOM_SITES_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.filter(s => typeof s === 'string' && s.trim()) : [];
+    } catch (_) {
+        return [];
+    }
+}
+
+function saveCustomSites(list) {
+    try {
+        localStorage.setItem(CUSTOM_SITES_KEY, JSON.stringify(list));
+    } catch (_) {}
+}
+
+function rememberCustomSite(site) {
+    const s = String(site || '').trim();
+    if (!s || DEFAULT_SITES.includes(s)) return;
+    const list = getCustomSites();
+    const lower = s.toLowerCase();
+    if (list.some(x => x.toLowerCase() === lower)) return;
+    list.push(s);
+    saveCustomSites(list);
+    refreshSiteOptions();
+    refreshCustomSiteFilterChips();
+}
+
+function collectAllSites() {
+    const set = new Map();
+    DEFAULT_SITES.forEach(s => set.set(s.toLowerCase(), s));
+    getCustomSites().forEach(s => {
+        const k = s.toLowerCase();
+        if (!set.has(k)) set.set(k, s);
+    });
+    (state.tournaments || []).forEach(t => {
+        const s = String(t.site || '').trim();
+        if (!s) return;
+        const k = s.toLowerCase();
+        if (!set.has(k)) set.set(k, s);
+    });
+    return Array.from(set.values());
+}
+
+function refreshSiteOptions() {
+    const sel = document.getElementById('tourneySite');
+    if (!sel) return;
+    let prevVal = '';
+    if (sel.value === '__other__') {
+        prevVal = (document.getElementById('tourneySiteCustom')?.value || '').trim();
+    } else {
+        prevVal = (sel.value || '').trim();
+    }
+    const all = collectAllSites();
+    const extras = all.filter(s => !DEFAULT_SITES.includes(s));
+    sel.innerHTML = '';
+    DEFAULT_SITES.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sel.appendChild(opt);
+    });
+    extras.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sel.appendChild(opt);
+    });
+    const other = document.createElement('option');
+    other.value = '__other__';
+    other.textContent = 'Otro…';
+    sel.appendChild(other);
+    const wrap = document.getElementById('tourneySiteCustomWrap');
+    const customInput = document.getElementById('tourneySiteCustom');
+    if (prevVal && [...sel.options].some(o => o.value === prevVal)) {
+        sel.value = prevVal;
+        if (wrap) wrap.style.display = 'none';
+        if (customInput) customInput.value = '';
+    } else if (prevVal) {
+        sel.value = '__other__';
+        if (customInput) customInput.value = prevVal;
+        if (wrap) wrap.style.display = '';
+    } else {
+        sel.value = 'CoinPoker';
+        if (wrap) wrap.style.display = 'none';
+        if (customInput) customInput.value = '';
+    }
+}
+
+function onTourneySiteChange() {
+    const sel = document.getElementById('tourneySite');
+    const wrap = document.getElementById('tourneySiteCustomWrap');
+    if (!sel || !wrap) return;
+    if (sel.value === '__other__') {
+        wrap.style.display = '';
+        document.getElementById('tourneySiteCustom').focus();
+    } else {
+        wrap.style.display = 'none';
+        document.getElementById('tourneySiteCustom').value = '';
+    }
+}
+
+function resolveTourneysite() {
+    const sel = document.getElementById('tourneySite');
+    if (!sel) return '';
+    if (sel.value === '__other__') {
+        return (document.getElementById('tourneySiteCustom')?.value || '').trim();
+    }
+    return (sel.value || '').trim();
+}
+
+function setTourneysiteValue(site) {
+    const s = String(site || '').trim();
+    const sel = document.getElementById('tourneySite');
+    const wrap = document.getElementById('tourneySiteCustomWrap');
+    const customInput = document.getElementById('tourneySiteCustom');
+    if (!sel) return;
+    refreshSiteOptions();
+    if (!s) {
+        sel.value = 'CoinPoker';
+        if (wrap) wrap.style.display = 'none';
+        if (customInput) customInput.value = '';
+        return;
+    }
+    if ([...sel.options].some(o => o.value === s)) {
+        sel.value = s;
+        if (wrap) wrap.style.display = 'none';
+        if (customInput) customInput.value = '';
+        return;
+    }
+    // No está en la lista → Otro
+    sel.value = '__other__';
+    if (wrap) wrap.style.display = '';
+    if (customInput) customInput.value = s;
+}
+
+function refreshCustomSiteFilterChips() {
+    const container = document.getElementById('customSiteFilterChips');
+    if (!container) return;
+    const extras = collectAllSites().filter(s => !DEFAULT_SITES.includes(s));
+    container.innerHTML = extras.map(s => {
+        const safe = escapeHtml(s);
+        const onclickSafe = String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return `<button type="button" class="filter-chip" data-site-filter="${safe}" onclick="pickHistSite('${onclickSafe}', this)">${safe}</button>`;
+    }).join('');
+    const sf = (_histDraft && _histDraft.site) || state.siteFilter || 'all';
+    document.querySelectorAll('#siteFilters .filter-chip').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-site-filter') === sf);
+    });
+}
+
+async function deleteTournament(idx) {
+    if (!confirm('¿Eliminar este torneo? El capital se ajustará.')) return;
+    const t = state.tournaments[idx];
+    if (!t) return;
+    setLoading(true);
+    try {
+        await FeltLabAPI.tracker.deleteTournament(t.id);
+        await loadStateFromServer();
+        updateUI();
+        showToast('Torneo eliminado', 'error');
+    } catch (e) {
+        showToast('Error: ' + (e.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+async function deleteTransaction(idx) {
+    if (!confirm('¿Eliminar este movimiento? El capital se ajustará.')) return;
+    const tx = state.transactions[idx];
+    if (!tx) return;
+    setLoading(true);
+    try {
+        await FeltLabAPI.tracker.deleteTransaction(tx.id);
+        await loadStateFromServer();
+        updateUI();
+        showToast('Movimiento eliminado', 'error');
+    } catch (e) {
+        showToast('Error: ' + (e.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+let _editingTxIdx = null;
+
+function editTransactionNotes(idx) {
+    const tx = state.transactions[idx];
+    if (!tx) return;
+    _editingTxIdx = idx;
+    const isDeposit = tx.type === 'deposit';
+    const icon = document.getElementById('txNotesIcon');
+    const title = document.getElementById('txNotesTitle');
+    const sub = document.getElementById('txNotesSub');
+    const input = document.getElementById('txNotesInput');
+    if (icon) icon.textContent = isDeposit ? '⬇️' : '⬆️';
+    if (title) title.textContent = isDeposit ? 'Notas del depósito' : 'Notas del retiro';
+    if (sub) {
+        const amt = Number(tx.amount || 0).toFixed(2);
+        const d = toDateStr(tx.date) || '';
+        sub.textContent = `${isDeposit ? '+' : '-'}$${amt}${d ? ' · ' + d : ''}`;
+    }
+    if (input) input.value = tx.notes || '';
+    document.getElementById('txNotesModal').classList.add('show');
+    setTimeout(() => input && input.focus(), 250);
+}
+
+function closeTxNotes() {
+    document.getElementById('txNotesModal').classList.remove('show');
+    _editingTxIdx = null;
+}
+
+async function saveTxNotes() {
+    if (_editingTxIdx == null) return;
+    const tx = state.transactions[_editingTxIdx];
+    if (!tx || !tx.id) return;
+    const notes = (document.getElementById('txNotesInput')?.value || '').trim();
+    setLoading(true);
+    try {
+        await FeltLabAPI.tracker.updateTransaction(tx.id, { notes });
+        tx.notes = notes;
+        await loadStateFromServer();
+        updateUI();
+        closeTxNotes();
+        showToast(notes ? 'Notas guardadas ✅' : 'Notas eliminadas', 'success');
+    } catch (e) {
+        showToast('Error: ' + (e.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+async function clearHistory() {
+    if (!confirm('¿Borrar TODO el historial? El capital no se modificará.')) return;
+    setLoading(true);
+    try {
+        await FeltLabAPI.tracker.clear();
+        await loadStateFromServer();
+        updateUI();
+        showToast('Historial borrado', 'error');
+    } catch (e) {
+        showToast('Error: ' + (e.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESET TOTAL (REINICIAR TODO)
+   ═══════════════════════════════════════════════════════════ */
+function openResetModal() {
+    document.getElementById('resetModal').classList.add('show');
+}
+
+async function confirmReset() {
+    if (!confirm('⚠️ CONFIRMACIÓN FINAL: ¿Borrar TODO y empezar de cero?\n\nEsta acción no se puede deshacer.')) {
+        return;
+    }
+    setLoading(true);
+    try {
+        // 1. Borrar todo el historial (torneos + transacciones)
+        await FeltLabAPI.tracker.clear();
+        // 2. Resetear capital a 0 y marcar welcome como no mostrado
+        await FeltLabAPI.tracker.setState({
+            bankroll: 0,
+            initial_bankroll: 0,
+            welcome_shown: false
+        });
+        // 3. Recargar estado desde el servidor
+        await loadStateFromServer();
+        updateUI();
+        closeModal('resetModal');
+        showToast('Todo reiniciado. Empezando de cero 🚀', 'success');
+        // 4. Mostrar de nuevo el modal de bienvenida para pedir capital inicial
+        setTimeout(() => {
+            document.getElementById('welcomeModal').classList.add('show');
+            setTimeout(() => document.getElementById('welcomeAmount').focus(), 400);
+        }, 500);
+    } catch (e) {
+        showToast('Error al reiniciar: ' + (e.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FECHAS
+   ═══════════════════════════════════════════════════════════ */
+function toDateStr(v) {
+    if (!v) return '';
+    if (typeof v === 'string') {
+        const m = v.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (m) return m[1];
+    }
+    try {
+        const d = (v instanceof Date) ? v : new Date(v);
+        if (isNaN(d.getTime())) return '';
+        const y = d.getFullYear();
+        const mo = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${mo}-${day}`;
+    } catch { return ''; }
+}
+
+function parseLocalDate(dateStr) {
+    const s = toDateStr(dateStr);
+    if (!s) return null;
+    const d = new Date(s + 'T12:00:00');
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function todayStr() {
+    return toDateStr(new Date());
+}
+
+function addDaysLocal(dateStr, days) {
+    const d = parseLocalDate(dateStr) || new Date();
+    d.setDate(d.getDate() + days);
+    return toDateStr(d);
+}
+
+function startOfMonthStr(ref) {
+    const d = parseLocalDate(ref) || new Date();
+    return toDateStr(new Date(d.getFullYear(), d.getMonth(), 1));
+}
+
+function endOfMonthStr(ref) {
+    const d = parseLocalDate(ref) || new Date();
+    return toDateStr(new Date(d.getFullYear(), d.getMonth() + 1, 0));
+}
+
+function getDashDateBounds() {
+    const today = todayStr();
+    const f = state.dashFilter || 'all';
+    if (f === 'all') return { from: '', to: '' };
+    if (f === 'today') return { from: today, to: today };
+    if (f === 'week') return { from: addDaysLocal(today, -6), to: today };
+    if (f === 'month') return { from: addDaysLocal(today, -29), to: today };
+    if (f === 'thisMonth') return { from: startOfMonthStr(today), to: today };
+    if (f === 'custom') return { from: state.dashFrom || '', to: state.dashTo || '' };
+    return { from: '', to: '' };
+}
+
+function dateInBounds(dateStr, from, to) {
+    const s = toDateStr(dateStr);
+    if (!s) return false;
+    if (from && s < from) return false;
+    if (to && s > to) return false;
+    return true;
+}
+
+function setDashFilter(f, el) {
+    state.dashFilter = f;
+    document.querySelectorAll('#dashFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const row = document.getElementById('dashDateRow');
+    if (f === 'custom') {
+        if (row) row.style.display = 'flex';
+        const fromEl = document.getElementById('dashDateFrom');
+        const toEl = document.getElementById('dashDateTo');
+        if (fromEl && state.dashFrom) fromEl.value = state.dashFrom;
+        if (toEl && state.dashTo) toEl.value = state.dashTo;
+    } else {
+        if (row) row.style.display = 'none';
+        state.dashFrom = '';
+        state.dashTo = '';
+    }
+    updateUI();
+}
+
+function toggleDashDatePicker(el) {
+    document.querySelectorAll('#dashFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    if (el) el.classList.add('active');
+    state.dashFilter = 'custom';
+    const row = document.getElementById('dashDateRow');
+    if (row) row.style.display = 'flex';
+    const fromEl = document.getElementById('dashDateFrom');
+    const toEl = document.getElementById('dashDateTo');
+    if (fromEl && !fromEl.value) fromEl.value = addDaysLocal(todayStr(), -29);
+    if (toEl && !toEl.value) toEl.value = todayStr();
+}
+
+function applyDashRange() {
+    const from = document.getElementById('dashDateFrom')?.value || '';
+    const to = document.getElementById('dashDateTo')?.value || '';
+    if (!from && !to) { showToast('Selecciona al menos una fecha', 'error'); return; }
+    if (from && to && from > to) { showToast('La fecha "Desde" debe ser anterior a "Hasta"', 'error'); return; }
+    state.dashFrom = from;
+    state.dashTo = to;
+    state.dashFilter = 'custom';
+    document.querySelectorAll('#dashFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    const chip = document.querySelector('#dashFilters [data-dash-filter="custom"]');
+    if (chip) chip.classList.add('active');
+    updateUI();
+    showToast('Rango del dashboard aplicado 📅', 'success');
+}
+
+function clearDashRange() {
+    state.dashFrom = '';
+    state.dashTo = '';
+    state.dashFilter = 'all';
+    const fromEl = document.getElementById('dashDateFrom');
+    const toEl = document.getElementById('dashDateTo');
+    if (fromEl) fromEl.value = '';
+    if (toEl) toEl.value = '';
+    const row = document.getElementById('dashDateRow');
+    if (row) row.style.display = 'none';
+    document.querySelectorAll('#dashFilters .filter-chip').forEach(c => c.classList.remove('active'));
+    const allChip = document.querySelector('#dashFilters [data-dash-filter="all"]');
+    if (allChip) allChip.classList.add('active');
+    updateUI();
+}
+
+/* Compat: setFilter / setSiteFilter redirigen al nuevo sistema */
+function setFilter(filter, el) {
+    const periodKeys = ['all', 'today', 'week', 'month', 'thisMonth', 'lastMonth', 'thisYear', 'range'];
+    const typeKeys = ['tourney', 'deposit', 'withdraw'];
+    if (typeKeys.includes(filter)) {
+        state.histType = filter;
+        state.histPeriod = state.histPeriod || 'all';
+    } else if (periodKeys.includes(filter)) {
+        state.histPeriod = filter;
+    } else {
+        state.histPeriod = 'all';
+        state.histType = 'all';
+    }
+    syncLegacyFilter();
+    updateHistFilterUI();
+    renderHistory();
+}
+
+function setSiteFilter(site, el) {
+    state.siteFilter = site || 'all';
+    updateHistFilterUI();
+    renderHistory();
+}
+
+function onHistSearch() {
+    state.histSearch = (document.getElementById('histSearch')?.value || '').trim().toLowerCase();
+    renderHistory();
+}
+
+function syncLegacyFilter() {
+    /* mantiene state.filter por si algún código legacy lo lee */
+    if (state.histType !== 'all') state.filter = state.histType;
+    else state.filter = state.histPeriod || 'all';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FREEROLL FILTER
+   ═══════════════════════════════════════════════════════════ */
+function toggleFreerollFilter(checked) {
+    /* checked = mostrar freerolls; no marcado = ocultarlos de stats */
+    state.excludeFreerolls = !checked;
+    const hint = document.getElementById('freerollHint');
+    if (hint) hint.textContent = state.excludeFreerolls ? 'Ocultos' : 'Visibles';
+    try { localStorage.setItem('rangelab-exclude-freerolls', state.excludeFreerolls ? '1' : '0'); } catch(_) {}
+    const cb = document.getElementById('freerollToggle');
+    if (cb) cb.checked = !state.excludeFreerolls;
+    updateUI();
+}
+
+function loadFreerollPref() {
+    try {
+        state.excludeFreerolls = localStorage.getItem('rangelab-exclude-freerolls') === '1';
+    } catch(_) { state.excludeFreerolls = false; }
+    const cb = document.getElementById('freerollToggle');
+    if (cb) cb.checked = !state.excludeFreerolls;
+    const hint = document.getElementById('freerollHint');
+    if (hint) hint.textContent = state.excludeFreerolls ? 'Ocultos' : 'Visibles';
+}
+
+function isFreeroll(t) {
+    if (!t) return false;
+    if ((Number(t.cost) || 0) === 0) return true;
+    if ((Number(t.baseCost != null ? t.baseCost : t.base_cost) || 0) === 0) return true;
+    if (String(t.type || '').toLowerCase() === 'freeroll') return true;
+    return false;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HIST FILTER MODAL
+   ═══════════════════════════════════════════════════════════ */
+function openHistFilterModal() {
+    _histDraft = {
+        period: state.histPeriod || 'all',
+        type: state.histType || 'all',
+        site: state.siteFilter || 'all',
+        rangeFrom: state.rangeFrom || '',
+        rangeTo: state.rangeTo || ''
+    };
+    /* sincronizar inputs de fecha del modal */
+    const fromEl = document.getElementById('rangeFrom');
+    const toEl = document.getElementById('rangeTo');
+    if (fromEl) fromEl.value = _histDraft.rangeFrom;
+    if (toEl) toEl.value = _histDraft.rangeTo;
+
+    refreshCustomSiteFilterChips();
+    syncHistModalChips();
+    switchHistFilterTab('period');
+
+    const modal = document.getElementById('histFilterModal');
+    if (!modal) return;
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeHistFilterModal() {
+    const modal = document.getElementById('histFilterModal');
+    if (modal) modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function onHistFilterOverlayClick(e) {
+    if (e.target === e.currentTarget) closeHistFilterModal();
+}
+
+function switchHistFilterTab(tab, btn) {
+    document.querySelectorAll('.hist-ftab').forEach(t => {
+        t.classList.toggle('active', t.getAttribute('data-ftab') === tab);
+    });
+    document.querySelectorAll('.hist-ftab-panel').forEach(p => {
+        p.classList.toggle('active', p.id === 'histFtab-' + tab);
+    });
+    if (btn) btn.classList.add('active');
+}
+
+function syncHistModalChips() {
+    document.querySelectorAll('#histPeriodChips .filter-chip').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-period') === _histDraft.period);
+    });
+    document.querySelectorAll('#histTypeChips .filter-chip').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-htype') === _histDraft.type);
+    });
+    document.querySelectorAll('#siteFilters .filter-chip').forEach(c => {
+        c.classList.toggle('active', c.getAttribute('data-site-filter') === _histDraft.site);
+    });
+    const custom = document.getElementById('histCustomRange');
+    if (custom) custom.style.display = _histDraft.period === 'range' ? 'block' : 'none';
+}
+
+function pickHistPeriod(period, el) {
+    _histDraft.period = period;
+    if (period !== 'range') {
+        /* rellenar fechas de atajos en el draft */
+        const bounds = periodBounds(period);
+        _histDraft.rangeFrom = bounds.from;
+        _histDraft.rangeTo = bounds.to;
+        const fromEl = document.getElementById('rangeFrom');
+        const toEl = document.getElementById('rangeTo');
+        if (fromEl) fromEl.value = bounds.from || '';
+        if (toEl) toEl.value = bounds.to || '';
+    }
+    syncHistModalChips();
+}
+
+function pickHistType(type, el) {
+    _histDraft.type = type || 'all';
+    syncHistModalChips();
+}
+
+function pickHistSite(site, el) {
+    _histDraft.site = site || 'all';
+    syncHistModalChips();
+}
+
+function periodBounds(period) {
+    const today = todayStr();
+    if (period === 'today') return { from: today, to: today };
+    if (period === 'week') return { from: addDaysLocal(today, -6), to: today };
+    if (period === 'month') return { from: addDaysLocal(today, -29), to: today };
+    if (period === 'thisMonth') return { from: startOfMonthStr(today), to: today };
+    if (period === 'lastMonth') {
+        const d = parseLocalDate(today);
+        const prev = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+        const from = toDateStr(prev);
+        return { from, to: endOfMonthStr(from) };
+    }
+    if (period === 'thisYear') return { from: today.slice(0, 4) + '-01-01', to: today.slice(0, 4) + '-12-31' };
+    if (period === 'range') return { from: state.rangeFrom || '', to: state.rangeTo || '' };
+    return { from: '', to: '' };
+}
+
+function applyHistFiltersFromModal() {
+    const fromEl = document.getElementById('rangeFrom');
+    const toEl = document.getElementById('rangeTo');
+    const from = fromEl ? fromEl.value : '';
+    const to = toEl ? toEl.value : '';
+
+    if (_histDraft.period === 'range') {
+        if (!from && !to) {
+            showToast('Selecciona al menos una fecha', 'error');
+            return;
+        }
+        if (from && to && from > to) {
+            showToast('La fecha "Desde" debe ser anterior a "Hasta"', 'error');
+            return;
+        }
+        _histDraft.rangeFrom = from;
+        _histDraft.rangeTo = to;
+    } else if (_histDraft.period !== 'all') {
+        const bounds = periodBounds(_histDraft.period);
+        _histDraft.rangeFrom = bounds.from;
+        _histDraft.rangeTo = bounds.to;
+    } else {
+        _histDraft.rangeFrom = '';
+        _histDraft.rangeTo = '';
+    }
+
+    state.histPeriod = _histDraft.period;
+    state.histType = _histDraft.type;
+    state.siteFilter = _histDraft.site;
+    state.rangeFrom = _histDraft.rangeFrom || '';
+    state.rangeTo = _histDraft.rangeTo || '';
+    syncLegacyFilter();
+
+    closeHistFilterModal();
+    updateHistFilterUI();
+    /* no hacer scroll: solo re-renderizar lista */
+    renderHistory();
+    showToast('Filtros aplicados ✅', 'success');
+}
+
+function clearAllHistFilters() {
+    _histDraft = { period: 'all', type: 'all', site: 'all', rangeFrom: '', rangeTo: '' };
+    const fromEl = document.getElementById('rangeFrom');
+    const toEl = document.getElementById('rangeTo');
+    if (fromEl) fromEl.value = '';
+    if (toEl) toEl.value = '';
+    state.histPeriod = 'all';
+    state.histType = 'all';
+    state.siteFilter = 'all';
+    state.rangeFrom = '';
+    state.rangeTo = '';
+    syncLegacyFilter();
+    syncHistModalChips();
+    updateHistFilterUI();
+    renderHistory();
+    showToast('Filtros eliminados', 'success');
+}
+
+function updateHistFilterUI() {
+    /* badge en el botón Filtrar */
+    let n = 0;
+    if (state.histPeriod && state.histPeriod !== 'all') n++;
+    if (state.histType && state.histType !== 'all') n++;
+    if (state.siteFilter && state.siteFilter !== 'all') n++;
+    const badge = document.getElementById('histFilterBadge');
+    const btn = document.getElementById('histFilterBtn');
+    if (badge) {
+        if (n > 0) {
+            badge.style.display = 'inline-flex';
+            badge.textContent = String(n);
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+    if (btn) btn.classList.toggle('has-filters', n > 0);
+
+    /* chips activos bajo la barra de búsqueda */
+    const wrap = document.getElementById('histActiveFilters');
+    if (!wrap) return;
+    const chips = [];
+    const periodLabels = {
+        today: 'Hoy', week: '7 días', month: '30 días',
+        thisMonth: 'Este mes', lastMonth: 'Mes pasado', thisYear: 'Este año',
+        range: 'Rango'
+    };
+    if (state.histPeriod && state.histPeriod !== 'all') {
+        let label = periodLabels[state.histPeriod] || state.histPeriod;
+        if (state.histPeriod === 'range' || (state.rangeFrom || state.rangeTo)) {
+            const a = state.rangeFrom ? formatShortDate(state.rangeFrom) : '…';
+            const b = state.rangeTo ? formatShortDate(state.rangeTo) : '…';
+            if (state.histPeriod === 'range') label = `${a} → ${b}`;
+            else label = `${label}`;
+        }
+        chips.push(`<button type="button" class="hist-active-chip" onclick="removeHistFilter('period')">📅 ${escapeHtml(label)} ✕</button>`);
+    }
+    if (state.histType && state.histType !== 'all') {
+        const typeLabels = { tourney: 'Torneos', deposit: 'Depósitos', withdraw: 'Retiros' };
+        chips.push(`<button type="button" class="hist-active-chip" onclick="removeHistFilter('type')">📋 ${typeLabels[state.histType] || state.histType} ✕</button>`);
+    }
+    if (state.siteFilter && state.siteFilter !== 'all') {
+        chips.push(`<button type="button" class="hist-active-chip" onclick="removeHistFilter('site')">🏠 ${escapeHtml(state.siteFilter)} ✕</button>`);
+    }
+    wrap.innerHTML = chips.join('');
+    wrap.style.display = chips.length ? 'flex' : 'none';
+}
+
+function removeHistFilter(kind) {
+    if (kind === 'period') {
+        state.histPeriod = 'all';
+        state.rangeFrom = '';
+        state.rangeTo = '';
+    } else if (kind === 'type') {
+        state.histType = 'all';
+    } else if (kind === 'site') {
+        state.siteFilter = 'all';
+    }
+    syncLegacyFilter();
+    updateHistFilterUI();
+    renderHistory();
+}
+
+/* legacy stubs (por si quedan referencias) */
+function toggleRangePanel() {}
+function quickRange() {}
+function applyRange() {}
+function clearRange() {}
+function updateRangeChipUI() {}
+
+function formatShortDate(dateStr) {
+    if (!dateStr) return '';
+    const d = parseLocalDate(dateStr);
+    if (!d) return dateStr;
+    return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function isInRange(dateStr) {
+    return dateInBounds(dateStr, state.rangeFrom, state.rangeTo);
+}
+
+function histDatePass(dateStr) {
+    const p = state.histPeriod || 'all';
+    if (p === 'all') return true;
+    if (p === 'range') return isInRange(dateStr);
+    const bounds = periodBounds(p);
+    /* si el periodo tiene bounds calculados, usarlos; también respetar rangeFrom/To si están */
+    const from = state.rangeFrom || bounds.from;
+    const to = state.rangeTo || bounds.to;
+    return dateInBounds(dateStr, from, to);
+}
+
+function filterTournaments() {
+    const ht = state.histType || 'all';
+    if (ht === 'deposit' || ht === 'withdraw') return [];
+    const sf = state.siteFilter || 'all';
+    return state.tournaments.filter(t => {
+        if (!histDatePass(t.date)) return false;
+        if (sf === 'all') return true;
+        const s = String(t.site || '').trim();
+        if (sf === '__other__') {
+            return s && s !== 'ACR' && s !== 'CoinPoker';
+        }
+        return s === sf;
+    });
+}
+
+function filterTransactions() {
+    const ht = state.histType || 'all';
+    if (ht === 'tourney') return [];
+    /* Si se filtra por una sala concreta, no mostrar depósitos/retiros (no tienen sala) */
+    if ((state.siteFilter || 'all') !== 'all') return [];
+    return state.transactions.filter(tx => {
+        if (ht === 'deposit' && tx.type !== 'deposit') return false;
+        if (ht === 'withdraw' && tx.type !== 'withdraw') return false;
+        return histDatePass(tx.date);
+    });
+}
+
+function getDashTourneys() {
+    const { from, to } = getDashDateBounds();
+    let list = state.tournaments.slice();
+    if (from || to) list = list.filter(t => dateInBounds(t.date, from, to));
+    if (state.excludeFreerolls) list = list.filter(t => !isFreeroll(t));
+    return list;
+}
+
+function dashPeriodLabelText() {
+    const f = state.dashFilter || 'all';
+    if (f === 'all') return '';
+    const { from, to } = getDashDateBounds();
+    if (f === 'custom' && !from && !to) return 'Elige un rango y pulsa Aplicar';
+    const a = from ? formatShortDate(from) : '…';
+    const b = to ? formatShortDate(to) : '…';
+    const names = {
+        today: 'Hoy',
+        week: 'Últimos 7 días',
+        month: 'Últimos 30 días',
+        thisMonth: 'Este mes',
+        custom: 'Rango personalizado'
+    };
+    return `${names[f] || f}: ${a} → ${b}`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UI UPDATE
+   ═══════════════════════════════════════════════════════════ */
+function updateUI() {
+    document.getElementById('bankrollDisplay').textContent = '$' + state.bankroll.toFixed(2);
+    const change = state.bankroll - state.initialBankroll;
+    const changeEl = document.getElementById('bankrollChange');
+    if (change !== 0 && state.initialBankroll > 0) {
+        changeEl.textContent = (change >= 0 ? '▲ +$' : '▼ -$') + Math.abs(change).toFixed(2);
+        changeEl.className = 'bankroll-change ' + (change >= 0 ? 'up' : 'down');
+    } else {
+        changeEl.textContent = '';
+    }
+
+    const txDep = state.transactions.filter(t => t.type === 'deposit').reduce((s, t) => s + t.amount, 0);
+    const totalDep = (Number(state.initialBankroll) || 0) + txDep;
+    const totalWd = state.transactions.filter(t => t.type === 'withdraw').reduce((s, t) => s + t.amount, 0);
+    document.getElementById('totalDeposited').textContent = '$' + totalDep.toFixed(2);
+    document.getElementById('totalWithdrawn').textContent = '$' + totalWd.toFixed(2);
+
+    const tourneys = getDashTourneys();
+    const periodLabel = document.getElementById('dashPeriodLabel');
+    const plText = dashPeriodLabelText();
+    if (periodLabel) {
+        if (plText) {
+            periodLabel.style.display = 'block';
+            periodLabel.textContent = '📆 ' + plText + ' · ' + tourneys.length + ' torneo' + (tourneys.length === 1 ? '' : 's');
+        } else {
+            periodLabel.style.display = 'none';
+            periodLabel.textContent = '';
+        }
+    }
+
+    const n = tourneys.length;
+    const totalBuyin = tourneys.reduce((s, t) => s + (Number(t.cost) || 0), 0);
+    const totalPrizes = tourneys.reduce((s, t) => s + (Number(t.win) || 0), 0);
+    const profit = totalPrizes - totalBuyin;
+    /* ROI solo con buy-in real; freerolls (coste 0) → N/A */
+    const hasPaid = totalBuyin > 0.0001;
+    const roi = hasPaid ? (profit / totalBuyin) * 100 : null;
+    const itmCount = tourneys.filter(t => (Number(t.win) || 0) > 0).length;
+    const itm = n > 0 ? (itmCount / n) * 100 : 0;
+    const maxPrize = tourneys.reduce((m, t) => Math.max(m, Number(t.win) || 0), 0);
+    const avgBuyin = n > 0 ? totalBuyin / n : 0;
+    const avgProfit = n > 0 ? profit / n : 0;
+    const wins = tourneys.filter(t => ((Number(t.win) || 0) - (Number(t.cost) || 0)) > 0).length;
+    const winrate = n > 0 ? (wins / n) * 100 : 0;
+
+    let best = 0, worst = 0, hasNet = false;
+    tourneys.forEach(t => {
+        const net = (Number(t.win) || 0) - (Number(t.cost) || 0);
+        if (!hasNet) { best = net; worst = net; hasNet = true; }
+        else {
+            if (net > best) best = net;
+            if (net < worst) worst = net;
+        }
+    });
+    if (!hasNet) { best = 0; worst = 0; }
+
+    const sortedAsc = tourneys.slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    let streak = 0, streakSign = 0;
+    for (let i = sortedAsc.length - 1; i >= 0; i--) {
+        const net = (Number(sortedAsc[i].win) || 0) - (Number(sortedAsc[i].cost) || 0);
+        const sign = net > 0 ? 1 : (net < 0 ? -1 : 0);
+        if (sign === 0) continue;
+        if (streakSign === 0) { streakSign = sign; streak = 1; }
+        else if (sign === streakSign) streak++;
+        else break;
+    }
+
+    const fmtMoney = (v, signed) => {
+        const n = Number(v) || 0;
+        const abs = Math.abs(n);
+        const decimals = abs > 0 && abs < 1 ? 2 : (abs < 100 && abs !== Math.floor(abs) ? 2 : (abs < 10 ? 2 : 0));
+        const body = abs.toFixed(decimals);
+        if (signed) return (n > 0 ? '+$' : (n < 0 ? '-$' : '$')) + body;
+        return '$' + body;
+    };
+
+    document.getElementById('statTourneys').textContent = String(n);
+    document.getElementById('statMaxPrize').textContent = fmtMoney(maxPrize, false);
+
+    const profitEl = document.getElementById('statProfit');
+    profitEl.textContent = fmtMoney(profit, true);
+    profitEl.className = 'stat-value ' + (profit > 0 ? 'green' : (profit < 0 ? 'red' : ''));
+
+    document.getElementById('statBuyin').textContent = fmtMoney(totalBuyin, false);
+    document.getElementById('statITM').textContent = n ? itm.toFixed(0) + '%' : '0%';
+
+    const roiEl = document.getElementById('statROI');
+    if (roi === null) {
+        roiEl.textContent = n ? 'N/A' : '0%';
+        roiEl.className = 'stat-value';
+        roiEl.title = 'ROI no aplica con buy-in total 0 (freerolls)';
+    } else {
+        roiEl.textContent = roi.toFixed(1) + '%';
+        roiEl.className = 'stat-value ' + (roi > 0 ? 'green' : (roi < 0 ? 'red' : ''));
+        roiEl.title = '';
+    }
+
+    document.getElementById('statAvgBuyin').textContent = fmtMoney(avgBuyin, false);
+
+    const avgEl = document.getElementById('statAvgProfit');
+    avgEl.textContent = fmtMoney(avgProfit, true);
+    avgEl.className = 'stat-value ' + (avgProfit > 0 ? 'green' : (avgProfit < 0 ? 'red' : ''));
+
+    const wrEl = document.getElementById('statWinrate');
+    if (wrEl) {
+        wrEl.textContent = n ? winrate.toFixed(0) + '%' : '0%';
+        wrEl.className = 'stat-value ' + (n ? (winrate >= 50 ? 'green' : 'red') : '');
+    }
+    const stEl = document.getElementById('statStreak');
+    if (stEl) {
+        if (streak === 0) {
+            stEl.textContent = '—';
+            stEl.className = 'stat-value';
+        } else {
+            stEl.textContent = (streakSign > 0 ? '🔥+' : '❄️') + streak;
+            stEl.className = 'stat-value ' + (streakSign > 0 ? 'green' : 'red');
+        }
+    }
+    const bestEl = document.getElementById('statBest');
+    if (bestEl) {
+        bestEl.textContent = fmtMoney(best, true);
+        bestEl.className = 'stat-value ' + (best > 0 ? 'green' : '');
+    }
+    const worstEl = document.getElementById('statWorst');
+    if (worstEl) {
+        worstEl.textContent = fmtMoney(worst, true);
+        worstEl.className = 'stat-value ' + (worst < 0 ? 'red' : '');
+    }
+
+    const chartHint = document.getElementById('chartFilterHint');
+    if (chartHint) {
+        let hint = plText ? '(periodo filtrado)' : '(todo el historial)';
+        if (state.excludeFreerolls) hint += ' · sin freerolls';
+        chartHint.textContent = hint;
+    }
+
+    try { updateHistFilterUI(); } catch (_) {}
+    renderHistory();
+    updateChart();
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    const q = (state.histSearch || '').toLowerCase();
+
+    const tourneys = filterTournaments().map(t => ({
+        kind: 'tourney',
+        data: t,
+        date: parseLocalDate(t.date) || new Date(0)
+    })).filter(item => {
+        if (!q) return true;
+        const t = item.data;
+        const hay = [t.name, t.type, t.speed, t.site, t.notes, t.pos, String(t.players || '')].join(' ').toLowerCase();
+        return hay.includes(q);
+    });
+
+    const txs = filterTransactions().map(tx => ({
+        kind: 'tx',
+        data: tx,
+        date: parseLocalDate(tx.date) || new Date(0)
+    })).filter(item => {
+        if (!q) return true;
+        const label = item.data.type === 'deposit' ? 'depósito deposit ingreso' : 'retiro withdraw egreso';
+        const hay = [label, String(item.data.amount), item.data.notes || ''].join(' ').toLowerCase();
+        return hay.includes(q);
+    });
+
+    const combined = [...tourneys, ...txs].sort((a, b) => b.date - a.date);
+
+    const summaryBar = document.getElementById('histSummaryBar');
+    if (summaryBar) {
+        const tCount = tourneys.length;
+        const txCount = txs.length;
+        const tProfit = tourneys.reduce((s, i) => s + ((i.data.win || 0) - (i.data.cost || 0)), 0);
+        if (tCount + txCount > 0) {
+            summaryBar.style.display = 'block';
+            summaryBar.textContent = `Mostrando ${tCount} torneo${tCount === 1 ? '' : 's'} · ${txCount} movimiento${txCount === 1 ? '' : 's'}` +
+                (tCount ? ` · Neto torneos: ${tProfit >= 0 ? '+' : ''}$${tProfit.toFixed(2)}` : '');
+        } else {
+            summaryBar.style.display = 'none';
+        }
+    }
+
+    if (combined.length === 0) {
+        list.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">🃏</div>
+                <p>No hay movimientos que mostrar</p>
+            </div>`;
+        return;
+    }
+
+    list.innerHTML = '';
+    combined.forEach(item => {
+        if (item.kind === 'tourney') {
+            const t = item.data;
+            const originalIdx = state.tournaments.findIndex(x => x.id === t.id);
+            const net = (t.win || 0) - (t.cost || 0);
+            const isWin = net >= 0;
+            const dateStr = item.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' });
+
+            const el = document.createElement('div');
+            el.className = 'history-item ' + (isWin ? 'win' : 'loss');
+            el.innerHTML = `
+                <div class="history-info">
+                    <div class="history-name">🎯 ${escapeHtml(t.name || 'Torneo')}</div>
+                    <div class="history-meta">
+                        <span>${dateStr}</span>
+                        ${t.site ? `<span class="history-badge" style="background:var(--accent);color:#fff;">${escapeHtml(t.site)}</span>` : ''}
+                        <span class="history-badge">${escapeHtml(t.type || '')}</span>
+                        ${t.speed ? `<span class="history-badge">${escapeHtml(t.speed)}</span>` : ''}
+                        ${t.pos ? `<span class="history-badge">#${escapeHtml(String(t.pos))}</span>` : ''}
+                        ${t.players ? `<span class="history-badge">${t.players}p</span>` : ''}
+                        ${t.rebuys > 0 ? `<span class="history-badge">${t.rebuys}R</span>` : ''}
+                    </div>
+                    <div class="history-meta" style="margin-top:3px;">
+                        <span>Entrada: $${Number(t.cost || 0).toFixed(2)}</span>
+                        ${t.notes ? `<span>📝 ${escapeHtml(String(t.notes).substring(0,28))}${String(t.notes).length > 28 ? '...' : ''}</span>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <div class="history-amount ${isWin ? 'win' : 'loss'}">
+                        ${isWin ? '+' : ''}$${net.toFixed(2)}
+                    </div>
+                    <div class="history-actions">
+                        <button class="mini-btn" onclick="editTournament(${originalIdx})" title="Editar">✏️</button>
+                        <button class="mini-btn delete" onclick="deleteTournament(${originalIdx})" title="Eliminar">🗑️</button>
+                    </div>
+                </div>
+            `;
+            list.appendChild(el);
+        } else {
+            const tx = item.data;
+            const originalIdx = state.transactions.findIndex(x => x.id === tx.id);
+            const isDeposit = tx.type === 'deposit';
+            const d = parseLocalDate(tx.date) || new Date(String(tx.date).replace(' ', 'T'));
+            const dateStr = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' });
+
+            const el = document.createElement('div');
+            el.className = 'history-item ' + (isDeposit ? 'deposit-item' : 'withdraw-item');
+            el.innerHTML = `
+                <div class="history-info">
+                    <div class="history-name">
+                        <span class="tx-icon">${isDeposit ? '⬇️' : '⬆️'}</span>
+                        ${isDeposit ? 'Depósito' : 'Retiro'}
+                    </div>
+                    <div class="history-meta">
+                        <span>${dateStr}</span>
+                        <span class="history-badge">${isDeposit ? 'Ingreso' : 'Egreso'}</span>
+                        ${tx.notes ? `<span>📝 ${escapeHtml(String(tx.notes).substring(0,28))}${String(tx.notes).length > 28 ? '...' : ''}</span>` : ''}
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <div class="history-amount ${isDeposit ? 'win' : 'loss'}">
+                        ${isDeposit ? '+' : '-'}$${Number(tx.amount || 0).toFixed(2)}
+                    </div>
+                    <div class="history-actions">
+                        <button class="mini-btn" onclick="editTransactionNotes(${originalIdx})" title="Editar notas">📝</button>
+                        <button class="mini-btn delete" onclick="deleteTransaction(${originalIdx})" title="Eliminar">🗑️</button>
+                    </div>
+                </div>
+            `;
+            list.appendChild(el);
+        }
+    });
+}
+
+function exportHistoryCSV() {
+    const tourneys = filterTournaments();
+    const txs = filterTransactions();
+    const rows = [['tipo', 'fecha', 'nombre', 'buyin', 'premio', 'neto', 'posicion', 'tipo_torneo', 'velocidad', 'sala', 'jugadores', 'notas']];
+    tourneys.forEach(t => {
+        const net = (t.win || 0) - (t.cost || 0);
+        rows.push(['torneo', t.date || '', t.name || '', t.cost || 0, t.win || 0, net, t.pos || '', t.type || '', t.speed || '', t.site || '', t.players || '', (t.notes || '').replace(/\n/g, ' ')]);
+    });
+    txs.forEach(tx => {
+        const sign = tx.type === 'deposit' ? 1 : -1;
+        rows.push([tx.type, toDateStr(tx.date), tx.type === 'deposit' ? 'Depósito' : 'Retiro', '', '', sign * (tx.amount || 0), '', '', '', '', '', (tx.notes || '').replace(/\n/g, ' ')]);
+    });
+    const csv = rows.map(r => r.map(c => {
+        const s = String(c);
+        return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }).join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bankroll-lab-historial-${todayStr()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV exportado ✅', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CHART
+   ═══════════════════════════════════════════════════════════ */
+let _chartJsLoading = null;
+function ensureChartJs() {
+    if (typeof Chart !== 'undefined') return Promise.resolve();
+    if (_chartJsLoading) return _chartJsLoading;
+    _chartJsLoading = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = '/static/chart.js';
+        s.async = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('Chart.js failed'));
+        document.head.appendChild(s);
+    }).catch(err => {
+        console.warn(err);
+        _chartJsLoading = null;
+    });
+    return _chartJsLoading;
+}
+
+async function updateChart() {
+    const canvas = document.getElementById('bankrollChart');
+    if (!canvas) return;
+    if (typeof Chart === 'undefined') {
+        await ensureChartJs();
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js no cargado');
+            return;
+        }
+    }
+
+    const dash = document.getElementById('tab-dashboard');
+    if (dash && !dash.classList.contains('active')) return;
+
+    const { from: chartFrom, to: chartTo } = getDashDateBounds();
+    const events = [];
+    state.tournaments.forEach(t => {
+        if (state.excludeFreerolls && isFreeroll(t)) return;
+        if (chartFrom || chartTo) {
+            if (!dateInBounds(t.date, chartFrom, chartTo)) return;
+        }
+        const d = parseLocalDate(t.date);
+        if (!d) return;
+        events.push({ date: d, delta: (t.win || 0) - (t.cost || 0), label: toDateStr(t.date) });
+    });
+    state.transactions.forEach(tx => {
+        if (chartFrom || chartTo) {
+            if (!dateInBounds(tx.date, chartFrom, chartTo)) return;
+        }
+        const d = parseLocalDate(tx.date);
+        if (!d) return;
+        events.push({
+            date: d,
+            delta: tx.type === 'deposit' ? (tx.amount || 0) : -(tx.amount || 0),
+            label: toDateStr(tx.date)
+        });
+    });
+    events.sort((a, b) => a.date - b.date);
+
+    let running = Number(state.initialBankroll) || 0;
+    if (chartFrom) {
+        state.tournaments.forEach(t => {
+            if (state.excludeFreerolls && isFreeroll(t)) return;
+            const s = toDateStr(t.date);
+            if (s && s < chartFrom) running += (t.win || 0) - (t.cost || 0);
+        });
+        state.transactions.forEach(tx => {
+            const s = toDateStr(tx.date);
+            if (s && s < chartFrom) running += tx.type === 'deposit' ? (tx.amount || 0) : -(tx.amount || 0);
+        });
+    }
+
+    const labels = [chartFrom ? formatShortDate(chartFrom) : 'Inicio'];
+    const data = [Math.round(running * 100) / 100];
+
+    events.forEach(e => {
+        running += e.delta;
+        labels.push(e.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+        data.push(Math.round(running * 100) / 100);
+    });
+
+    /* Si se ocultan freerolls, no forzar el bankroll real (incluye freerolls). */
+    if (!chartFrom && !chartTo && !state.excludeFreerolls && (data.length === 1 || Math.abs(running - state.bankroll) > 0.01)) {
+        labels.push('Actual');
+        data.push(Number(state.bankroll) || 0);
+    }
+
+    if (chartInstance) {
+        try { chartInstance.destroy(); } catch (_) {}
+        chartInstance = null;
+    }
+
+    const isDark = state.theme !== 'light';
+    const textColor = isDark ? '#888' : '#666';
+    const gridColor = isDark ? '#222' : '#eee';
+
+    try {
+        chartInstance = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Bankroll',
+                    data: data,
+                    borderColor: '#2979ff',
+                    backgroundColor: 'rgba(41,121,255,0.25)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: data.length <= 12 ? 3 : 0,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#2979ff',
+                    pointHoverBackgroundColor: '#2979ff',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 400 },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1a1a1a',
+                        titleColor: '#fff',
+                        bodyColor: '#2979ff',
+                        borderColor: '#2979ff',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        callbacks: { label: (ctx) => '$' + Number(ctx.parsed.y).toFixed(2) }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: textColor, font: { size: 10 }, maxTicksLimit: 8 }
+                    },
+                    y: {
+                        grid: { color: gridColor },
+                        ticks: {
+                            color: textColor,
+                            font: { size: 10 },
+                            callback: (v) => '$' + v
+                        }
+                    }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            }
+        });
+    } catch (err) {
+        console.error('Error dibujando chart:', err);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODALS
+   ═══════════════════════════════════════════════════════════ */
+function openBackupModal() { document.getElementById('backupModal').classList.add('show'); }
+function openHelpModal() { document.getElementById('helpModal').classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+document.getElementById('backupModal').addEventListener('click', e => {
+    if (e.target.id === 'backupModal') closeModal('backupModal');
+});
+document.getElementById('walletModal').addEventListener('click', e => {
+    if (e.target.id === 'walletModal') closeWallet();
+});
+document.getElementById('helpModal').addEventListener('click', e => {
+    if (e.target.id === 'helpModal') closeModal('helpModal');
+});
+document.getElementById('resetModal').addEventListener('click', e => {
+    if (e.target.id === 'resetModal') closeModal('resetModal');
+});
+document.getElementById('importChoiceModal').addEventListener('click', e => {
+    if (e.target.id === 'importChoiceModal') cancelImportChoice();
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        const hm = document.getElementById('histFilterModal');
+        if (hm && hm.classList.contains('show')) {
+            closeHistFilterModal();
+            e.preventDefault();
+        }
+    }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   EXPORT / IMPORT
+   ═══════════════════════════════════════════════════════════ */
+/** Pending import payload while user chooses merge vs replace */
+let _pendingImport = null;
+
+function exportData() {
+    const data = {
+        exported_at: new Date().toISOString(),
+        app: 'Bankroll Lab Pro v3.1',
+        user: currentUser ? currentUser.username : null,
+        state: {
+            bankroll: state.bankroll,
+            initialBankroll: state.initialBankroll,
+            tournaments: state.tournaments,
+            transactions: state.transactions,
+            theme: state.theme,
+            welcomeShown: state.welcomeShown
+        }
+    };
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bankroll-lab-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Backup exportado ✅', 'success');
+    closeModal('backupModal');
+}
+
+function tournamentKey(t) {
+    const name = String(t.name || '').trim().toLowerCase();
+    const date = toDateStr(t.date) || '';
+    const cost = Number(t.cost != null ? t.cost : t.baseCost) || 0;
+    const win = Number(t.win) || 0;
+    const pos = String(t.pos != null ? t.pos : t.position != null ? t.position : '');
+    const type = String(t.type || '');
+    const site = String(t.site || '');
+    const rebuys = Number(t.rebuys) || 0;
+    return [name, date, cost.toFixed(2), win.toFixed(2), pos, type, site, rebuys].join('|');
+}
+
+function transactionKey(tx) {
+    const type = String(tx.type || '');
+    const amount = Number(tx.amount) || 0;
+    const date = toDateStr(tx.date) || '';
+    return [type, amount.toFixed(2), date].join('|');
+}
+
+function normalizeImportPayload(raw) {
+    const data = raw.state || raw;
+    const tournaments = Array.isArray(data.tournaments) ? data.tournaments : [];
+    const transactions = Array.isArray(data.transactions) ? data.transactions : [];
+    const initialBankroll = Number(
+        data.initialBankroll != null ? data.initialBankroll
+            : data.initial_bankroll != null ? data.initial_bankroll
+            : 0
+    ) || 0;
+    const bankroll = Number(
+        data.bankroll != null ? data.bankroll : initialBankroll
+    ) || 0;
+    return { tournaments, transactions, initialBankroll, bankroll };
+}
+
+/**
+ * Importa un backup JSON de Bankroll Lab.
+ * opts.fromWelcome: true si se llama desde el modal de bienvenida.
+ */
+async function importData(event, opts) {
+    opts = opts || {};
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const imported = JSON.parse(e.target.result);
+            const payload = normalizeImportPayload(imported);
+
+            if (!payload.tournaments.length && !payload.transactions.length && !payload.initialBankroll && !payload.bankroll) {
+                showToast('El archivo no contiene datos de Bankroll Lab', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const hasExisting =
+                state.tournaments.length > 0 ||
+                state.transactions.length > 0 ||
+                (state.welcomeShown && (state.bankroll !== 0 || state.initialBankroll !== 0));
+
+            // Primera vez / bienvenida sin datos → importar de cero directamente
+            if (opts.fromWelcome || !hasExisting) {
+                await applyImport(payload, 'replace', { fromWelcome: !!opts.fromWelcome });
+                event.target.value = '';
+                return;
+            }
+
+            // Hay datos: preguntar sumar vs reemplazar
+            _pendingImport = { payload, fromWelcome: false, fileInput: event.target };
+            const nT = payload.tournaments.length;
+            const nTx = payload.transactions.length;
+            const summary = document.getElementById('importChoiceSummary');
+            if (summary) {
+                summary.innerHTML =
+                    `<strong style="color:var(--text);">Archivo:</strong> ${escapeHtml(file.name)}<br>` +
+                    `Torneos: <strong style="color:var(--text);">${nT}</strong> · ` +
+                    `Movimientos: <strong style="color:var(--text);">${nTx}</strong><br>` +
+                    `Capital en backup: <strong style="color:var(--green);">$${(payload.bankroll || 0).toFixed(2)}</strong>` +
+                    (payload.initialBankroll ? ` (inicial $${payload.initialBankroll.toFixed(2)})` : '') +
+                    `<br><br>` +
+                    `<strong style="color:var(--text);">Ahora tienes:</strong> ` +
+                    `${state.tournaments.length} torneos · ${state.transactions.length} movimientos · ` +
+                    `capital $${Number(state.bankroll || 0).toFixed(2)}`;
+            }
+            closeModal('backupModal');
+            document.getElementById('importChoiceModal').classList.add('show');
+        } catch (err) {
+            console.error(err);
+            showToast('Archivo JSON inválido', 'error');
+        } finally {
+            event.target.value = '';
+        }
+    };
+    reader.readAsText(file);
+}
+
+async function confirmImportChoice(mode) {
+    if (!_pendingImport) return;
+    const { payload, fromWelcome } = _pendingImport;
+    document.getElementById('importChoiceModal').classList.remove('show');
+    _pendingImport = null;
+    await applyImport(payload, mode, { fromWelcome });
+}
+
+function cancelImportChoice() {
+    _pendingImport = null;
+    document.getElementById('importChoiceModal').classList.remove('show');
+    showToast('Importación cancelada', 'error');
+}
+
+/**
+ * @param {'merge'|'replace'} mode
+ */
+async function applyImport(payload, mode, opts) {
+    opts = opts || {};
+    setLoading(true);
+    let addedT = 0, skippedT = 0, addedTx = 0, skippedTx = 0;
+
+    try {
+        if (mode === 'replace') {
+            await FeltLabAPI.tracker.clear();
+            // Capital base = inicial del backup (los torneos/tx ajustan el bankroll al crearse)
+            const init = payload.initialBankroll || 0;
+            await FeltLabAPI.tracker.setState({
+                bankroll: init,
+                initial_bankroll: init,
+                welcome_shown: true
+            });
+            state.bankroll = init;
+            state.initialBankroll = init;
+            state.welcomeShown = true;
+            state.tournaments = [];
+            state.transactions = [];
+        }
+
+        // Sets de huellas para deduplicar (en replace el set está vacío)
+        const existingT = new Set((state.tournaments || []).map(tournamentKey));
+        const existingTx = new Set((state.transactions || []).map(transactionKey));
+
+        // 1) Depósitos primero (para no fallar retiros por balance)
+        const txs = Array.isArray(payload.transactions) ? payload.transactions.slice() : [];
+        const deposits = txs.filter(tx => tx.type === 'deposit');
+        const withdraws = txs.filter(tx => tx.type === 'withdraw');
+        const otherTx = txs.filter(tx => tx.type !== 'deposit' && tx.type !== 'withdraw');
+
+        async function importOneTx(tx) {
+            const key = transactionKey(tx);
+            if (mode === 'merge' && existingTx.has(key)) {
+                skippedTx++;
+                return;
+            }
+            try {
+                await FeltLabAPI.tracker.createTransaction({
+                    type: tx.type,
+                    amount: tx.amount,
+                    date: toDateStr(tx.date) || undefined,
+                    notes: tx.notes || undefined,
+                    skip_balance_check: true
+                });
+                existingTx.add(key);
+                addedTx++;
+            } catch (err) {
+                console.warn('Error importando tx:', err);
+            }
+        }
+
+        for (const tx of deposits) await importOneTx(tx);
+
+        // 2) Torneos
+        for (const t of (payload.tournaments || [])) {
+            const key = tournamentKey(t);
+            if (mode === 'merge' && existingT.has(key)) {
+                skippedT++;
+                continue;
+            }
+            try {
+                await FeltLabAPI.tracker.createTournament({
+                    name: t.name,
+                    cost: t.cost,
+                    base_cost: t.baseCost != null ? t.baseCost : (t.base_cost != null ? t.base_cost : t.cost),
+                    rebuys: t.rebuys || 0,
+                    win: t.win || 0,
+                    position: t.pos != null ? t.pos : t.position,
+                    type: t.type,
+                    speed: t.speed,
+                    site: t.site || '',
+                    players: t.players,
+                    date: t.date,
+                    notes: t.notes
+                });
+                existingT.add(key);
+                addedT++;
+            } catch (err) {
+                console.warn('Error importando torneo:', err);
+            }
+        }
+
+        // 3) Retiros y resto
+        for (const tx of otherTx) await importOneTx(tx);
+        for (const tx of withdraws) await importOneTx(tx);
+
+        // En replace, si el backup trae bankroll explícito, alineamos al final
+        if (mode === 'replace' && payload.bankroll != null && !isNaN(Number(payload.bankroll))) {
+            await FeltLabAPI.tracker.setState({
+                bankroll: Number(payload.bankroll),
+                initial_bankroll: payload.initialBankroll || 0,
+                welcome_shown: true
+            });
+        }
+
+        // Si venimos del welcome y el backup no traía initial, al menos marcamos welcome
+        if (opts.fromWelcome || mode === 'replace') {
+            await FeltLabAPI.tracker.setState({ welcome_shown: true });
+        }
+
+        await loadStateFromServer();
+        updateUI();
+
+        const welcomeEl = document.getElementById('welcomeModal');
+        if (welcomeEl) welcomeEl.classList.remove('show');
+        closeModal('backupModal');
+        document.getElementById('importChoiceModal').classList.remove('show');
+
+        const parts = [];
+        if (mode === 'replace') {
+            parts.push(`Importado de cero: ${addedT} torneos, ${addedTx} movimientos`);
+        } else {
+            parts.push(`Sumados: ${addedT} torneos, ${addedTx} movimientos`);
+            if (skippedT || skippedTx) {
+                parts.push(`omitidos ${skippedT + skippedTx} duplicados`);
+            }
+        }
+        showToast(parts.join(' · ') + ' ✅', 'success');
+    } catch (err) {
+        console.error(err);
+        showToast('Error al importar: ' + (err.message || 'desconocido'), 'error');
+    } finally {
+        setLoading(false);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LOGOUT
+   ═══════════════════════════════════════════════════════════ */
+async function logout() {
+    if (!confirm('¿Cerrar sesión?')) return;
+    try {
+        await FeltLabAPI.auth.logout();
+    } catch (e) { /* ignore */ }
+    window.location.href = '/login';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESIZE
+   ═══════════════════════════════════════════════════════════ */
+window.addEventListener('resize', () => {
+    if (chartInstance) {
+        try { chartInstance.resize(); } catch (_) {}
+    }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   AUTO-FREEROLL: si el coste es 0, marcar tipo Freeroll
+   ═══════════════════════════════════════════════════════════ */
+document.getElementById('tourneyCost').addEventListener('input', function() {
+    const typeSel = document.getElementById('tourneyType');
+    if (!typeSel) return;
+    const val = parseFloat(this.value);
+    if (val === 0 && typeSel.value !== 'Freeroll') {
+        typeSel.value = 'Freeroll';
+    }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   START
+   ═══════════════════════════════════════════════════════════ */
+init();
+</script>
+
+<script>
+(function(){
+  function boot(){
+    if(!window.RangeLabI18n){ setTimeout(boot,40); return; }
+    RangeLabI18n.applyDom();
+    RangeLabI18n.wireLangButtons();
+    if(window.RangeLabProfile){
+      RangeLabProfile.ensureStyles();
+      var chip = document.querySelector('.user-chip');
+      if(chip) RangeLabProfile.wireUserChip(chip, null);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+})();
+</script>
+
+
+<script>
+(function(){
+  function applySite(s){
+    if(!s) return;
+    document.querySelectorAll('.rl-site-footer').forEach(function(el){ el.textContent = s.footer_text || el.textContent; });
+    document.querySelectorAll('.rl-site-footer-brand').forEach(function(el){ el.textContent = 'Creado por ' + (s.brand_name || 'RangeSoft'); });
+    document.querySelectorAll('.rl-site-brand-name').forEach(function(el){ el.textContent = 'Acerca de ' + (s.brand_name || 'RangeSoft'); });
+  }
+  if(window.__RL_SITE) applySite(window.__RL_SITE);
+  else RangeLabAPI.site().then(function(s){ window.__RL_SITE=s; applySite(s); }).catch(function(){});
+})();
+</script>
+</body>
+</html>

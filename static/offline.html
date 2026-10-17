@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07090f">
+  <title>Offline — RangeLab</title>
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: #07090f; color: #e8ecf4;
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      padding: env(safe-area-inset-top, 0px) 20px env(safe-area-inset-bottom, 0px);
+    }
+    main { max-width: 360px; text-align: center; }
+    img { width: 72px; height: 72px; border-radius: 18px; margin-bottom: 18px; }
+    h1 { font-size: 1.35rem; margin: 0 0 8px; letter-spacing: -0.01em; }
+    p { color: #94a3b8; margin: 0 0 22px; }
+    button {
+      font: inherit; font-weight: 600; color: #0c1222; background: #f0c14b;
+      border: 0; border-radius: 12px; padding: 12px 22px; min-height: 44px; cursor: pointer;
+    }
+    button:focus-visible { outline: 2px solid #f0c14b; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/static/icons/icon-192.png" alt="">
+    <h1>Offline</h1>
+    <p>You can keep using RangeLab with the data you already downloaded from your profile. Your changes are saved on this device and sync automatically when the connection returns.</p>
+    <button id="retry" type="button">Retry</button>
+  </main>
+  <script>
+    document.getElementById('retry').addEventListener('click', function () { location.reload(); });
+    window.addEventListener('online', function () { location.reload(); });
+  </script>
+</body>
+</html>

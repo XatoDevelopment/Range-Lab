@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c13">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>AI Table — RangeLab</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/profile.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+  <script src="/static/js/api-client.js"></script>
+<style>
+/* ═══ AI TABLE v2 — mesa limpia estilo app móvil ═══ */
+body.tool-ailab {
+  margin: 0; padding: 0;
+  background: #07080c;
+  color: #eef1f7;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100dvh;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+body.tool-ailab * { box-sizing: border-box; }
+
+.ai-shell {
+  display: flex; flex-direction: column;
+  height: 100dvh;
+  max-width: 440px;
+  margin: 0 auto;
+  position: relative;
+  background: #07080c;
+}
+@media (min-width: 900px) {
+  .ai-shell { max-width: 400px; box-shadow: 0 0 80px rgba(0,0,0,0.65); }
+}
+
+/* ── Top bar ── */
+.ai-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  z-index: 30; flex-shrink: 0; gap: 8px;
+}
+.ai-top-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(36,40,52,0.95); border: 1px solid rgba(255,255,255,0.08);
+  color: #c8cdd8; display: grid; place-items: center; cursor: pointer;
+  transition: transform .15s; flex-shrink: 0;
+}
+.ai-top-btn:active { transform: scale(0.92); }
+.ai-top-btn svg { width: 18px; height: 18px; }
+.ai-top-center { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.ai-chip-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 999px;
+  background: rgba(36,40,52,0.95); border: 1px solid rgba(255,255,255,0.08);
+  font-size: 11px; font-weight: 700; color: #c8cdd8;
+  white-space: nowrap;
+}
+.ai-chip-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: #35d488; box-shadow: 0 0 6px #35d488; }
+.ai-chip-pill.mtt { border-color: rgba(242,168,60,0.35); color: #f2a83c; }
+
+/* ── MTT HUD ── */
+.ai-mtt-hud {
+  display: none;
+  flex-shrink: 0;
+  margin: 0 12px 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(242,168,60,0.12), rgba(155,139,244,0.08));
+  border: 1px solid rgba(242,168,60,0.25);
+  font-size: 11px; font-weight: 700;
+  color: #c8cdd8;
+  gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center;
+}
+.ai-mtt-hud.show { display: flex; }
+.ai-mtt-hud .mtt-item { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ai-mtt-hud .mtt-item b { color: #f2a83c; font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace; font-size: 13px; }
+.ai-mtt-hud .mtt-item span { color: #6b7590; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ── Table ── */
+.ai-table-wrap {
+  flex: 1; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 0;
+  padding: 4px 6px 0;
+}
+.ai-felt {
+  position: relative;
+  width: min(100%, 360px);
+  height: min(100%, 520px);
+  max-height: 100%;
+  border-radius: 50% / 42%;
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 48%, #1b6b42 0%, #0e4028 50%, #0a2a1a 100%);
+  border: 9px solid #161820;
+  box-shadow:
+    inset 0 0 50px rgba(0,0,0,0.4),
+    0 0 0 2px #2a2e3a,
+    0 10px 36px rgba(0,0,0,0.5);
+  overflow: visible;
+}
+.ai-felt::after {
+  content: '';
+  position: absolute; inset: 10%;
+  border-radius: 50% / 42%;
+  border: 1px solid rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+.ai-logo {
+  position: absolute; left: 50%; top: 26%;
+  transform: translate(-50%, -50%);
+  opacity: 0.11; text-align: center; pointer-events: none; z-index: 1;
+  font-weight: 900; letter-spacing: 1.5px; font-size: 12px; color: #fff;
+}
+.ai-logo span { display: block; font-size: 20px; margin-bottom: 2px; }
+
+/* Info above pot — compact, no overlap */
+.ai-table-info {
+  position: absolute; left: 50%; top: 14%;
+  transform: translateX(-50%);
+  text-align: center; width: 70%;
+  font-size: 9px; color: rgba(255,255,255,0.4);
+  line-height: 1.35; pointer-events: none; z-index: 2;
+  font-weight: 600;
+}
+.ai-table-info strong { display: block; color: rgba(255,255,255,0.55); font-size: 10px; margin-bottom: 2px; }
+
+/* Pot — center of felt */
+.ai-pot {
+  position: absolute; left: 50%; top: 40%;
+  transform: translate(-50%, -50%);
+  z-index: 5; text-align: center; pointer-events: none;
+}
+.ai-pot-main {
+  display: inline-flex; flex-direction: column; align-items: center;
+  padding: 6px 14px; border-radius: 12px;
+  background: rgba(8,10,14,0.88); border: 1px solid rgba(255,255,255,0.1);
+}
+.ai-pot-label {
+  font-size: 8px; font-weight: 800; letter-spacing: 0.8px;
+  color: #f2a83c; text-transform: uppercase;
+}
+.ai-pot-amount {
+  font-size: 16px; font-weight: 900; color: #fff;
+  font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace; line-height: 1.2;
+}
+.ai-pot-sub { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+/* Board — below pot, above hero */
+.ai-board {
+  position: absolute; left: 50%; top: 54%;
+  transform: translate(-50%, -50%);
+  display: flex; gap: 4px; z-index: 6;
+  justify-content: center;
+}
+.ai-card {
+  width: 36px; height: 50px;
+  border-radius: 5px;
+  background: #1a1c24;
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-weight: 900; line-height: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+.ai-card.suit-s { color: #e8eaef; background: linear-gradient(160deg, #3a3f4e, #252833); }
+.ai-card.suit-c { color: #e8eaef; background: linear-gradient(160deg, #2a8f5a, #1a5c3a); }
+.ai-card.suit-h { color: #fff; background: linear-gradient(160deg, #c9453d, #8b2a24); }
+.ai-card.suit-d { color: #fff; background: linear-gradient(160deg, #2f6fd4, #1a4a9a); }
+.ai-card .rank { font-size: 14px; letter-spacing: -0.5px; }
+.ai-card .suit { font-size: 11px; margin-top: 1px; }
+.ai-card.back {
+  background: linear-gradient(145deg, #4a2040, #2a1030);
+  border-color: rgba(219,97,162,0.3);
+}
+.ai-card.back::after { content: '★'; color: rgba(255,255,255,0.2); font-size: 14px; }
+.ai-card.empty { visibility: hidden; width: 36px; height: 50px; border: 0; box-shadow: none; background: transparent; }
+.ai-card.hero-card {
+  width: 52px; height: 72px; border-radius: 7px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+.ai-card.hero-card .rank { font-size: 22px; }
+.ai-card.hero-card .suit { font-size: 15px; }
+
+/* ── Seats — orbit around felt, outside center ── */
+.ai-seat {
+  position: absolute; z-index: 10;
+  display: flex; flex-direction: column; align-items: center;
+  width: 72px; pointer-events: none;
+}
+.ai-seat .avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(145deg, #3a4050, #1e2330);
+  border: 2px solid rgba(255,255,255,0.12);
+  display: grid; place-items: center; font-size: 16px;
+  position: relative; z-index: 2;
+}
+.ai-seat.hero .avatar {
+  width: 40px; height: 40px;
+  border-color: rgba(242,168,60,0.55);
+  box-shadow: 0 0 14px rgba(242,168,60,0.3);
+}
+.ai-seat.active .avatar {
+  border-color: #33d2e3;
+  box-shadow: 0 0 0 3px rgba(51,210,227,0.4);
+  animation: aiPulse 1.2s ease infinite;
+}
+@keyframes aiPulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(51,210,227,0.35); }
+  50% { box-shadow: 0 0 0 5px rgba(51,210,227,0.15); }
+}
+.ai-seat.folded { opacity: 0.38; filter: grayscale(0.4); }
+.ai-seat.sitting-out { opacity: 0.3; }
+.ai-seat .cards-row {
+  display: flex; gap: 2px; margin-bottom: -4px; z-index: 1; height: 22px;
+}
+.ai-seat .mini-card {
+  width: 18px; height: 24px; border-radius: 2px;
+  background: linear-gradient(145deg, #4a2040, #2a1030);
+  border: 1px solid rgba(219,97,162,0.25);
+}
+.ai-seat .name-badge {
+  margin-top: 2px;
+  padding: 2px 7px;
+  border-radius: 5px 5px 0 0;
+  background: rgba(8,10,14,0.92);
+  font-size: 9px; font-weight: 700; color: #eef1f7;
+  max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-align: center; line-height: 1.3;
+}
+.ai-seat.sitting-out .name-badge { color: #f2685f; font-size: 8px; }
+.ai-seat .stack-badge {
+  padding: 1px 7px 3px;
+  border-radius: 0 0 5px 5px;
+  background: rgba(8,10,14,0.92);
+  font-size: 10px; font-weight: 800;
+  font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+  color: #a4acc0; line-height: 1.3;
+}
+.ai-seat.hero .stack-badge { color: #35d488; }
+.ai-seat .bet-chip {
+  position: absolute;
+  padding: 2px 7px; border-radius: 999px;
+  background: rgba(8,10,14,0.92); border: 1px solid rgba(242,168,60,0.45);
+  font-size: 9px; font-weight: 800; color: #f2a83c;
+  font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+  white-space: nowrap; z-index: 12;
+}
+.ai-seat .dealer-btn {
+  position: absolute; width: 18px; height: 18px; border-radius: 50%;
+  background: #f2a83c; color: #1a1400; font-size: 9px; font-weight: 900;
+  display: grid; place-items: center; z-index: 12;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+.ai-seat .winner-tag {
+  position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+  font-size: 10px; font-weight: 900; letter-spacing: 0.8px;
+  color: #fff; text-shadow: 0 0 10px rgba(242,168,60,0.9), 0 2px 3px #000;
+  white-space: nowrap; z-index: 14;
+  animation: aiWinPulse 1.1s ease infinite;
+}
+@keyframes aiWinPulse {
+  0%,100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.06); }
+}
+
+/* Seat positions — 6-max baseline */
+.ai-seat[data-pos="0"] { bottom: -2%; left: 50%; transform: translateX(-50%); z-index: 15; }
+.ai-seat[data-pos="1"] { bottom: 14%; left: -6%; }
+.ai-seat[data-pos="2"] { top: 18%; left: -6%; }
+.ai-seat[data-pos="3"] { top: -3%; left: 50%; transform: translateX(-50%); }
+.ai-seat[data-pos="4"] { top: 18%; right: -6%; left: auto; }
+.ai-seat[data-pos="5"] { bottom: 14%; right: -6%; left: auto; }
+.ai-seat[data-pos="6"] { bottom: 4%; right: 4%; left: auto; }
+.ai-seat[data-pos="7"] { bottom: 4%; left: 4%; }
+.ai-seat[data-pos="8"] { top: 4%; left: 18%; }
+
+/* 8-max adjustments */
+.ai-felt.seats-8 .ai-seat { width: 66px; }
+.ai-felt.seats-8 .ai-seat .name-badge { max-width: 64px; font-size: 8px; }
+.ai-felt.seats-8 .ai-seat[data-pos="1"] { bottom: 12%; left: -8%; }
+.ai-felt.seats-8 .ai-seat[data-pos="2"] { top: 16%; left: -8%; }
+.ai-felt.seats-8 .ai-seat[data-pos="3"] { top: -4%; left: 28%; transform: none; }
+.ai-felt.seats-8 .ai-seat[data-pos="4"] { top: -4%; left: 72%; transform: translateX(-50%); }
+.ai-felt.seats-8 .ai-seat[data-pos="5"] { top: 16%; right: -8%; left: auto; }
+.ai-felt.seats-8 .ai-seat[data-pos="6"] { bottom: 12%; right: -8%; left: auto; }
+.ai-felt.seats-8 .ai-seat[data-pos="7"] { bottom: 4%; left: 8%; }
+
+/* 9-max */
+.ai-felt.seats-9 .ai-seat { width: 62px; }
+.ai-felt.seats-9 .ai-seat .avatar { width: 32px; height: 32px; font-size: 14px; }
+.ai-felt.seats-9 .ai-seat .name-badge { max-width: 60px; font-size: 8px; }
+.ai-felt.seats-9 .ai-seat .stack-badge { font-size: 9px; }
+.ai-felt.seats-9 .ai-seat[data-pos="1"] { bottom: 11%; left: -9%; }
+.ai-felt.seats-9 .ai-seat[data-pos="2"] { top: 22%; left: -9%; }
+.ai-felt.seats-9 .ai-seat[data-pos="3"] { top: 2%; left: 10%; }
+.ai-felt.seats-9 .ai-seat[data-pos="4"] { top: -4%; left: 50%; transform: translateX(-50%); }
+.ai-felt.seats-9 .ai-seat[data-pos="5"] { top: 2%; right: 10%; left: auto; }
+.ai-felt.seats-9 .ai-seat[data-pos="6"] { top: 22%; right: -9%; left: auto; }
+.ai-felt.seats-9 .ai-seat[data-pos="7"] { bottom: 11%; right: -9%; left: auto; }
+.ai-felt.seats-9 .ai-seat[data-pos="8"] { bottom: 3%; left: 10%; }
+
+/* 3-max */
+.ai-felt.seats-3 .ai-seat[data-pos="2"] { top: -3%; left: 50%; transform: translateX(-50%); }
+.ai-felt.seats-3 .ai-seat[data-pos="5"] { bottom: 20%; right: -4%; left: auto; }
+
+/* Bet chips toward center */
+.ai-seat[data-pos="0"] .bet-chip { top: -22px; left: 50%; transform: translateX(-50%); }
+.ai-seat[data-pos="1"] .bet-chip, .ai-seat[data-pos="2"] .bet-chip { right: -28px; top: 28px; }
+.ai-seat[data-pos="3"] .bet-chip, .ai-seat[data-pos="4"] .bet-chip { bottom: -20px; left: 50%; transform: translateX(-50%); top: auto; }
+.ai-seat[data-pos="5"] .bet-chip, .ai-seat[data-pos="6"] .bet-chip { left: -28px; top: 28px; right: auto; }
+.ai-seat[data-pos="7"] .bet-chip { right: -28px; top: 20px; }
+.ai-seat[data-pos="8"] .bet-chip { right: -28px; top: 24px; }
+
+.ai-seat[data-pos="0"] .dealer-btn { right: -6px; top: 6px; }
+.ai-seat[data-pos="1"] .dealer-btn, .ai-seat[data-pos="2"] .dealer-btn { right: -3px; top: -3px; }
+.ai-seat[data-pos="3"] .dealer-btn, .ai-seat[data-pos="4"] .dealer-btn { right: -6px; bottom: 4px; top: auto; }
+.ai-seat[data-pos="5"] .dealer-btn, .ai-seat[data-pos="6"] .dealer-btn { left: -3px; top: -3px; }
+.ai-seat[data-pos="7"] .dealer-btn, .ai-seat[data-pos="8"] .dealer-btn { right: -3px; top: -3px; }
+
+/* Hero cards — OUTSIDE felt, above action bar */
+.ai-hero-zone {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 2px 0 0; min-height: 0; z-index: 20;
+  position: relative;
+}
+.ai-hero-cards {
+  display: flex; gap: 6px;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45));
+  margin-bottom: 2px;
+}
+.ai-hero-cards:empty { display: none; }
+
+/* Status */
+.ai-status-bar {
+  text-align: center; font-size: 11px; font-weight: 600;
+  color: #6b7590; padding: 2px 12px; min-height: 18px; flex-shrink: 0;
+}
+
+/* Actions */
+.ai-actions {
+  flex-shrink: 0;
+  padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 8px;
+  background: linear-gradient(0deg, #07080c 80%, transparent);
+  z-index: 30;
+}
+.ai-bet-row {
+  display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap;
+}
+.ai-bet-preset {
+  padding: 7px 11px; border-radius: 9px;
+  background: rgba(36,40,52,0.95); border: 1px solid rgba(255,255,255,0.08);
+  color: #c8cdd8; font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: background .15s, transform .12s;
+}
+.ai-bet-preset:active { transform: scale(0.95); }
+.ai-bet-preset.active {
+  background: color-mix(in srgb, #f2a83c 18%, transparent);
+  border-color: rgba(242,168,60,0.45); color: #f2a83c;
+}
+.ai-btn-row { display: flex; gap: 8px; }
+.ai-act-btn {
+  flex: 1; padding: 13px 10px; border-radius: 13px;
+  font-size: 14px; font-weight: 800; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(36,40,52,0.95); color: #eef1f7;
+  transition: transform .12s, filter .15s;
+  min-height: 48px;
+}
+.ai-act-btn:active { transform: scale(0.97); }
+.ai-act-btn.fold { color: #f2685f; border-color: rgba(242,104,95,0.28); }
+.ai-act-btn.check { color: #eef1f7; }
+.ai-act-btn.call {
+  background: linear-gradient(135deg, #2a6fd4, #1a4a9a);
+  border-color: transparent; color: #fff;
+  box-shadow: 0 5px 16px rgba(42,111,212,0.3);
+}
+.ai-act-btn.raise {
+  background: linear-gradient(135deg, #f2a83c, #c9821f);
+  border-color: transparent; color: #1a1400;
+  box-shadow: 0 5px 16px rgba(242,168,60,0.3);
+}
+.ai-act-btn:disabled { opacity: 0.4; pointer-events: none; }
+.ai-slider-row { display: flex; align-items: center; gap: 10px; padding: 0 2px; }
+.ai-slider-row input[type=range] { flex: 1; accent-color: #f2a83c; height: 5px; }
+.ai-slider-val {
+  font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+  font-size: 12px; font-weight: 700; color: #f2a83c;
+  min-width: 58px; text-align: right;
+}
+
+/* Setup */
+.ai-setup {
+  position: absolute; inset: 0; z-index: 50;
+  background: #07080c;
+  display: flex; flex-direction: column;
+  padding: 14px; padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+}
+.ai-setup.hidden { display: none; }
+.ai-setup h1 {
+  font-size: 22px; font-weight: 900; letter-spacing: -0.02em; margin: 8px 0 4px;
+}
+.ai-setup h1 span {
+  background: linear-gradient(90deg, #f2a83c, #9b8bf4);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ai-setup .sub { color: #6b7590; font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
+.ai-setup-card {
+  background: #12151e; border: 1px solid #232a3c;
+  border-radius: 14px; padding: 14px; margin-bottom: 12px;
+}
+.ai-setup-card h3 {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.7px; color: #a4acc0; margin: 0 0 10px;
+}
+.ai-opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ai-opt-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+@media (max-width: 380px) {
+  .ai-opt-grid.cols-4 { grid-template-columns: 1fr 1fr; }
+}
+.ai-opt {
+  padding: 11px 8px; border-radius: 11px;
+  background: #171c2a; border: 1px solid #232a3c;
+  text-align: center; cursor: pointer; transition: all .15s;
+}
+.ai-opt:active { transform: scale(0.97); }
+.ai-opt.active {
+  border-color: #f2a83c;
+  background: color-mix(in srgb, #f2a83c 12%, #171c2a);
+  box-shadow: 0 0 0 1px rgba(242,168,60,0.2);
+}
+.ai-opt .lab { font-size: 12px; font-weight: 800; }
+.ai-opt .hint { font-size: 9px; color: #6b7590; margin-top: 2px; }
+.ai-profile-box {
+  font-size: 12px; line-height: 1.5; color: #a4acc0;
+  background: #171c2a; border-radius: 11px; padding: 11px;
+  border: 1px solid #232a3c;
+}
+.ai-profile-box strong { color: #f2a83c; }
+.ai-profile-stats { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.ai-profile-stats span {
+  font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 5px;
+  background: #202739; color: #c8cdd8; font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+}
+.ai-start-btn {
+  width: 100%; padding: 15px; border-radius: 13px; border: 0;
+  background: linear-gradient(135deg, #f2a83c, #c9821f);
+  color: #1a1400; font-size: 15px; font-weight: 900;
+  cursor: pointer; margin-top: 6px;
+  box-shadow: 0 8px 24px rgba(242,168,60,0.32);
+}
+.ai-start-btn:active { transform: scale(0.98); }
+.ai-start-btn:disabled { opacity: 0.5; cursor: wait; }
+
+.ai-toast {
+  position: absolute; left: 50%; bottom: 130px; transform: translateX(-50%);
+  z-index: 40; padding: 9px 16px; border-radius: 11px;
+  background: rgba(8,10,14,0.94); border: 1px solid rgba(255,255,255,0.12);
+  font-size: 12px; font-weight: 700; color: #eef1f7;
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+  white-space: nowrap; max-width: 90%; text-align: center;
+}
+.ai-toast.show { opacity: 1; }
+
+.ai-menu {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.6); 
+  opacity: 0; visibility: hidden; transition: .25s;
+}
+.ai-menu.show { opacity: 1; visibility: visible; }
+.ai-menu-panel {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: min(290px, 84%); background: #12151e;
+  border-right: 1px solid #232a3c;
+  transform: translateX(-100%); transition: transform .3s cubic-bezier(0.22,1,0.36,1);
+  padding: 18px 14px; padding-top: calc(18px + env(safe-area-inset-top, 0px));
+  display: flex; flex-direction: column; gap: 6px;
+}
+.ai-menu.show .ai-menu-panel { transform: translateX(0); }
+.ai-menu-panel a, .ai-menu-panel button {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 12px; border-radius: 11px;
+  background: transparent; border: 0; color: #eef1f7;
+  font-size: 14px; font-weight: 700; cursor: pointer; text-align: left;
+  font-family: inherit; text-decoration: none;
+}
+.ai-menu-panel a:hover, .ai-menu-panel button:hover { background: #1a2030; }
+
+/* ═══ v3 · Layout de partida, ayudas, hojas y animaciones ═══ */
+/* La herramienta tiene su propia barra superior (volver, opciones): la navegación global
+   tapaba el botón de sentarse y las acciones de juego, así que se oculta en esta pantalla */
+body.tool-ailab .rl-bottom-nav { display: none !important; }
+body.tool-ailab.ai-playing .ai-shell { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* Acciones: aparecen con suave subida cada vez que se muestran */
+.ai-actions { animation: aiRise .28s cubic-bezier(.22,1,.36,1); }
+@keyframes aiRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.ai-act-btn:disabled { opacity: 0.4; }
+
+.ai-hint-btn { color: #35d488; border-color: rgba(53,212,136,0.3); }
+.ai-hint-btn:active { background: rgba(53,212,136,0.12); }
+
+/* Hojas inferiores (estadísticas y revisión) */
+.ai-sheet-ov {
+  position: fixed; inset: 0; z-index: 120;
+  background: rgba(0,0,0,0.55);
+  opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility 0s linear .25s;
+}
+.ai-sheet-ov.show { opacity: 1; visibility: visible; transition: opacity .25s ease; }
+.ai-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  max-width: 440px; margin: 0 auto;
+  max-height: 78dvh; display: flex; flex-direction: column;
+  background: #12151e; border-top: 1px solid #232a3c;
+  border-radius: 20px 20px 0 0;
+  padding: 8px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%); transition: transform .32s cubic-bezier(.22,1,.36,1);
+}
+.ai-sheet-ov.show .ai-sheet { transform: none; }
+.ai-sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: #2a3348; margin: 4px auto 10px; }
+.ai-sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; color: #eef1f7; }
+.ai-sheet-head b { font-size: 15px; }
+.ai-sheet-x {
+  width: 32px; height: 32px; border-radius: 50%; border: 1px solid #232a3c;
+  background: #1a2030; color: #c8cdd8; cursor: pointer; font-size: 13px;
+}
+.ai-sheet-body { overflow: auto; -webkit-overflow-scrolling: touch; color: #c8cdd8; font-size: 13px; }
+.ai-stats-table { width: 100%; border-collapse: collapse; }
+.ai-stats-table th, .ai-stats-table td { padding: 8px 6px; text-align: right; border-bottom: 1px solid #1e2636; }
+.ai-stats-table th:first-child, .ai-stats-table td:first-child { text-align: left; }
+.ai-stats-table th { font-size: 10px; color: #6b7590; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+.ai-stats-table td.num { font-family: ui-monospace, Menlo, Consolas, monospace; }
+.ai-stats-note { font-size: 11px; color: #6b7590; margin-top: 10px; line-height: 1.5; }
+.ai-review-meta { font-size: 12px; color: #6b7590; margin-bottom: 8px; }
+.ai-review-board { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; color: #eef1f7; margin-bottom: 10px; }
+.ai-review-street { margin: 12px 0 4px; font-size: 10px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #f2a83c; }
+.ai-review-line { padding: 5px 0; border-bottom: 1px solid #1a2030; }
+.ai-review-line.hero { color: #35d488; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-actions, .ai-sheet, .ai-sheet-ov { animation: none !important; transition: none !important; }
+}
+</style>
+<link rel="stylesheet" href="/static/css/rangelab-menus.css">
+</head>
+<body class="tool-ailab rl-loading">
+
+<div id="splash">
+  <div class="splash-logo">🤖</div>
+  <div class="splash-title">AI <span>Table</span></div>
+  <div class="splash-sub">RangeLab Suite · vs IA · Hand Lab</div>
+  <div class="splash-credits">Cargando herramienta…</div>
+  <div class="splash-loader"></div>
+</div>
+
+<div class="ai-shell" id="app">
+  <!-- Setup -->
+  <div class="ai-setup" id="setupScreen">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <a href="/" class="ai-top-btn" title="Portal" style="text-decoration:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      </a>
+      <button class="ai-top-btn theme-toggle" type="button" title="Tema">
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+    </div>
+    <h1>AI <span>Table</span></h1>
+    <p class="sub">Juega Hold'em contra rivales IA. La IA aprende de tus manos de <strong style="color:var(--accent,#f2a83c)">Hand Lab</strong> para imitar el pool real.</p>
+
+    <div class="ai-setup-card">
+      <h3>Tipo de juego</h3>
+      <div class="ai-opt-grid" id="optMode">
+        <div class="ai-opt active" data-v="cash"><div class="lab">Cash</div><div class="hint">Blinds fijos</div></div>
+        <div class="ai-opt" data-v="tournament"><div class="lab">Torneo SNG</div><div class="hint">Blinds suben</div></div>
+      </div>
+    </div>
+
+    <div class="ai-setup-card">
+      <h3>Jugadores en mesa</h3>
+      <div class="ai-opt-grid cols-4" id="optSeats">
+        <div class="ai-opt" data-v="3"><div class="lab">3-max</div><div class="hint">HU + 1</div></div>
+        <div class="ai-opt active" data-v="6"><div class="lab">6-max</div><div class="hint">Clásico</div></div>
+        <div class="ai-opt" data-v="8"><div class="lab">8-max</div><div class="hint">MTT común</div></div>
+        <div class="ai-opt" data-v="9"><div class="lab">9-max</div><div class="hint">Full ring</div></div>
+      </div>
+    </div>
+
+    <div class="ai-setup-card">
+      <h3>Stacks iniciales</h3>
+      <div class="ai-opt-grid" id="optStack">
+        <div class="ai-opt active" data-v="100"><div class="lab">100 BB</div><div class="hint">Deep / SNG</div></div>
+        <div class="ai-opt" data-v="50"><div class="lab">50 BB</div><div class="hint">Medio</div></div>
+        <div class="ai-opt" data-v="30"><div class="lab">30 BB</div><div class="hint">Turbo</div></div>
+        <div class="ai-opt" data-v="15"><div class="lab">15 BB</div><div class="hint">Hyper</div></div>
+      </div>
+    </div>
+
+    <div class="ai-setup-card">
+      <h3>Guardar en Hand Lab</h3>
+      <div class="ai-opt-grid" id="optSave">
+        <div class="ai-opt active" data-v="1"><div class="lab">Sí</div><div class="hint">Replay después</div></div>
+        <div class="ai-opt" data-v="0"><div class="lab">No</div><div class="hint">Solo práctica</div></div>
+      </div>
+      <p style="font-size:11px;color:#6b7590;margin:10px 0 0;line-height:1.45;">Cada mano se guarda en <strong style="color:#f2a83c">Hand Lab</strong> para que puedas repetirla después.</p>
+    </div>
+
+    <div class="ai-setup-card">
+      <h3>Sonido / voces</h3>
+      <div class="ai-opt-grid" id="optSound">
+        <div class="ai-opt active" data-v="1"><div class="lab">Voces + SFX</div><div class="hint">Fold, call, raise…</div></div>
+        <div class="ai-opt" data-v="0"><div class="lab">Silencio</div><div class="hint">Sin audio</div></div>
+      </div>
+    </div>
+
+    <div class="ai-setup-card">
+      <h3>Dificultad IA</h3>
+      <div class="ai-opt-grid" id="optDiff">
+        <div class="ai-opt" data-v="0.7"><div class="lab">Relax</div><div class="hint">Más leaks</div></div>
+        <div class="ai-opt active" data-v="1"><div class="lab">Normal</div><div class="hint">Equilibrado</div></div>
+        <div class="ai-opt" data-v="1.25"><div class="lab">Tough</div><div class="hint">Más tight-aggro</div></div>
+        <div class="ai-opt" data-v="1.5"><div class="lab">Shark</div><div class="hint">Muy fuerte</div></div>
+      </div>
+    </div>
+
+    <div class="ai-setup-card">
+      <h3>Perfil Hand Lab</h3>
+      <div class="ai-profile-box" id="profileBox">
+        Cargando perfil desde Hand Lab…
+      </div>
+    </div>
+
+    <button class="ai-start-btn" id="btnStart" type="button">Sentarse en la mesa</button>
+  </div>
+
+  <!-- Game -->
+  <div class="ai-top" id="gameTop" style="display:none;">
+    <button class="ai-top-btn" id="btnBack" type="button" title="Menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="ai-top-center">
+      <div class="ai-chip-pill"><span class="dot"></span> <span id="handCount">Hand #1</span></div>
+      <div class="ai-chip-pill" id="bbLabel">0.5/1</div>
+      <div class="ai-chip-pill mtt" id="rankPill" style="display:none;">#1/9</div>
+    </div>
+    <button class="ai-top-btn" id="btnMenu" type="button" title="Opciones">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="ai-mtt-hud" id="mttHud">
+    <div class="mtt-item"><b id="mttRank">—</b><span>Posición</span></div>
+    <div class="mtt-item"><b id="mttAlive">—</b><span>En juego</span></div>
+    <div class="mtt-item"><b id="mttLevel">—</b><span>Nivel</span></div>
+    <div class="mtt-item"><b id="mttNext">—</b><span>Próx. blinds</span></div>
+  </div>
+
+  <div class="ai-table-wrap" id="tableWrap" style="display:none;">
+    <div class="ai-felt" id="felt">
+      <div class="ai-logo"><img class="rl-brand-img" src="/static/icons/icon-192.png" alt="" width="22" height="22" style="width:22px;height:22px;display:inline-block;vertical-align:-5px;margin-right:6px;border-radius:6px">RangeLab</div>
+      <div class="ai-table-info" id="tableInfo">
+        <strong id="tableTitle">AI Table · NL Hold'em</strong>
+        <span id="tableBlinds">Blinds 0.5 / 1</span>
+      </div>
+      <div class="ai-pot" id="potBox" style="display:none;">
+        <div class="ai-pot-main">
+          <div class="ai-pot-label">♦ TOTAL POT</div>
+          <div class="ai-pot-amount" id="potAmt">0 BB</div>
+          <div class="ai-pot-sub" id="potSub"></div>
+        </div>
+      </div>
+      <div class="ai-board" id="board"></div>
+      <!-- seats injected -->
+    </div>
+  </div>
+
+  <div class="ai-hero-zone" id="heroZone" style="display:none;">
+    <div class="ai-hero-cards" id="heroCards"></div>
+  </div>
+
+  <div class="ai-status-bar" id="statusBar" style="display:none;"></div>
+
+  <div class="ai-actions" id="actionBar" style="display:none;">
+    <div class="ai-bet-row" id="betPresets">
+      <button type="button" class="ai-bet-preset" data-m="0.33">33%</button>
+      <button type="button" class="ai-bet-preset" data-m="0.5">50%</button>
+      <button type="button" class="ai-bet-preset" data-m="0.75">75%</button>
+      <button type="button" class="ai-bet-preset" data-m="1">Pot</button>
+      <button type="button" class="ai-bet-preset" data-m="allin">All-in</button>
+      <button type="button" class="ai-bet-preset ai-hint-btn" id="btnHint" title="Pista heurística">💡 Pista</button>
+    </div>
+    <div class="ai-slider-row" id="betSliderRow">
+      <input type="range" id="betSlider" min="1" max="100" value="50">
+      <div class="ai-slider-val" id="betSliderVal">2.5 BB</div>
+    </div>
+    <div class="ai-btn-row" id="btnRow">
+      <button type="button" class="ai-act-btn fold" id="btnFold">Fold</button>
+      <button type="button" class="ai-act-btn check" id="btnCheck">Check</button>
+      <button type="button" class="ai-act-btn call" id="btnCall">Call</button>
+      <button type="button" class="ai-act-btn raise" id="btnRaise">Raise</button>
+    </div>
+  </div>
+
+  <div class="ai-toast" id="toast"></div>
+</div>
+
+<div class="ai-sheet-ov" id="statsSheet" aria-hidden="true">
+  <div class="ai-sheet" role="dialog" aria-label="Estadísticas">
+    <div class="ai-sheet-handle"></div>
+    <div class="ai-sheet-head"><b>Estadísticas de la sesión</b><button type="button" class="ai-sheet-x" data-close="statsSheet">✕</button></div>
+    <div class="ai-sheet-body" id="statsBody"></div>
+  </div>
+</div>
+<div class="ai-sheet-ov" id="reviewSheet" aria-hidden="true">
+  <div class="ai-sheet" role="dialog" aria-label="Revisión de mano">
+    <div class="ai-sheet-handle"></div>
+    <div class="ai-sheet-head"><b>Última mano</b><button type="button" class="ai-sheet-x" data-close="reviewSheet">✕</button></div>
+    <div class="ai-sheet-body" id="reviewBody"></div>
+  </div>
+</div>
+
+<div class="ai-menu" id="sideMenu">
+  <div class="ai-menu-panel">
+    <div class="rl-sheet-handle" aria-hidden="true" style="width:36px;height:4px;background:var(--border,#2a3348);border-radius:2px;margin:10px auto 8px;"></div>
+    <a href="/" class="ai-menu-portal-first" style="display:flex;align-items:center;gap:12px;padding:14px 16px;font-weight:700;color:var(--cyan,#33d2e3);text-decoration:none;border-bottom:1px solid var(--border,#1e2636);margin-bottom:6px;">
+      <span style="font-size:1.25rem;">🏠</span> Portal
+    </a>
+    <button type="button" id="menuContinue">Continuar</button>
+    <button type="button" id="menuNewHand">Nueva mano</button>
+    <button type="button" id="menuSound">🔊 Sonido: ON</button>
+    <button type="button" id="menuStats">📊 Estadísticas de la sesión</button>
+    <button type="button" id="menuReview">🔁 Revisar última mano</button>
+    <button type="button" id="menuSetup">Cambiar configuración</button>
+    <a href="/tool/feltlab">Abrir Hand Lab</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ─── Audio: voces + SFX (Web Audio + SpeechSynthesis) ───
+  var soundOn = true;
+  try {
+    var savedSound = localStorage.getItem('rangelab-ailab-sound');
+    if (savedSound === '0') soundOn = false;
+  } catch (e) {}
+
+  var audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) audioCtx = new AC();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      try { audioCtx.resume(); } catch (e) {}
+    }
+    return audioCtx;
+  }
+
+  function playTone(freq, dur, type, vol, slideTo) {
+    if (!soundOn) return;
+    var ctx = ensureAudio();
+    if (!ctx) return;
+    var t0 = ctx.currentTime;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t0);
+    if (slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(40, slideTo), t0 + dur);
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(vol || 0.12, t0 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+
+  function sfxFor(action) {
+    if (!soundOn) return;
+    switch (action) {
+      case 'fold':
+        playTone(220, 0.12, 'triangle', 0.08, 120);
+        break;
+      case 'check':
+        playTone(480, 0.06, 'sine', 0.06);
+        setTimeout(function () { playTone(520, 0.05, 'sine', 0.05); }, 50);
+        break;
+      case 'call':
+        playTone(360, 0.08, 'square', 0.05);
+        setTimeout(function () { playTone(300, 0.1, 'triangle', 0.07, 240); }, 40);
+        break;
+      case 'bet':
+        playTone(400, 0.1, 'sawtooth', 0.05, 520);
+        break;
+      case 'raise':
+        playTone(380, 0.08, 'sawtooth', 0.06);
+        setTimeout(function () { playTone(520, 0.12, 'sawtooth', 0.07, 680); }, 60);
+        break;
+      case 'allin':
+        playTone(200, 0.15, 'square', 0.08, 500);
+        setTimeout(function () { playTone(600, 0.2, 'sawtooth', 0.09, 900); }, 80);
+        break;
+      case 'win':
+        playTone(523, 0.1, 'sine', 0.08);
+        setTimeout(function () { playTone(659, 0.1, 'sine', 0.08); }, 90);
+        setTimeout(function () { playTone(784, 0.18, 'sine', 0.1); }, 180);
+        break;
+      case 'deal':
+        playTone(700, 0.04, 'triangle', 0.04, 500);
+        break;
+      default:
+        playTone(440, 0.06, 'sine', 0.05);
+    }
+  }
+
+  // Voz inmediata: cancela la anterior, solo dice la acción (sin nombre)
+  var cachedVoice = null;
+  function pickVoice() {
+    if (cachedVoice) return cachedVoice;
+    try {
+      var voices = window.speechSynthesis.getVoices() || [];
+      var es = voices.filter(function (v) { return /^es/i.test(v.lang); });
+      if (es.length) cachedVoice = es[0];
+      else if (voices.length) cachedVoice = voices[0];
+    } catch (e) {}
+    return cachedVoice;
+  }
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = function () {
+      cachedVoice = null;
+      pickVoice();
+    };
+  }
+
+  function speak(text, rate) {
+    if (!soundOn || !text || !window.speechSynthesis) return;
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'es-ES';
+    u.rate = rate || 1.25;
+    u.pitch = 1;
+    u.volume = 1;
+    var v = pickVoice();
+    if (v) u.voice = v;
+    try { window.speechSynthesis.speak(u); } catch (e) {}
+  }
+
+  function announceAction(playerName, actionKey, amountStr, isHero) {
+    if (!soundOn) return;
+    sfxFor(actionKey);
+    // Solo la acción, sin nombre ni cantidades (más rápido, sin cola)
+    var phrase = '';
+    switch (actionKey) {
+      case 'fold': phrase = 'Fold'; break;
+      case 'check': phrase = 'Check'; break;
+      case 'call': phrase = 'Call'; break;
+      case 'bet': phrase = 'Bet'; break;
+      case 'raise': phrase = 'Raise'; break;
+      case 'allin': phrase = 'All in'; break;
+      default: phrase = actionKey || '';
+    }
+    if (phrase) speak(phrase, 1.3);
+  }
+
+  function setSoundEnabled(on) {
+    soundOn = !!on;
+    try { localStorage.setItem('rangelab-ailab-sound', soundOn ? '1' : '0'); } catch (e) {}
+    if (!soundOn) {
+      try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
+    }
+    var btn = document.getElementById('menuSound');
+    if (btn) btn.textContent = soundOn ? '🔊 Sonido: ON' : '🔇 Sonido: OFF';
+  }
+
+  // ─── Cards / evaluation ───
+  var RANKS = '23456789TJQKA';
+  var SUITS = 'shdc';
+  var SUIT_SYM = { s: '♠', h: '♥', d: '♦', c: '♣' };
+  var SUIT_CLASS = { s: 'suit-s', h: 'suit-h', d: 'suit-d', c: 'suit-c' };
+
+  function makeDeck() {
+    var d = [];
+    for (var i = 0; i < 13; i++)
+      for (var j = 0; j < 4; j++)
+        d.push(RANKS[i] + SUITS[j]);
+    return d;
+  }
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = (Math.random() * (i + 1)) | 0;
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function cardHTML(c, hero) {
+    if (!c) return '<div class="ai-card empty"></div>';
+    if (c === 'back') return '<div class="ai-card back' + (hero ? ' hero-card' : '') + '"></div>';
+    var r = c[0], s = c[1];
+    var cls = 'ai-card ' + (SUIT_CLASS[s] || '') + (hero ? ' hero-card' : '');
+    var rank = r === 'T' ? '10' : r;
+    return '<div class="' + cls + '"><span class="rank">' + rank + '</span><span class="suit">' + (SUIT_SYM[s] || s) + '</span></div>';
+  }
+
+  // Hand rank: higher = better. Returns [category, k1, k2, ...]
+  function rankValue(r) { return RANKS.indexOf(r); }
+  function evaluate5(cards) {
+    var rs = cards.map(function (c) { return rankValue(c[0]); }).sort(function (a, b) { return b - a; });
+    var ss = cards.map(function (c) { return c[1]; });
+    var counts = {};
+    rs.forEach(function (r) { counts[r] = (counts[r] || 0) + 1; });
+    var flush = ss.every(function (s) { return s === ss[0]; });
+    var uniq = rs.filter(function (r, i) { return i === 0 || r !== rs[i - 1]; });
+    var straight = false, highS = 0;
+    if (uniq.length >= 5) {
+      for (var i = 0; i <= uniq.length - 5; i++) {
+        if (uniq[i] - uniq[i + 4] === 4) { straight = true; highS = uniq[i]; break; }
+      }
+      // wheel A-5
+      if (!straight && uniq.indexOf(12) >= 0 && uniq.indexOf(3) >= 0 && uniq.indexOf(2) >= 0 && uniq.indexOf(1) >= 0 && uniq.indexOf(0) >= 0) {
+        straight = true; highS = 3;
+      }
+    } else if (uniq.length === 5 && uniq[0] - uniq[4] === 4) {
+      straight = true; highS = uniq[0];
+    }
+    // wheel on exactly 5
+    if (!straight && rs.indexOf(12) >= 0 && rs.indexOf(0) >= 0 && rs.indexOf(1) >= 0 && rs.indexOf(2) >= 0 && rs.indexOf(3) >= 0) {
+      var onlyWheel = rs.every(function (r) { return [12, 0, 1, 2, 3].indexOf(r) >= 0; });
+      if (onlyWheel || uniq.length <= 5) { straight = true; highS = 3; }
+    }
+
+    var byCount = Object.keys(counts).map(Number).sort(function (a, b) {
+      return counts[b] - counts[a] || b - a;
+    });
+
+    if (straight && flush) return [8, highS];
+    if (counts[byCount[0]] === 4) return [7, byCount[0], byCount[1]];
+    if (counts[byCount[0]] === 3 && counts[byCount[1]] === 2) return [6, byCount[0], byCount[1]];
+    if (flush) return [5].concat(rs);
+    if (straight) return [4, highS];
+    if (counts[byCount[0]] === 3) return [3, byCount[0]].concat(byCount.slice(1));
+    if (counts[byCount[0]] === 2 && counts[byCount[1]] === 2) {
+      var p1 = Math.max(byCount[0], byCount[1]), p2 = Math.min(byCount[0], byCount[1]);
+      return [2, p1, p2, byCount[2]];
+    }
+    if (counts[byCount[0]] === 2) return [1, byCount[0]].concat(byCount.slice(1));
+    return [0].concat(rs);
+  }
+
+  function bestHand(hole, board) {
+    var all = hole.concat(board);
+    if (all.length < 5) return [0, 0];
+    var best = null;
+    // combinations of 5
+    function comb(start, chosen) {
+      if (chosen.length === 5) {
+        var v = evaluate5(chosen);
+        if (!best || cmpRank(v, best) > 0) best = v;
+        return;
+      }
+      for (var i = start; i < all.length; i++) {
+        chosen.push(all[i]);
+        comb(i + 1, chosen);
+        chosen.pop();
+      }
+    }
+    comb(0, []);
+    return best || [0];
+  }
+
+  function cmpRank(a, b) {
+    for (var i = 0; i < Math.max(a.length, b.length); i++) {
+      var x = a[i] || 0, y = b[i] || 0;
+      if (x !== y) return x - y;
+    }
+    return 0;
+  }
+
+  var HAND_NAMES = ['High card', 'Pair', 'Two pair', 'Trips', 'Straight', 'Flush', 'Full house', 'Quads', 'Straight flush'];
+
+  // ─── AI names ───
+  var AI_NAMES = ['Bazzle', 'Saikat24', 'VIDALBETS', 'Birguen', 'Fingers311', 'KriszKrosz', 'YAKKY1957', 'NovaFold', 'ChipThief', 'RiverGod'];
+
+  // ─── State ───
+  var profile = null;
+  var cfg = { seats: 6, stackBB: 100, difficulty: 1, mode: 'cash', saveHands: true, sound: true };
+  var game = null;
+  var tourneyId = null;
+  var handLog = []; // actions for current hand
+
+  // Blind structure for SNG (SB/BB in chips; we use BB units where starting stack is stackBB)
+  var BLIND_LEVELS = [
+    { sb: 0.5, bb: 1 },
+    { sb: 0.75, bb: 1.5 },
+    { sb: 1, bb: 2 },
+    { sb: 1.5, bb: 3 },
+    { sb: 2, bb: 4 },
+    { sb: 3, bb: 6 },
+    { sb: 4, bb: 8 },
+    { sb: 5, bb: 10 },
+    { sb: 7.5, bb: 15 },
+    { sb: 10, bb: 20 },
+    { sb: 15, bb: 30 },
+    { sb: 20, bb: 40 },
+    { sb: 30, bb: 60 },
+    { sb: 50, bb: 100 }
+  ];
+  var HANDS_PER_LEVEL = 8;
+
+  // ─── Profile load ───
+  function loadProfile() {
+    var box = document.getElementById('profileBox');
+    RangeLabAPI.ailab.profile(3000)
+      .then(function (p) {
+        profile = p;
+        var src = p.source === 'handlab'
+          ? ('Entrenada con <strong>' + p.hands_used + '</strong> manos' + (p.hands_total > p.hands_used ? ' (de ' + p.hands_total + ')' : '') + ' de Hand Lab.')
+          : (p.note || 'Perfil base.');
+        box.innerHTML = src +
+          '<div class="ai-profile-stats">' +
+          '<span>VPIP ' + p.vpip + '%</span>' +
+          '<span>PFR ' + p.pfr + '%</span>' +
+          '<span>AF ' + p.af + '</span>' +
+          '<span>3bet ' + p.three_bet + '%</span>' +
+          '<span>WTSD ' + p.wtsd + '%</span>' +
+          '</div>';
+      })
+      .catch(function () {
+        profile = null;
+        box.innerHTML = 'No se pudo cargar Hand Lab. Se usará perfil base.';
+      });
+  }
+
+  // ─── Setup UI ───
+  function wireOpts(id, key, kind) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', function (e) {
+      var opt = e.target.closest('.ai-opt');
+      if (!opt) return;
+      el.querySelectorAll('.ai-opt').forEach(function (o) { o.classList.remove('active'); });
+      opt.classList.add('active');
+      var v = opt.getAttribute('data-v');
+      if (kind === 'int') cfg[key] = parseInt(v, 10);
+      else if (kind === 'float') cfg[key] = parseFloat(v);
+      else if (kind === 'bool') cfg[key] = v === '1' || v === 'true';
+      else cfg[key] = v;
+    });
+  }
+  wireOpts('optSeats', 'seats', 'int');
+  wireOpts('optStack', 'stackBB', 'int');
+  wireOpts('optDiff', 'difficulty', 'float');
+  wireOpts('optMode', 'mode', 'str');
+  wireOpts('optSave', 'saveHands', 'bool');
+  wireOpts('optSound', 'sound', 'bool');
+
+  document.getElementById('btnStart').addEventListener('click', function () {
+    ensureAudio();
+    if (typeof cfg.sound === 'boolean') setSoundEnabled(cfg.sound);
+    startSession();
+    sfxFor('deal');
+  });
+
+  // ─── Game engine ───
+  function createPlayers(n, stack) {
+    var names = AI_NAMES.slice().sort(function () { return Math.random() - 0.5; });
+    var players = [];
+    for (var i = 0; i < n; i++) {
+      players.push({
+        id: i,
+        name: i === 0 ? 'Tú' : names[i - 1],
+        stack: stack,
+        hole: [],
+        bet: 0,
+        totalBet: 0,
+        folded: false,
+        allIn: false,
+        sittingOut: false,
+        isHero: i === 0,
+        isAI: i !== 0
+      });
+    }
+    return players;
+  }
+
+  function startSession() {
+    var stack = cfg.stackBB;
+    tourneyId = 'AIT' + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 1000);
+    game = {
+      players: createPlayers(cfg.seats, stack),
+      button: Math.floor(Math.random() * cfg.seats),
+      handNum: 0,
+      bb: 1,
+      sb: 0.5,
+      street: 'preflop',
+      board: [],
+      pot: 0,
+      deck: [],
+      toAct: 0,
+      currentBet: 0,
+      minRaise: 1,
+      lastAggressor: -1,
+      waitingHero: false,
+      running: true,
+      handOver: false,
+      mode: cfg.mode,
+      level: 0,
+      levelHand: 0,
+      startingStack: stack,
+      tournament: tourneyId,
+      saveHands: !!cfg.saveHands
+    };
+    applyBlindLevel(0);
+    document.getElementById('setupScreen').classList.add('hidden');
+    document.getElementById('gameTop').style.display = 'flex';
+    document.body.classList.add('ai-playing');
+    document.getElementById('tableWrap').style.display = 'flex';
+    document.getElementById('heroZone').style.display = 'flex';
+    document.getElementById('statusBar').style.display = 'block';
+    document.getElementById('actionBar').style.display = 'flex';
+    var hud = document.getElementById('mttHud');
+    var rankPill = document.getElementById('rankPill');
+    if (game.mode === 'tournament') {
+      hud.classList.add('show');
+      rankPill.style.display = '';
+    } else {
+      hud.classList.remove('show');
+      rankPill.style.display = 'none';
+    }
+    buildSeats();
+    nextHand();
+  }
+
+  function updateMttHud() {
+    if (!game || game.mode !== 'tournament') return;
+    var alive = game.players.filter(function (p) { return !p.sittingOut && p.stack >= 0.5; });
+    var totalStart = game.players.length;
+    // Rank by stack among alive; hero rank
+    var sorted = alive.slice().sort(function (a, b) { return b.stack - a.stack; });
+    var heroRank = sorted.findIndex(function (p) { return p.isHero; }) + 1;
+    if (heroRank < 1) heroRank = alive.length + 1;
+    document.getElementById('mttRank').textContent = '#' + heroRank + '/' + totalStart;
+    document.getElementById('mttAlive').textContent = alive.length;
+    document.getElementById('mttLevel').textContent = (game.level + 1) + ' · ' + game.sb + '/' + game.bb;
+    var nextIdx = Math.min(game.level + 1, BLIND_LEVELS.length - 1);
+    var next = BLIND_LEVELS[nextIdx];
+    var handsLeft = HANDS_PER_LEVEL - (game.levelHand || 0);
+    if (game.level >= BLIND_LEVELS.length - 1) {
+      document.getElementById('mttNext').textContent = 'MAX';
+    } else {
+      document.getElementById('mttNext').textContent = next.sb + '/' + next.bb + ' (' + handsLeft + 'h)';
+    }
+    document.getElementById('rankPill').textContent = '#' + heroRank + '/' + totalStart;
+  }
+
+  function applyBlindLevel(idx) {
+    idx = Math.min(idx, BLIND_LEVELS.length - 1);
+    game.level = idx;
+    game.sb = BLIND_LEVELS[idx].sb;
+    game.bb = BLIND_LEVELS[idx].bb;
+    game.minRaise = game.bb;
+  }
+
+  function maybeLevelUp() {
+    if (game.mode !== 'tournament') return;
+    game.levelHand++;
+    if (game.levelHand >= HANDS_PER_LEVEL && game.level < BLIND_LEVELS.length - 1) {
+      game.levelHand = 0;
+      applyBlindLevel(game.level + 1);
+      toast('▲ Nivel ' + (game.level + 1) + ' · Blinds ' + game.sb + '/' + game.bb);
+    }
+  }
+
+  function buildSeats() {
+    var felt = document.getElementById('felt');
+    felt.querySelectorAll('.ai-seat').forEach(function (s) { s.remove(); });
+    felt.className = 'ai-felt seats-' + game.players.length;
+    var n = game.players.length;
+    // Map logical index to visual pos (0=hero bottom)
+    for (var i = 0; i < n; i++) {
+      var vis = seatVisual(i, n);
+      var div = document.createElement('div');
+      div.className = 'ai-seat' + (i === 0 ? ' hero' : '');
+      div.dataset.pos = String(vis);
+      div.dataset.pid = String(i);
+      div.innerHTML = '<div class="cards-row"></div><div class="avatar">' + (i === 0 ? '😎' : '👤') + '</div>' +
+        '<div class="name-badge"></div><div class="stack-badge"></div>';
+      felt.appendChild(div);
+    }
+  }
+
+  function seatVisual(i, n) {
+    // Player index → visual data-pos (0 = hero bottom). Matches CSS orbits.
+    var maps = {
+      3: [0, 2, 5],
+      6: [0, 1, 2, 3, 4, 5],
+      // 8-max: hero, BL, ML, TL, TR, MR, BR, BM-left
+      8: [0, 1, 2, 3, 4, 5, 6, 7],
+      // 9-max: full ring
+      9: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    };
+    var m = maps[n] || maps[6];
+    return m[i] != null ? m[i] : i;
+  }
+
+  function nextHand() {
+    if (!game.running) return;
+    // remove busted AI, hero busted -> end
+    game.players.forEach(function (p) {
+      if (p.stack < 0.01) { p.sittingOut = true; p.folded = true; }
+    });
+    if (game.players[0].stack < 0.5) {
+      toast('Stack insuficiente. Vuelve a configurar la mesa.');
+      setStatus('Sesión terminada');
+      hideActions();
+      return;
+    }
+    var active = game.players.filter(function (p) { return !p.sittingOut && p.stack >= 0.5; });
+    if (active.length < 2) {
+      toast('No quedan rivales con fichas.');
+      hideActions();
+      return;
+    }
+
+    game.handNum++;
+    maybeLevelUp();
+    handLog = [];
+    game._streetStartStacks = game.players.map(function (p) { return p.stack; });
+    game.board = [];
+    game.pot = 0;
+    game.street = 'preflop';
+    game.deck = shuffle(makeDeck());
+    game.currentBet = 0;
+    game.minRaise = game.bb;
+    game.lastAggressor = -1;
+    game.handOver = false;
+    game.waitingHero = false;
+    game._checks = 0;
+
+    game.players.forEach(function (p) {
+      p.hole = [];
+      p.bet = 0;
+      p.totalBet = 0;
+      p.folded = p.sittingOut || p.stack < 0.5;
+      p.allIn = false;
+    });
+
+    // button moves among active
+    do {
+      game.button = (game.button + 1) % game.players.length;
+    } while (game.players[game.button].folded);
+
+    var alive = game.players.filter(function (p) { return !p.sittingOut && p.stack >= 0.5; }).length;
+    document.getElementById('handCount').textContent = 'Hand #' + game.handNum;
+    document.getElementById('bbLabel').textContent = game.sb + '/' + game.bb;
+    var titleEl = document.getElementById('tableTitle');
+    if (titleEl) {
+      titleEl.textContent = (game.mode === 'tournament' ? 'SNG' : 'Cash') + ' ' + cfg.seats + '-max · NL Hold\'em';
+    }
+    document.getElementById('tableBlinds').textContent =
+      'Blinds ' + game.sb + ' / ' + game.bb + ' · ' + alive + ' jugadores';
+    updateMttHud();
+
+    // posts
+    var seats = activeSeats();
+    var bi = seats.indexOf(game.button);
+    var sbI = seats[(bi + 1) % seats.length];
+    var bbI = seats[(bi + 2) % seats.length];
+    if (seats.length === 2) {
+      sbI = game.button;
+      bbI = seats[(bi + 1) % seats.length];
+    }
+    postBlind(sbI, game.sb);
+    postBlind(bbI, game.bb);
+    game.currentBet = game.bb;
+    game.minRaise = game.bb;
+
+    // deal
+    for (var r = 0; r < 2; r++) {
+      seats.forEach(function (i) {
+        game.players[i].hole.push(game.deck.pop());
+      });
+    }
+    seats.forEach(function (i) {
+      var pl = game.players[i];
+      // Only hero cards stored in clear; AI cards for replay at showdown
+      logAction({
+        type: 'deal_hole',
+        player: pl.name,
+        cards: pl.isHero ? pl.hole.slice() : [],
+        street: 'preflop'
+      });
+    });
+
+    game.toAct = seats[(seats.indexOf(bbI) + 1) % seats.length];
+    render();
+    setStatus('Preflop');
+    setTimeout(runActionLoop, 400);
+  }
+
+  function activeSeats() {
+    var a = [];
+    game.players.forEach(function (p, i) {
+      if (!p.folded && !p.sittingOut) a.push(i);
+    });
+    return a;
+  }
+
+  function logAction(obj) {
+    handLog.push(obj);
+  }
+
+  function postBlind(i, amt) {
+    var p = game.players[i];
+    var pay = Math.min(p.stack, amt);
+    p.stack -= pay;
+    p.bet += pay;
+    p.totalBet += pay;
+    game.pot += pay;
+    if (p.stack < 0.001) p.allIn = true;
+    var blindType = Math.abs(amt - game.sb) < 0.001 ? 'small blind' : 'big blind';
+    if (Math.abs(amt - game.bb) < 0.001) blindType = 'big blind';
+    else if (Math.abs(amt - game.sb) < 0.001) blindType = 'small blind';
+    logAction({ type: 'blind', player: p.name, blind: blindType, amount: pay, street: 'preflop' });
+  }
+
+  function playersInHand() {
+    return game.players.filter(function (p) { return !p.folded; });
+  }
+
+  function runActionLoop() {
+    if (game.handOver) return;
+    var alive = playersInHand();
+    if (alive.length === 1) {
+      endHand([alive[0]]);
+      return;
+    }
+    // all all-in or matched?
+    if (streetComplete()) {
+      advanceStreet();
+      return;
+    }
+    var p = game.players[game.toAct];
+    if (p.folded || p.allIn || p.sittingOut) {
+      advanceToAct();
+      runActionLoop();
+      return;
+    }
+    if (p.isHero) {
+      game.waitingHero = true;
+      showHeroActions();
+      var odds = potOddsText(p);
+      setStatus('Tu turno · ' + game.street + (odds ? ' · ' + odds : ''));
+      render();
+      return;
+    }
+    // AI
+    hideActions();
+    setStatus(p.name + ' piensa…');
+    render();
+    setTimeout(function () {
+      var act = aiDecide(p);
+      applyAction(game.toAct, act);
+      render();
+      setTimeout(runActionLoop, 350);
+    }, 450 + Math.random() * 500);
+  }
+
+  function streetComplete() {
+    var need = game.currentBet;
+    var contenders = game.players.filter(function (p) { return !p.folded && !p.sittingOut; });
+    if (contenders.length < 2) return true;
+    var toActStill = contenders.filter(function (p) {
+      return !p.allIn && (p.bet < need - 0.001 || (need === 0 && p.totalBet === 0 && game.street !== 'preflop' && p !== game.players[game.lastAggressor]));
+    });
+    // Simpler: everyone who can act has matched currentBet and we've gone around past aggressor
+    var unmatched = contenders.some(function (p) {
+      return !p.allIn && Math.abs(p.bet - need) > 0.001;
+    });
+    if (unmatched) return false;
+    // if currentBet is 0 (checked around), need full orbit
+    if (need < 0.001) {
+      // check if everyone who can has "acted" this street — use lastAggressor marker -1 and all have been visited
+      // We use a checked flag via total street actions: if minRaise path complete when toAct returns to first checker
+      return game._checks >= contenders.filter(function (p) { return !p.allIn; }).length;
+    }
+    return true;
+  }
+
+  function advanceToAct() {
+    var n = game.players.length;
+    for (var k = 0; k < n; k++) {
+      game.toAct = (game.toAct + 1) % n;
+      var p = game.players[game.toAct];
+      if (!p.folded && !p.allIn && !p.sittingOut) return;
+    }
+  }
+
+  function advanceStreet() {
+    // collect bets to pot already tracked
+    game.players.forEach(function (p) { p.bet = 0; });
+    game.currentBet = 0;
+    game.minRaise = game.bb;
+    game._checks = 0;
+    game.lastAggressor = -1;
+
+    if (game.street === 'preflop') {
+      game.street = 'flop';
+      game.board.push(game.deck.pop(), game.deck.pop(), game.deck.pop());
+      logAction({ type: 'street', street: 'flop', board: game.board.slice() });
+    } else if (game.street === 'flop') {
+      game.street = 'turn';
+      game.board.push(game.deck.pop());
+      logAction({ type: 'street', street: 'turn', board: game.board.slice() });
+    } else if (game.street === 'turn') {
+      game.street = 'river';
+      game.board.push(game.deck.pop());
+      logAction({ type: 'street', street: 'river', board: game.board.slice() });
+    } else {
+      showdown();
+      return;
+    }
+
+    var seats = activeSeats().filter(function (i) { return !game.players[i].allIn; });
+    if (seats.length < 1) {
+      // run out board
+      while (game.board.length < 5) game.board.push(game.deck.pop());
+      showdown();
+      return;
+    }
+    // first to act: left of button
+    var seatsAll = activeSeats();
+    var bi = seatsAll.indexOf(game.button);
+    var start = seatsAll[(bi + 1) % seatsAll.length];
+    for (var k = 0; k < seatsAll.length; k++) {
+      var idx = seatsAll[(bi + 1 + k) % seatsAll.length];
+      if (!game.players[idx].allIn && !game.players[idx].folded) { start = idx; break; }
+    }
+    game.toAct = start;
+    setStatus(game.street.charAt(0).toUpperCase() + game.street.slice(1));
+    render();
+    setTimeout(runActionLoop, 400);
+  }
+
+  function applyAction(i, act) {
+    var p = game.players[i];
+    var toCall = Math.max(0, game.currentBet - p.bet);
+    var street = game.street;
+    if (street === 'preflop') {
+      var hf = game.handFlags = game.handFlags || {};
+      var flags = hf[p.name] = hf[p.name] || {};
+      if (act.type === 'raise' || act.type === 'bet') { flags.vpip = 1; flags.pfr = 1; }
+      else if (act.type === 'call' && toCall > 0.001) flags.vpip = 1;
+    }
+    if (act.type === 'fold') {
+      p.folded = true;
+      logAction({ type: 'fold', player: p.name, street: street });
+      toast(p.name + ' fold');
+      announceAction(p.name, 'fold', null, p.isHero);
+    } else if (act.type === 'check') {
+      game._checks = (game._checks || 0) + 1;
+      logAction({ type: 'check', player: p.name, street: street });
+      toast(p.name + ' check');
+      announceAction(p.name, 'check', null, p.isHero);
+    } else if (act.type === 'call') {
+      var pay = Math.min(p.stack, toCall);
+      p.stack -= pay; p.bet += pay; p.totalBet += pay; game.pot += pay;
+      if (p.stack < 0.001) p.allIn = true;
+      var callKey = p.allIn ? 'allin' : 'call';
+      logAction({ type: callKey, player: p.name, amount: pay, street: street, allin: p.allIn });
+      toast(p.name + ' call ' + fmt(pay));
+      announceAction(p.name, callKey, fmt(pay), p.isHero);
+    } else if (act.type === 'raise' || act.type === 'bet') {
+      var target = act.amount;
+      var need = Math.max(0, target - p.bet);
+      need = Math.min(need, p.stack);
+      p.stack -= need; p.bet += need; p.totalBet += need; game.pot += need;
+      if (p.stack < 0.001) p.allIn = true;
+      var raiseSize = p.bet - game.currentBet;
+      if (raiseSize > 0) game.minRaise = Math.max(game.minRaise, raiseSize);
+      game.currentBet = Math.max(game.currentBet, p.bet);
+      game.lastAggressor = i;
+      game._checks = 0;
+      var isRaise = toCall > 0.001;
+      var raiseKey = p.allIn ? 'allin' : (isRaise ? 'raise' : 'bet');
+      logAction({
+        type: raiseKey,
+        player: p.name,
+        amount: need,
+        to: p.bet,
+        street: street,
+        allin: p.allIn
+      });
+      toast(p.name + (isRaise ? ' raise ' : ' bet ') + fmt(p.bet));
+      announceAction(p.name, raiseKey, fmt(p.bet), p.isHero);
+    }
+    advanceToAct();
+  }
+
+  // ─── AI ───
+  function aiDecide(p) {
+    var pr = profile || { vpip: 24, pfr: 18, aggression: 0.55, tightness: 0.55, bluff_freq: 0.28, call_station: 0.22, cbet: 58, fold_to_cbet: 48 };
+    var diff = cfg.difficulty;
+    var tight = Math.min(0.92, (pr.tightness || 0.5) * (diff > 1 ? 1.1 : 0.95));
+    var agg = Math.min(0.95, (pr.aggression || 0.5) * diff);
+    var bluff = (pr.bluff_freq || 0.25) / diff;
+    var callSt = (pr.call_station || 0.2) * (2 - Math.min(diff, 1.5));
+
+    var toCall = Math.max(0, game.currentBet - p.bet);
+    var pot = game.pot + toCall;
+    var spr = p.stack / Math.max(pot, game.bb);
+    var hs = handStrength(p.hole, game.board);
+    var street = game.street;
+
+    // random noise
+    var roll = Math.random();
+
+    if (toCall < 0.001) {
+      // can check
+      if (hs > 0.72 && roll < agg) {
+        return { type: 'raise', amount: p.bet + sizeBet(0.55 + agg * 0.3) };
+      }
+      if (hs > 0.55 && roll < agg * 0.6) {
+        return { type: 'raise', amount: p.bet + sizeBet(0.4) };
+      }
+      if (hs < 0.35 && roll < bluff * 0.5 && street !== 'preflop') {
+        return { type: 'raise', amount: p.bet + sizeBet(0.45) };
+      }
+      return { type: 'check' };
+    }
+
+    // facing bet
+    var potOdds = toCall / Math.max(pot, 0.01);
+    if (hs > 0.8) {
+      if (roll < agg * 0.7 && p.stack > toCall * 2) {
+        return { type: 'raise', amount: p.bet + toCall + sizeBet(0.7) };
+      }
+      return { type: 'call' };
+    }
+    if (hs > 0.55) {
+      if (potOdds < 0.35 + callSt * 0.2 || roll < 0.55) return { type: 'call' };
+      if (roll < agg * 0.35) return { type: 'raise', amount: p.bet + toCall + sizeBet(0.6) };
+      return { type: 'call' };
+    }
+    if (hs > 0.38) {
+      if (potOdds < 0.28 || roll < callSt) return { type: 'call' };
+      if (roll < bluff * 0.4 && street !== 'river') return { type: 'raise', amount: p.bet + toCall + sizeBet(0.55) };
+      return { type: 'fold' };
+    }
+    // weak
+    if (roll < bluff * 0.25 && toCall <= game.bb * 2.5 && street !== 'preflop') {
+      return { type: 'raise', amount: p.bet + toCall + sizeBet(0.5) };
+    }
+    if (toCall <= game.bb * 0.5 && roll < 0.15) return { type: 'call' };
+    // preflop looseness from VPIP
+    if (street === 'preflop') {
+      var vpipP = (pr.vpip || 24) / 100;
+      if (toCall <= game.bb && roll < vpipP * 1.2 * (2 - tight)) return { type: 'call' };
+      if (toCall <= game.bb && roll < (pr.pfr || 18) / 100 * diff) {
+        return { type: 'raise', amount: p.bet + toCall + game.bb * (2.2 + Math.random()) };
+      }
+    }
+    return { type: 'fold' };
+  }
+
+  function sizeBet(mult) {
+    var pot = game.pot;
+    var amt = Math.max(game.bb, pot * mult);
+    return Math.round(amt * 10) / 10;
+  }
+
+  function handStrength(hole, board) {
+    if (!hole || hole.length < 2) return 0;
+    // preflop chart-ish
+    if (!board || board.length === 0) {
+      var r1 = rankValue(hole[0][0]), r2 = rankValue(hole[1][0]);
+      var hi = Math.max(r1, r2), lo = Math.min(r1, r2);
+      var paired = r1 === r2;
+      var suited = hole[0][1] === hole[1][1];
+      if (paired) return 0.45 + hi / 13 * 0.5;
+      var gap = hi - lo;
+      var base = (hi + lo) / 26 * 0.55;
+      if (suited) base += 0.08;
+      if (gap === 1) base += 0.06;
+      if (hi >= 11) base += 0.1;
+      return Math.min(0.95, base);
+    }
+    var best = bestHand(hole, board);
+    var cat = best[0];
+    // crude equity proxy
+    var score = cat / 8 * 0.75 + (best[1] || 0) / 12 * 0.2;
+    // pair on board lower
+    if (cat === 1 && board.some(function (c) { return rankValue(c[0]) === best[1]; })) score *= 0.7;
+    return Math.min(0.98, Math.max(0.05, score));
+  }
+
+  // ─── Hero actions ───
+  function showHeroActions() {
+    var p = game.players[0];
+    var toCall = Math.max(0, game.currentBet - p.bet);
+    var btnFold = document.getElementById('btnFold');
+    var btnCheck = document.getElementById('btnCheck');
+    var btnCall = document.getElementById('btnCall');
+    var btnRaise = document.getElementById('btnRaise');
+    document.getElementById('actionBar').style.display = 'flex';
+
+    btnFold.disabled = false;
+    if (toCall < 0.001) {
+      btnCheck.style.display = '';
+      btnCall.style.display = 'none';
+      btnCheck.textContent = 'Check';
+      btnFold.textContent = 'Check/Fold';
+    } else {
+      btnCheck.style.display = 'none';
+      btnCall.style.display = '';
+      btnCall.textContent = 'Call ' + fmt(toCall);
+      btnFold.textContent = 'Fold';
+    }
+    var minRaiseTotal = game.currentBet + game.minRaise;
+    if (toCall < 0.001) minRaiseTotal = Math.max(game.bb, game.minRaise);
+    var maxAll = p.bet + p.stack;
+    btnRaise.textContent = (toCall < 0.001 ? 'Bet' : 'Raise');
+    btnRaise.disabled = p.stack < 0.01;
+
+    var slider = document.getElementById('betSlider');
+    var minAmt = Math.min(maxAll, Math.max(minRaiseTotal, game.currentBet + game.bb));
+    slider.min = minAmt;
+    slider.max = maxAll;
+    slider.step = 0.1;
+    slider.value = Math.min(maxAll, Math.max(minAmt, game.pot * 0.55 + p.bet));
+    updateSliderLabel();
+  }
+
+  // Línea de pot odds para la barra de estado (vacía si no hay nada que pagar)
+  function potOddsText(p) {
+    var toCall = Math.max(0, game.currentBet - p.bet);
+    if (toCall < 0.001) return '';
+    var need = Math.round(toCall / (game.pot + toCall) * 100);
+    var str = Math.round(handStrength(p.hole, game.board) * 100);
+    return 'pagas ' + fmt(toCall) + ' para ganar ' + fmt(game.pot) + ' · necesitas ' + need + '% · tu mano ~' + str + '%';
+  }
+
+  function hideActions() {
+    document.getElementById('actionBar').style.display = 'none';
+    game.waitingHero = false;
+  }
+
+  function updateSliderLabel() {
+    var v = parseFloat(document.getElementById('betSlider').value) || 0;
+    document.getElementById('betSliderVal').textContent = fmt(v);
+  }
+  document.getElementById('betSlider').addEventListener('input', updateSliderLabel);
+
+  document.getElementById('betPresets').addEventListener('click', function (e) {
+    var b = e.target.closest('.ai-bet-preset');
+    if (!b || !game) return;
+    document.querySelectorAll('.ai-bet-preset').forEach(function (x) { x.classList.remove('active'); });
+    b.classList.add('active');
+    var p = game.players[0];
+    var m = b.getAttribute('data-m');
+    var slider = document.getElementById('betSlider');
+    var maxAll = p.bet + p.stack;
+    if (m === 'allin') slider.value = maxAll;
+    else {
+      var target = p.bet + Math.max(game.bb, game.pot * parseFloat(m));
+      if (game.currentBet > p.bet) target = game.currentBet + Math.max(game.minRaise, game.pot * parseFloat(m));
+      slider.value = Math.min(maxAll, target);
+    }
+    updateSliderLabel();
+  });
+
+  document.getElementById('btnFold').addEventListener('click', function () {
+    if (!game || !game.waitingHero) return;
+    var toCall = game.currentBet - game.players[0].bet;
+    if (toCall < 0.001 && this.textContent.indexOf('Check') >= 0) {
+      heroAct({ type: 'check' });
+    } else {
+      heroAct({ type: 'fold' });
+    }
+  });
+  document.getElementById('btnCheck').addEventListener('click', function () {
+    if (!game || !game.waitingHero) return;
+    heroAct({ type: 'check' });
+  });
+  document.getElementById('btnCall').addEventListener('click', function () {
+    if (!game || !game.waitingHero) return;
+    heroAct({ type: 'call' });
+  });
+  document.getElementById('btnRaise').addEventListener('click', function () {
+    if (!game || !game.waitingHero) return;
+    var amt = parseFloat(document.getElementById('betSlider').value) || 0;
+    heroAct({ type: 'raise', amount: amt });
+  });
+
+  function heroAct(act) {
+    hideActions();
+    applyAction(0, act);
+    render();
+    setTimeout(runActionLoop, 300);
+  }
+
+  // ─── Showdown ───
+  function showdown() {
+    while (game.board.length < 5) game.board.push(game.deck.pop());
+    var contenders = game.players.filter(function (p) { return !p.folded; });
+    var ranks = contenders.map(function (p) {
+      return { p: p, rank: bestHand(p.hole, game.board) };
+    });
+    ranks.sort(function (a, b) { return cmpRank(b.rank, a.rank); });
+    var winners = [ranks[0]];
+    for (var i = 1; i < ranks.length; i++) {
+      if (cmpRank(ranks[i].rank, ranks[0].rank) === 0) winners.push(ranks[i]);
+      else break;
+    }
+    endHand(winners.map(function (w) { return w.p; }), ranks[0].rank);
+  }
+
+  function endHand(winners, rank) {
+    game.handOver = true;
+    hideActions();
+    var potBefore = game.pot;
+    var share = game.pot / winners.length;
+    winners.forEach(function (p) {
+      p.stack += share;
+      p._winner = true;
+      logAction({ type: 'collect', player: p.name, amount: share, pot: 'main', street: 'showdown' });
+    });
+    // reveal cards at showdown for contenders
+    game.players.forEach(function (p) {
+      if (!p.folded && p.hole && p.hole.length) {
+        logAction({ type: 'show', player: p.name, cards: p.hole.slice(), street: 'showdown' });
+        // update deal_hole entries with full cards for replay
+        handLog.forEach(function (a) {
+          if (a.type === 'deal_hole' && a.player === p.name) a.cards = p.hole.slice();
+        });
+      }
+    });
+
+    var name = winners.map(function (w) { return w.name; }).join(', ');
+    var handName = rank ? (HAND_NAMES[rank[0]] || '') : 'última en pie';
+    toast('🏆 ' + name + ' · ' + handName + ' · +' + fmt(share));
+    sfxFor('win');
+    speak('Winner', 1.2);
+    setStatus('Mano terminada · ' + handName);
+    game.pot = 0;
+
+    // Build Hand Lab payload
+    var hero = game.players[0];
+    var startStack = (game._streetStartStacks && game._streetStartStacks[0] != null) ? game._streetStartStacks[0] : game.startingStack;
+    // Approximate hero net from stack delta this hand
+    var heroNet = hero.stack - startStack;
+    // More accurate: sum puts - collects
+    var spent = 0, won = 0;
+    handLog.forEach(function (a) {
+      if (a.player !== hero.name) return;
+      if (a.type === 'collect') won += a.amount || 0;
+      else if (['blind', 'call', 'bet', 'allin', 'raise'].indexOf(a.type) >= 0) spent += a.amount || 0;
+    });
+    heroNet = Math.round((won - spent) * 100) / 100;
+    var heroNetBB = game.bb > 0 ? Math.round((heroNet / game.bb) * 100) / 100 : 0;
+
+    var playersPayload = game.players.map(function (p, idx) {
+      return {
+        seat: idx + 1,
+        name: p.name,
+        stack: Math.round(((game._streetStartStacks && game._streetStartStacks[idx]) || p.stack) * 100) / 100,
+        sitting_out: !!p.sittingOut
+      };
+    });
+
+    var handId = 'AI' + tourneyId + '-' + game.handNum + '-' + Date.now().toString(36);
+    var handPayload = {
+      id: handId,
+      site: 'ailab',
+      tournament: game.mode === 'tournament' ? game.tournament : null,
+      tournamentName: game.mode === 'tournament'
+        ? ('AI SNG ' + cfg.seats + '-max #' + game.tournament)
+        : ('AI Cash ' + cfg.seats + '-max'),
+      level: game.mode === 'tournament' ? (game.level + 1) : 1,
+      blinds: [game.sb, game.bb],
+      date: new Date().toISOString().replace('T', ' ').slice(0, 19),
+      table: 'AI Table',
+      button: game.button + 1,
+      hero: hero.name,
+      hero_cards: hero.hole.slice(),
+      hero_net: heroNet,
+      hero_net_bb: heroNetBB,
+      hero_folded: !!hero.folded,
+      hero_showdown: (!hero.folded && (winners.some(function (w) { return w.isHero; }) || !!rank)),
+      winner: winners.length === 1 ? winners[0].name : winners.map(function (w) { return w.name; }).join(', '),
+      pot_total: Math.round(potBefore * 100) / 100,
+      bb: game.bb,
+      board: game.board.slice(),
+      players: playersPayload,
+      actions: handLog.slice(),
+      sourceFile: 'ailab'
+    };
+
+    game.lastHand = handPayload;
+    game.stats = game.stats || {};
+    game.players.forEach(function (pl) {
+      if (pl.sittingOut) return;
+      var st = game.stats[pl.name] = game.stats[pl.name] || { hands: 0, vpip: 0, pfr: 0 };
+      var fl = (game.handFlags || {})[pl.name] || {};
+      st.hands++;
+      if (fl.vpip) st.vpip++;
+      if (fl.pfr) st.pfr++;
+    });
+    game.handFlags = {};
+
+    if (game.saveHands) {
+      saveHandToLab(handPayload);
+    }
+
+    render();
+    setTimeout(function () {
+      game.players.forEach(function (p) { p._reveal = !p.folded; });
+      render();
+    }, 200);
+    setTimeout(function () {
+      game.players.forEach(function (p) {
+        p._winner = false;
+        p._reveal = false;
+        if (p.stack < 0.5 && !p.isHero) {
+          p.sittingOut = true;
+          p.folded = true;
+        }
+      });
+      // Tournament end checks
+      var alive = game.players.filter(function (p) { return !p.sittingOut && p.stack >= 0.5; });
+      if (game.players[0].stack < 0.5) {
+        toast('Eliminado. Posición ~' + (alive.length + 1));
+        setStatus('Torneo / sesión terminada — sin fichas');
+        hideActions();
+        game.running = false;
+        return;
+      }
+      if (game.mode === 'tournament' && alive.length === 1 && alive[0].isHero) {
+        toast('🏆 ¡Ganaste el torneo!');
+        setStatus('¡Campeón del SNG!');
+        hideActions();
+        game.running = false;
+        return;
+      }
+      nextHand();
+    }, 2800);
+  }
+
+  function saveHandToLab(hand) {
+    RangeLabAPI.ailab.saveHand(hand).then(function (j) {
+      if (j && j.ok) {
+        var t = document.getElementById('toast');
+        // soft hint without blocking
+        console.log('[AI Table] Mano guardada en Hand Lab:', j.id);
+      }
+    }).catch(function (e) {
+      console.warn('No se pudo guardar la mano', e);
+    });
+  }
+
+  // ─── Pista heurística (no es GTO: compara la fuerza de mano aproximada con las pot odds) ───
+  function hintFor(p) {
+    var toCall = Math.max(0, game.currentBet - p.bet);
+    var str = handStrength(p.hole, game.board);
+    var pct = Math.round(str * 100);
+    if (toCall < 0.001) {
+      return str >= 0.6 ? 'Apuesta: tienes una mano fuerte (~' + pct + '%).'
+                        : 'Check: mano débil o media (~' + pct + '%); controla el bote.';
+    }
+    var need = Math.round(toCall / (game.pot + toCall) * 100);
+    if (str >= need / 100 + 0.15) return 'Raise: tu mano (~' + pct + '%) supera de sobra las pot odds (' + need + '%).';
+    if (str >= need / 100) return 'Call: tu mano (~' + pct + '%) cubre las pot odds (' + need + '%).';
+    return 'Fold: tu mano (~' + pct + '%) no cubre las pot odds (' + need + '%).';
+  }
+
+  document.getElementById('btnHint').addEventListener('click', function () {
+    if (!game || !game.waitingHero) return;
+    toast('💡 ' + hintFor(game.players[0]));
+  });
+
+  // ─── Hojas: estadísticas y revisión ───
+  function openSheet(id) {
+    document.getElementById(id).classList.add('show');
+    document.getElementById(id).setAttribute('aria-hidden', 'false');
+  }
+  function closeSheet(id) {
+    document.getElementById(id).classList.remove('show');
+    document.getElementById(id).setAttribute('aria-hidden', 'true');
+  }
+  document.querySelectorAll('.ai-sheet-ov').forEach(function (ov) {
+    ov.addEventListener('click', function (e) {
+      if (e.target === ov) closeSheet(ov.id);
+    });
+  });
+  document.querySelectorAll('[data-close]').forEach(function (b) {
+    b.addEventListener('click', function () { closeSheet(b.getAttribute('data-close')); });
+  });
+
+  function closeMenu() {
+    var m = document.getElementById('sideMenu');
+    if (m) m.classList.remove('show');
+  }
+  function escHtml(t) {
+    return String(t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function pct(n, d) { return d ? Math.round((n / d) * 100) + '%' : '–'; }
+
+  function renderStats() {
+    var body = document.getElementById('statsBody');
+    var st = (game && game.stats) || {};
+    var rows = Object.keys(st).map(function (k) { return Object.assign({ name: k }, st[k]); });
+    if (!rows.length) {
+      body.innerHTML = '<p class="ai-stats-note">Aún no hay manos terminadas en esta sesión.</p>';
+      return;
+    }
+    rows.sort(function (a, b) { return b.hands - a.hands; });
+    var html = '<table class="ai-stats-table"><thead><tr><th>Jugador</th><th>Manos</th><th>VPIP</th><th>PFR</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      html += '<tr><td>' + escHtml(r.name) + '</td><td class="num">' + r.hands + '</td>' +
+        '<td class="num">' + pct(r.vpip, r.hands) + '</td><td class="num">' + pct(r.pfr, r.hands) + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<p class="ai-stats-note"><b>VPIP</b>: % de manos en las que entra voluntariamente con dinero (call o subida preflop). ' +
+      '<b>PFR</b>: % de manos en las que sube preflop. Son muestras pequeñas al principio: no sacar conclusiones con menos de 50 manos.</p>';
+    body.innerHTML = html;
+  }
+
+  var ACT_TXT = { fold: 'fold', check: 'check', call: 'call', allin: 'all-in', raise: 'raise', bet: 'bet', blind: 'blind', collect: 'gana' };
+  function renderReview() {
+    var body = document.getElementById('reviewBody');
+    var h = game && game.lastHand;
+    if (!h) { body.innerHTML = '<p class="ai-stats-note">Todavía no hay ninguna mano terminada.</p>'; return; }
+    var html = '<div class="ai-review-meta">Mano ' + escHtml(h.id.split('-').slice(-2).join(' · ')) +
+      ' · Ganador: ' + escHtml(h.winner) + ' · Tu resultado: ' + (h.hero_net >= 0 ? '+' : '') + fmt(h.hero_net_bb) + '</div>';
+    if (h.board && h.board.length) html += '<div class="ai-review-board">Board: ' + h.board.join(' ') + '</div>';
+    var street = null;
+    h.actions.forEach(function (a) {
+      if (a.type === 'deal_hole' || !a.player) {
+        if (a.type !== 'show') return;
+      }
+      if (a.street && a.street !== street) {
+        street = a.street;
+        html += '<div class="ai-review-street">' + escHtml(street) + '</div>';
+      }
+      var who = escHtml(a.player || '');
+      var line;
+      if (a.type === 'show') line = who + ' muestra ' + (a.cards || []).join(' ');
+      else if (a.type === 'collect') line = who + ' gana ' + fmt(a.amount);
+      else if (a.type === 'fold' || a.type === 'check') line = who + ' ' + ACT_TXT[a.type];
+      else line = who + ' ' + (ACT_TXT[a.type] || a.type) + (a.amount != null ? ' ' + fmt(a.type === 'raise' || a.type === 'bet' ? (a.to || a.amount) : a.amount) : '');
+      var isHero = game && game.players[0] && a.player === game.players[0].name;
+      html += '<div class="ai-review-line' + (isHero ? ' hero' : '') + '">' + line + '</div>';
+    });
+    body.innerHTML = html;
+  }
+
+  document.getElementById('menuStats').addEventListener('click', function () {
+    closeMenu(); renderStats(); openSheet('statsSheet');
+  });
+  document.getElementById('menuReview').addEventListener('click', function () {
+    closeMenu(); renderReview(); openSheet('reviewSheet');
+  });
+
+  // ─── Render ───
+  function fmt(n) {
+    if (n === undefined || n === null) return '0';
+    var x = Math.round(n * 100) / 100;
+    return (x % 1 === 0 ? x.toFixed(0) : x.toFixed(2)) + ' BB';
+  }
+
+  function render() {
+    if (!game) return;
+    updateMttHud();
+    // pot
+    var potBox = document.getElementById('potBox');
+    if (game.pot > 0.01) {
+      potBox.style.display = '';
+      document.getElementById('potAmt').textContent = fmt(game.pot);
+      document.getElementById('potSub').textContent = game.street !== 'preflop' ? ('Main · ' + game.street) : '';
+    } else potBox.style.display = 'none';
+
+    // board — only dealt cards
+    var boardEl = document.getElementById('board');
+    var html = '';
+    for (var i = 0; i < game.board.length; i++) {
+      html += cardHTML(game.board[i], false);
+    }
+    boardEl.innerHTML = html;
+
+    // hero cards
+    var hc = document.getElementById('heroCards');
+    if (game.players[0] && game.players[0].hole.length) {
+      hc.innerHTML = cardHTML(game.players[0].hole[0], true) + cardHTML(game.players[0].hole[1], true);
+    } else hc.innerHTML = '';
+
+    // seats
+    game.players.forEach(function (p, i) {
+      var el = document.querySelector('.ai-seat[data-pid="' + i + '"]');
+      if (!el) return;
+      el.classList.toggle('folded', p.folded && !p.sittingOut);
+      el.classList.toggle('sitting-out', !!p.sittingOut);
+      el.classList.toggle('active', game.toAct === i && !game.handOver && !p.folded);
+      el.classList.toggle('hero', p.isHero);
+      var name = el.querySelector('.name-badge');
+      name.textContent = p.sittingOut ? 'SITTING OUT' : p.name;
+      el.querySelector('.stack-badge').textContent = fmt(p.stack);
+      var cardsRow = el.querySelector('.cards-row');
+      if (p.isHero || p._reveal) {
+        cardsRow.innerHTML = '';
+      } else if (!p.folded && p.hole.length) {
+        cardsRow.innerHTML = '<div class="mini-card"></div><div class="mini-card"></div>';
+      } else cardsRow.innerHTML = '';
+
+      var bet = el.querySelector('.bet-chip');
+      if (p.bet > 0.01) {
+        if (!bet) {
+          bet = document.createElement('div');
+          bet.className = 'bet-chip';
+          el.appendChild(bet);
+        }
+        bet.textContent = fmt(p.bet);
+        bet.style.display = '';
+      } else if (bet) bet.style.display = 'none';
+
+      var d = el.querySelector('.dealer-btn');
+      if (i === game.button) {
+        if (!d) {
+          d = document.createElement('div');
+          d.className = 'dealer-btn';
+          d.textContent = 'D';
+          el.appendChild(d);
+        }
+        d.style.display = '';
+      } else if (d) d.style.display = 'none';
+
+      var w = el.querySelector('.winner-tag');
+      if (p._winner) {
+        if (!w) {
+          w = document.createElement('div');
+          w.className = 'winner-tag';
+          w.textContent = 'WINNER';
+          el.appendChild(w);
+        }
+        w.style.display = '';
+      } else if (w) w.style.display = 'none';
+    });
+  }
+
+  function setStatus(t) {
+    document.getElementById('statusBar').textContent = t || '';
+  }
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { t.classList.remove('show'); }, 1600);
+  }
+
+  // Menu
+  document.getElementById('btnMenu').addEventListener('click', function () {
+    document.getElementById('sideMenu').classList.add('show');
+  });
+  document.getElementById('btnBack').addEventListener('click', function () {
+    document.getElementById('sideMenu').classList.add('show');
+  });
+  document.getElementById('sideMenu').addEventListener('click', function (e) {
+    if (e.target.id === 'sideMenu') e.currentTarget.classList.remove('show');
+  });
+  document.getElementById('menuContinue').addEventListener('click', function () {
+    document.getElementById('sideMenu').classList.remove('show');
+  });
+  document.getElementById('menuSound').addEventListener('click', function () {
+    setSoundEnabled(!soundOn);
+    ensureAudio();
+    if (soundOn) sfxFor('check');
+  });
+  document.getElementById('menuNewHand').addEventListener('click', function () {
+    document.getElementById('sideMenu').classList.remove('show');
+    if (game) nextHand();
+  });
+  document.getElementById('menuSetup').addEventListener('click', function () {
+    document.getElementById('sideMenu').classList.remove('show');
+    game = null;
+    document.getElementById('setupScreen').classList.remove('hidden');
+    document.getElementById('gameTop').style.display = 'none';
+    document.body.classList.remove('ai-playing');
+    document.getElementById('tableWrap').style.display = 'none';
+    document.getElementById('heroZone').style.display = 'none';
+    document.getElementById('statusBar').style.display = 'none';
+    document.getElementById('actionBar').style.display = 'none';
+    document.getElementById('mttHud').classList.remove('show');
+  });
+
+  // init
+  loadProfile();
+  setSoundEnabled(soundOn);
+  document.body.classList.remove('rl-loading');
+  var splash = document.getElementById('splash');
+  if (splash) {
+    splash.classList.add('hide');
+    setTimeout(function () { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 500);
+  }
+  if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+})();
+</script>
+
+<nav class="rl-bottom-nav" aria-label="Navegación">
+
+  <a href="/" class="rl-nav-item"><span class="rl-nav-ico">🏠</span><span class="rl-nav-label">Portal</span></a>
+  <button type="button" class="rl-nav-item active"><span class="rl-nav-ico">🤖</span><span class="rl-nav-label">AI Table</span></button>
+  <button type="button" class="rl-nav-item" onclick="document.getElementById('sideMenu')?.classList.add('show')"><span class="rl-nav-ico">☰</span><span class="rl-nav-label">Menú</span></button>
+  <a href="/profile" class="rl-nav-item"><span class="rl-nav-ico">👤</span><span class="rl-nav-label">Perfil</span></a>
+
+</nav>
+
+</body>
+</html>

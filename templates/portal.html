@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>RangeLab — Poker Tools</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/profile.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+<style>
+  /* ── Header desktop / mobile split ── */
+  body.page-portal .header-actions-desktop { display: flex; gap: 8px; align-items: center; }
+  body.page-portal .header-actions-mobile { display: none; gap: 8px; align-items: center; }
+  @media (max-width: 720px) {
+    body.page-portal .header-actions-desktop { display: none !important; }
+    body.page-portal .header-actions-mobile { display: flex !important; }
+  }
+  body.page-portal .user-chip-mobile { max-width: 120px; }
+  body.page-portal .user-chip-mobile .user-name { max-width: 72px; overflow: hidden; text-overflow: ellipsis; }
+  @media (max-width: 380px) {
+    body.page-portal .user-chip-mobile .user-name { display: none; }
+    body.page-portal .user-chip-mobile { padding: 8px; max-width: 40px; }
+  }
+  body.page-portal .portal-burger {
+    flex-shrink: 0;
+  }
+  body.page-portal .portal-burger .burger-close { display: none; }
+  body.page-portal .portal-burger .burger-ico { display: block; }
+  body.page-portal .portal-burger.is-open .burger-ico { display: none; }
+  body.page-portal .portal-burger.is-open .burger-close { display: block; }
+  body.page-portal .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  /* En desktop el menú hamburguesa también queda a la izquierda (como tools) */
+  @media (min-width: 721px) {
+    body.page-portal .portal-burger { display: inline-flex; }
+  }
+
+  /* ── Portal drawer (mismo diseño que Equity Lab) ── */
+  body.page-portal .portal-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 9, 15, 0.72);
+    
+    
+    z-index: 500;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.28s var(--ease-out, ease), visibility 0.28s;
+  }
+  body.page-portal .portal-drawer-backdrop.show { opacity: 1; visibility: visible; }
+
+  body.page-portal .portal-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(88%, 360px);
+    max-width: 360px;
+    background: var(--glass-bg, var(--bg-1, #0d1117));
+    
+    
+    border-right: 1px solid var(--glass-border, var(--border, #1e2636));
+    z-index: 501;
+    transform: translateX(-105%);
+    transition: transform 0.32s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--safe-top, 0px);
+    padding-bottom: var(--safe-bottom, 0px);
+    box-shadow: 8px 0 40px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+  }
+  body.page-portal .portal-drawer.show { transform: translateX(0); }
+
+  body.page-portal .portal-drawer-head {
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid var(--border-soft, var(--border, #1e2636));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  body.page-portal .portal-drawer-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+  body.page-portal .portal-drawer-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent, #f2a83c), var(--accent-2, #9b8bf4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: #1a1400;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent, #f2a83c) 35%, transparent);
+    flex-shrink: 0;
+  }
+  body.page-portal .portal-drawer-title-text { min-width: 0; }
+  body.page-portal .portal-drawer-title-text .pdu-name {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--text, #eef1f7);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body.page-portal .portal-drawer-title-text .pdu-meta {
+    font-size: 11px;
+    color: var(--text-3, #6b7590);
+    font-weight: 500;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body.page-portal .portal-drawer-close {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--bg-2, #171c2a);
+    border: 1px solid var(--border, #1e2636);
+    color: var(--text-2, #a4acc0);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  body.page-portal .portal-drawer-close:hover { color: var(--red, #f2685f); border-color: var(--red, #f2685f); }
+  body.page-portal .portal-drawer-close:active { transform: scale(0.94); }
+
+  body.page-portal .portal-drawer-body {
+    flex: 1;
+    padding: 10px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.page-portal .portal-drawer-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 12px;
+    color: var(--text-2, #a4acc0);
+    font-size: 13.5px;
+    font-weight: 700;
+    text-align: left;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+    box-sizing: border-box;
+  }
+  body.page-portal .portal-drawer-item:hover {
+    background: var(--bg-2, #171c2a);
+    color: var(--text, #eef1f7);
+    border-color: var(--border, #1e2636);
+  }
+  body.page-portal .portal-drawer-item:active { transform: scale(0.98); }
+  body.page-portal .portal-drawer-item.danger { color: var(--red, #f2685f); }
+  body.page-portal .portal-drawer-item.danger:hover {
+    background: rgba(248, 113, 113, 0.08);
+    border-color: rgba(248, 113, 113, 0.3);
+    color: var(--red, #f2685f);
+  }
+  body.page-portal .portal-drawer-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--bg-2, #171c2a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    border: 1px solid var(--border-soft, var(--border, #1e2636));
+  }
+  body.page-portal .portal-drawer-text { min-width: 0; flex: 1; }
+  body.page-portal .portal-drawer-name {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: inherit;
+    line-height: 1.2;
+  }
+  body.page-portal .portal-drawer-desc {
+    font-size: 11px;
+    color: var(--text-3, #6b7590);
+    font-weight: 500;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  body.page-portal .portal-drawer-item.danger .portal-drawer-desc { color: rgba(248, 113, 113, 0.75); }
+  body.page-portal .portal-drawer-divider {
+    height: 1px;
+    background: var(--border-soft, var(--border, #1e2636));
+    margin: 8px 4px;
+  }
+  body.page-portal .portal-drawer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+  }
+  body.page-portal .portal-drawer-row .pdr-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-2, #a4acc0);
+  }
+  body.page-portal .portal-drawer-row .theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    border: 1px solid var(--border, #1e2636);
+    background: var(--bg-2, #171c2a);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2, #a4acc0);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  body.page-portal .portal-drawer-row .theme-toggle svg { width: 18px; height: 18px; }
+  body.page-portal .portal-drawer-footer {
+    padding: 16px 20px 20px;
+    border-top: 1px solid var(--border-soft, var(--border, #1e2636));
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--text-3, #6b7590);
+    line-height: 1.6;
+    flex-shrink: 0;
+  }
+  body.page-portal .portal-drawer-footer strong { color: var(--accent, #f2a83c); font-weight: 800; }
+
+  /* ── Portal layout: header fijo + espacio a tools ── */
+  body.page-portal .main {
+    padding: 16px 14px 88px !important;
+    padding-top: calc(12px + var(--header-h, 56px) + var(--safe-top, 0px)) !important;
+  }
+  @media (min-width: 768px) {
+    body.page-portal .main {
+      padding: 24px 28px 100px !important;
+      padding-top: calc(20px + var(--header-h, 56px) + var(--safe-top, 0px)) !important;
+    }
+  }
+
+  /* Hero compacto */
+  body.page-portal .hero {
+    padding: 6px 6px 10px !important;
+    margin-bottom: 10px !important;
+    text-align: center;
+  }
+  body.page-portal .hero .hero-eyebrow {
+    font-size: 11px !important;
+    margin-bottom: 6px !important;
+    letter-spacing: 0.08em;
+  }
+  body.page-portal .hero h1 {
+    font-size: clamp(1.3rem, 4vw, 1.85rem) !important;
+    line-height: 1.2 !important;
+    margin: 0 0 6px !important;
+  }
+  body.page-portal .hero h1 br { display: none; }
+  body.page-portal .hero p {
+    font-size: 13px !important;
+    margin: 0 auto 10px !important;
+    max-width: 520px;
+    opacity: 0.85;
+  }
+  body.page-portal .hero .quick-stats {
+    gap: 8px !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px !important;
+  }
+  body.page-portal .hero .qs {
+    font-size: 12px !important;
+    padding: 5px 10px !important;
+  }
+  @media (max-width: 519px) {
+    body.page-portal .hero {
+      padding: 2px 2px 6px !important;
+      margin-bottom: 6px !important;
+    }
+    body.page-portal .hero h1 { font-size: 1.25rem !important; }
+    body.page-portal .hero p { display: none; }
+    body.page-portal .hero .quick-stats { gap: 6px !important; margin-top: 8px !important; }
+  }
+
+  /* Section heads */
+  body.page-portal .section-head {
+    margin: 4px 0 10px !important;
+    padding: 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  body.page-portal .section-head h2 {
+    font-size: 1.05rem !important;
+    margin: 0 0 2px !important;
+  }
+  body.page-portal .section-head p {
+    font-size: 12px !important;
+    margin: 0 !important;
+    opacity: 0.7;
+  }
+  body.page-portal .section-head .section-hint {
+    font-size: 11px;
+    color: var(--text-3, #888);
+    white-space: nowrap;
+  }
+
+  /* ── Dock de fijadas: círculos con icono + nombre ── */
+  body.page-portal .pinned-section {
+    margin-bottom: 16px;
+  }
+  body.page-portal .pinned-section:empty { display: none; }
+  body.page-portal .pinned-dock {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 2px 8px;
+  }
+  body.page-portal .pinned-dock::-webkit-scrollbar { display: none; }
+  @media (min-width: 520px) {
+    body.page-portal .pinned-dock {
+      justify-content: center;
+      flex-wrap: wrap;
+      overflow-x: visible;
+    }
+  }
+
+  body.page-portal .pin-circle {
+    flex: 0 0 auto;
+    width: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    color: inherit;
+    font: inherit;
+  }
+  body.page-portal .pin-circle:focus-visible .pin-circle-icon {
+    outline: 2px solid var(--tool-color);
+    outline-offset: 3px;
+  }
+  body.page-portal .pin-circle-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+    background: color-mix(in srgb, var(--tool-color) 16%, var(--bg-1, #0d1117));
+    border: 2px solid color-mix(in srgb, var(--tool-color) 45%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--tool-color) 12%, transparent),
+      0 6px 18px color-mix(in srgb, var(--tool-color) 18%, transparent);
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+  }
+  body.page-portal .pin-circle:hover .pin-circle-icon {
+    transform: translateY(-3px) scale(1.05);
+    border-color: var(--tool-color);
+    background: color-mix(in srgb, var(--tool-color) 26%, var(--bg-1, #0d1117));
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--tool-color) 25%, transparent),
+      0 10px 28px color-mix(in srgb, var(--tool-color) 28%, transparent);
+  }
+  body.page-portal .pin-circle:active .pin-circle-icon {
+    transform: translateY(-1px) scale(0.97);
+  }
+  body.page-portal .pin-circle-name {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    max-width: 76px;
+    color: var(--text-2, #b0b8c4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body.page-portal .pin-circle:hover .pin-circle-name {
+    color: var(--text, #e8eaed);
+  }
+
+  @media (max-width: 519px) {
+    body.page-portal .pin-circle { width: 68px; }
+    body.page-portal .pin-circle-icon {
+      width: 52px;
+      height: 52px;
+      font-size: 22px;
+    }
+    body.page-portal .pin-circle-name {
+      font-size: 10.5px;
+      max-width: 68px;
+    }
+  }
+
+  /* Tools grid */
+  body.page-portal .tools-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 520px) {
+    body.page-portal .tools-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+  }
+  @media (min-width: 960px) {
+    body.page-portal .tools-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+  }
+
+  /* Card */
+  body.page-portal .tool-card {
+    cursor: pointer;
+    position: relative;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    padding: 14px !important;
+  }
+  body.page-portal .tool-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--tool-color);
+    box-shadow: 0 14px 40px rgba(0,0,0,.4), 0 0 0 1px var(--tool-color);
+  }
+  body.page-portal .tool-card:focus-visible {
+    outline: 2px solid var(--tool-color);
+    outline-offset: 2px;
+  }
+  body.page-portal .tool-card:active { transform: translateY(-1px); }
+
+  /* Pin button */
+  body.page-portal .btn-pin {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-2, rgba(255,255,255,0.06));
+    border: 1px solid var(--border, rgba(255,255,255,0.08));
+    color: var(--text-3, #888);
+    transition: all .18s ease;
+    cursor: pointer;
+  }
+  body.page-portal .btn-pin:hover {
+    background: color-mix(in srgb, var(--tool-color) 18%, transparent);
+    border-color: color-mix(in srgb, var(--tool-color) 40%, transparent);
+    color: var(--tool-color);
+  }
+  body.page-portal .btn-pin.pinned {
+    background: color-mix(in srgb, var(--tool-color) 22%, transparent);
+    border-color: color-mix(in srgb, var(--tool-color) 50%, transparent);
+    color: var(--tool-color);
+  }
+  body.page-portal .btn-pin svg {
+    width: 16px;
+    height: 16px;
+  }
+  body.page-portal .btn-pin .ico-pin-fill { display: none; }
+  body.page-portal .btn-pin.pinned .ico-pin-outline { display: none; }
+  body.page-portal .btn-pin.pinned .ico-pin-fill { display: block; }
+
+  /* Pinned card: only the active pin button (sin tarjeta duplicada arriba) */
+  body.page-portal .tool-card.is-pinned .btn-pin {
+    background: color-mix(in srgb, var(--tool-color) 22%, transparent);
+    border-color: color-mix(in srgb, var(--tool-color) 50%, transparent);
+    color: var(--tool-color);
+  }
+
+  /* Footer launch button full width */
+  body.page-portal .tool-footer .btn-launch {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 14px;
+    min-height: 42px;
+  }
+
+  /* Max 2 features on card */
+  body.page-portal .feature-list .feature-item:nth-child(n+3) { display: none; }
+
+  @media (max-width: 519px) {
+    body.page-portal .tool-card .feature-list { display: none; }
+    body.page-portal .tool-card .tool-desc {
+      -webkit-line-clamp: 2;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    body.page-portal .btn-pin {
+      width: 38px;
+      height: 38px;
+      top: 8px;
+      right: 8px;
+    }
+    body.page-portal .tool-footer .btn-launch {
+      min-height: 46px;
+      font-size: 15px;
+    }
+  }
+
+  body.page-portal .tool-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 13px !important;
+  }
+
+  body.page-portal .tool-badge {
+    background: color-mix(in srgb, var(--tool-color) 15%, transparent);
+    color: var(--tool-color);
+    border-color: color-mix(in srgb, var(--tool-color) 30%, transparent);
+  }
+
+  body.page-portal .feature-item span { color: var(--text-2); }
+
+  /* Empty pinned hint */
+  body.page-portal .pin-hint {
+    display: none;
+    text-align: center;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    border: 1px dashed var(--border, rgba(255,255,255,0.12));
+    background: var(--bg-2, rgba(255,255,255,0.03));
+    font-size: 12.5px;
+    color: var(--text-3, #888);
+    line-height: 1.45;
+  }
+  body.page-portal .pin-hint.show { display: block; }
+  body.page-portal .pin-hint strong { color: var(--text-2, #bbb); }
+
+  /* Modal */
+  body.page-portal .modal-hero-text h2 { font-size: 1.5rem; }
+
+body.page-portal .brand-mark {
+  width: 36px; height: 36px; padding: 0; overflow: hidden;
+  border-radius: 10px; background: transparent; display: flex;
+  align-items: center; justify-content: center;
+}
+body.page-portal .brand-mark img { width: 100%; height: 100%; object-fit: cover; }
+
+</style>
+
+<style>
+/* Portal polish v1.3.4 */
+body.page-portal .tool-card {
+  transition: transform 0.22s cubic-bezier(0.22,1,0.36,1), box-shadow 0.22s ease, border-color 0.22s ease;
+  border-radius: 16px;
+}
+body.page-portal .tool-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 32px -8px rgba(0,0,0,0.45),
+    0 0 0 1px color-mix(in srgb, var(--tool-color) 35%, transparent),
+    0 0 40px -12px color-mix(in srgb, var(--tool-color) 40%, transparent);
+}
+body.page-portal .tool-card .tool-icon {
+  font-size: 1.75rem;
+  filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--tool-color) 40%, transparent));
+}
+body.page-portal .hero-section h1,
+body.page-portal .portal-hero h1 {
+  letter-spacing: -0.025em;
+}
+body.page-portal .btn-launch {
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+body.page-portal .btn-launch:hover {
+  transform: translateY(-1px);
+}
+body.page-portal .section-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-3);
+}
+</style>
+
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/static/icons/icon-512.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="/static/css/rangelab-menus.css">
+</head>
+<body class="rl-loading page-portal">
+
+<!-- ═══════════════════════ SPLASH ═══════════════════════ -->
+<div id="splash">
+  <div class="splash-logo"><img class="rl-brand-img" src="/static/icons/icon-192.png" alt="" width="192" height="192"></div>
+  <div class="splash-title">Range<span>Lab</span></div>
+  <div class="splash-sub">Poker Tools Collection</div>
+  <div class="splash-loader"></div>
+</div>
+
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<header class="app-header">
+  <div class="brand">
+    <!-- Hamburguesa a la izquierda (como en las herramientas) -->
+    <button type="button" class="icon-btn portal-burger" id="btnPortalMenu" aria-label="Menu" aria-expanded="false" aria-controls="portalDrawer" data-i18n-title="nav.menu" data-i18n-aria="nav.menu" title="Menu">
+      <svg class="burger-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      <svg class="burger-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="brand-mark"><img src="/static/icons/icon-192.png" alt="RangeLab" width="28" height="28" style="border-radius:7px;display:block;"></div>
+    <div class="brand-text">
+      <div class="brand-title">Range<span>Lab</span></div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <!-- Desktop: full actions -->
+    <div class="header-actions-desktop">
+      <button class="theme-toggle" type="button" data-i18n-title="common.theme" data-i18n-aria="common.theme" title="Light/dark theme" aria-label="Toggle light/dark theme">
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+      {% if is_admin %}
+      <a href="/admin" class="icon-btn" data-i18n-title="portal.adminDash" title="Admin Dashboard" aria-label="Admin" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--amber,#f0c14b);">⚙</a>
+      {% endif %}
+      <div class="user-chip" id="userChip" title="{{ user.username }}" role="button" tabindex="0" style="cursor:pointer">
+        <span class="user-dot"></span>
+        <span class="user-name">{{ user.display_name }}</span>
+      </div>
+      <button class="icon-btn" id="btnProfile" data-i18n-title="profile.openProfile" data-i18n-aria="profile.openProfile" title="Mi perfil" aria-label="Mi perfil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </button>
+      <button class="icon-btn danger" id="btnLogout" data-i18n-title="portal.logout" data-i18n-aria="portal.logout" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+    <!-- Móvil: solo chip de usuario a la derecha -->
+    <div class="header-actions-mobile">
+      <div class="user-chip user-chip-mobile" id="userChipMobile" title="{{ user.username }}" role="button" tabindex="0" style="cursor:pointer">
+        <span class="user-dot"></span>
+        <span class="user-name">{{ user.display_name }}</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Drawer menú móvil (mismo diseño que herramientas) -->
+<div class="portal-drawer-backdrop" id="portalDrawerBackdrop"></div>
+<aside class="portal-drawer rl-as-sheet" id="portalDrawer" aria-hidden="true">
+  <div class="rl-sheet-handle" aria-hidden="true"></div>
+  <div class="portal-drawer-head">
+    <div class="portal-drawer-title">
+      <div class="portal-drawer-logo"><img class="rl-brand-img" src="/static/icons/icon-192.png" alt="" width="192" height="192"></div>
+      <div class="portal-drawer-title-text">
+        <div class="pdu-name">{{ user.display_name }}</div>
+        <div class="pdu-meta">@{{ user.username }}</div>
+      </div>
+    </div>
+    <button type="button" class="portal-drawer-close" id="btnPortalDrawerClose" aria-label="Close menu" data-i18n-aria="nav.closeMenu">✕</button>
+  </div>
+
+  <div class="portal-drawer-body">
+    <div class="portal-drawer-row">
+      <span class="pdr-label" style="display:flex;align-items:center;gap:10px;">
+        <span class="lmr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span data-i18n="common.language">Idioma</span>
+      </span>
+      <div class="rl-lang-toggle" role="group" aria-label="Language" id="portalLangToggleMobile">
+        <button type="button" data-lang-set="es" title="Español">ES</button>
+        <button type="button" data-lang-set="en" title="English">EN</button>
+      </div>
+    </div>
+    <div class="portal-drawer-row">
+      <span class="pdr-label" data-i18n="common.theme">Tema</span>
+      <button class="theme-toggle" type="button" data-i18n-title="common.theme" title="Light/dark theme" aria-label="Tema">
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    </div>
+
+    <div class="portal-drawer-divider"></div>
+
+    <a href="/profile" class="portal-drawer-item" id="btnProfileMobile">
+      <div class="portal-drawer-icon">👤</div>
+      <div class="portal-drawer-text">
+        <div class="portal-drawer-name" data-i18n="common.profile">Mi perfil</div>
+        <div class="portal-drawer-desc" data-i18n="profile.subtitle">Account, membership and data</div>
+      </div>
+    </a>
+    {% if is_admin %}
+    <a href="/admin" class="portal-drawer-item">
+      <div class="portal-drawer-icon">⚙</div>
+      <div class="portal-drawer-text">
+        <div class="portal-drawer-name" data-i18n="portal.adminDash">Admin Dashboard</div>
+        <div class="portal-drawer-desc" data-i18n="admin.subtitle">Users · usage · database</div>
+      </div>
+    </a>
+    {% endif %}
+
+    <div class="portal-drawer-divider"></div>
+
+    <button type="button" class="portal-drawer-item danger" id="btnLogoutMobile">
+      <div class="portal-drawer-icon">🚪</div>
+      <div class="portal-drawer-text">
+        <div class="portal-drawer-name" data-i18n="portal.logout">Sign out</div>
+        <div class="portal-drawer-desc" data-i18n="nav.logoutDesc">Sign out of your account</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="portal-drawer-footer">
+    RangeLab<br>
+    {{ site.footer_text }}
+  </div>
+</aside>
+
+<!-- Bottom Nav nativo (móvil) -->
+<nav class="rl-bottom-nav" id="portalBottomNav" aria-label="Main navigation">
+  <a href="/" class="rl-nav-item active" data-nav="home">
+    <span class="rl-nav-ico">🏠</span>
+    <span class="rl-nav-label">Portal</span>
+  </a>
+  <a href="/profile" class="rl-nav-item" data-nav="profile">
+    <span class="rl-nav-ico">👤</span>
+    <span class="rl-nav-label" data-i18n="common.profile">Perfil</span>
+  </a>
+  <button type="button" class="rl-nav-item" id="btnPortalSheetMenu" data-nav="menu" aria-label="Menu" aria-expanded="false">
+    <span class="rl-nav-ico">☰</span>
+    <span class="rl-nav-label" data-i18n="nav.menu">Menu</span>
+  </button>
+  {% if is_admin %}
+  <a href="/admin" class="rl-nav-item" data-nav="admin">
+    <span class="rl-nav-ico">⚙</span>
+    <span class="rl-nav-label">Admin</span>
+  </a>
+  {% endif %}
+</nav>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main class="main">
+
+  <section class="hero">
+    <div class="hero-eyebrow" data-i18n="portal.heroEyebrow">Complete poker suite</div>
+    <h1><span data-i18n="portal.heroTitle">8 tools.</span><br><span class="grad" data-i18n="portal.heroGrad">One lab.</span></h1>
+    <p data-i18n="portal.heroDesc">Equity, Preflop, Bankroll, Hand Lab, Range Lab, MTT Exploiter and AI Table. Everything in one place, ready to play.</p>
+    <div class="quick-stats">
+      <div class="qs">
+        <span class="qs-dot" style="background: var(--cyan); box-shadow: 0 0 8px var(--cyan);"></span>
+        <strong id="statToolsCount">8</strong> <span data-i18n="portal.statTools">tools</span>
+      </div>
+      <div class="qs">
+        <span class="qs-dot" style="background: var(--green); box-shadow: 0 0 8px var(--green);"></span>
+        <strong data-i18n="portal.statPrivate">Datos privados</strong>
+      </div>
+      <div class="qs">
+        <span class="qs-dot" style="background: var(--gold); box-shadow: 0 0 8px var(--gold);"></span>
+        <strong data-i18n="portal.statMulti">Multi-dispositivo</strong>
+      </div>
+    </div>
+  </section>
+
+  <div class="pin-hint" id="pinHint">
+    <strong>💡 <span data-i18n="portal.pinTip">Tip:</span></strong> <span data-i18n="portal.pinTipText">Tap the pin on a card to pin it: it appears at the top as a circle and opens when tapped.</span>
+  </div>
+
+  <!-- Sección fijadas -->
+  <div class="pinned-section" id="pinnedSection"></div>
+
+  <div class="section-head" id="allToolsHead">
+    <div>
+      <h2>Tools</h2>
+      <p>Tap a card to see details or press Open</p>
+    </div>
+    <span class="section-hint" id="toolsCountHint"></span>
+  </div>
+
+  <div class="tools-grid" id="toolsGrid"><div class="tool-card rl-skeleton-card" aria-hidden="true" style="min-height:180px;pointer-events:none;"></div><div class="tool-card rl-skeleton-card" aria-hidden="true" style="min-height:180px;pointer-events:none;"></div><div class="tool-card rl-skeleton-card" aria-hidden="true" style="min-height:180px;pointer-events:none;"></div><div class="tool-card rl-skeleton-card" aria-hidden="true" style="min-height:180px;pointer-events:none;"></div><div class="tool-card rl-skeleton-card" aria-hidden="true" style="min-height:180px;pointer-events:none;"></div><div class="tool-card rl-skeleton-card" aria-hidden="true" style="min-height:180px;pointer-events:none;"></div></div>
+</main>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer class="footer">
+  <div class="footer-brand">Range<span>Lab</span></div>
+  <div class="footer-authors">Created by <b>RangeSoft®</b></div>
+  <div class="footer-authors">Developed by <b>{{ developer.name }}</b> · <a href="mailto:{{ developer.email }}" style="color:inherit">{{ developer.email }}</a></div>
+  <div class="footer-note">© 2026 RangeSoft®. Open source · non-commercial use (see LICENSE).</div>
+</footer>
+
+<!-- ═══════════════════════ MODAL DETALLE ═══════════════════════ -->
+<div class="modal-overlay" id="detailModal" role="dialog" aria-modal="true">
+  <div class="modal" id="detailModalContent"></div>
+</div>
+
+<!-- ═══════════════════════ MODAL CAMBIO CONTRASEÑA ═══════════════════════ -->
+<div class="modal-overlay" id="pwdModal">
+  <div class="modal" style="max-width: 420px;">
+    <div class="pwd-modal-body">
+      <h2>🔐 Change password</h2>
+      <p>Enter your current password and the new one</p>
+
+      <div class="pwd-error" id="pwdError"></div>
+      <div class="pwd-success" id="pwdSuccess"></div>
+
+      <div class="pwd-field">
+        <label>Current password</label>
+        <input type="password" id="pwdOld" autocomplete="current-password" autocapitalize="none">
+      </div>
+      <div class="pwd-field">
+        <label>New password</label>
+        <input type="password" id="pwdNew" autocomplete="new-password" autocapitalize="none">
+      </div>
+      <div class="pwd-field" style="margin-bottom: 22px;">
+        <label>Repeat new password</label>
+        <input type="password" id="pwdNew2" autocomplete="new-password" autocapitalize="none">
+      </div>
+
+      <div class="pwd-actions">
+        <button class="pwd-cancel" id="pwdCancel">Cancelar</button>
+        <button class="pwd-save" id="pwdSave">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TOAST ═══════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<script src="/static/js/api-client.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   CONFIGURACIÓN DE HERRAMIENTAS (orden de prioridad por defecto)
+   ═══════════════════════════════════════════════════════════════ */
+const ALLOWED_TOOLS = {{ allowed_tools | tojson }};
+const IS_ADMIN = {{ 'true' if is_admin else 'false' }};
+
+const TOOLS_ALL = [
+  {
+    id: 'tournament-lab',
+    url: '/tool/tournament-lab',
+    icon: '♠',
+    badge: 'Tournaments',
+    title: 'Tournament Lab',
+    subtitle: 'ITM · Bubble · Push/Fold',
+    color: '#f59e0b',
+    color2: '#d97706',
+    priority: 3,
+    short: 'Live tournament calculator: stack in BB, zone, bubble factor, stack life and push/fold.',
+    description: 'Analyze your spot in any MTT or SNG. Enter level, players and stack to see ITM, FT, bubble factor and level projections. Build custom structures and export them as JSON.',
+    features: [
+      'Live analysis: BB, zone, M-factor, average ITM/FT',
+      'Bubble factor and pressure alerts',
+      'Stack life and projection by level',
+      'Push/fold guide by position and BF',
+      'Create and save tournaments with a blind structure',
+      'Export / import JSON'
+    ],
+    tags: ['MTT', 'ITM', 'Push/Fold'],
+    howto: [
+      'Choose or create a tournament with its blind structure.',
+      'In Live analysis enter stack, level and players.',
+      'Press Calculate to see zone, ITM and projection.',
+      'Use Push/Fold for approximate short-stack ranges.'
+    ]
+  },
+  {
+    id: 'equity',
+    url: '/tool/equity',
+    icon: '🎯',
+    badge: 'Calculation',
+    title: 'Equity Lab',
+    subtitle: 'Equity · Ranges',
+    color: '#22d3ee',
+    color2: '#0891b2',
+    priority: 1,
+    short: 'Calculate your chances of winning against one or more opponents, with exact cards or full ranges.',
+    description: 'Find out how often you win the hand before the board is dealt. Add your opponents with exact cards or ranges and let the calculator simulate thousands of scenarios for you.',
+    features: [
+      'Calculate equity against 2 or more opponents at once',
+      'Use exact cards or define custom ranges',
+      'Simulate the full board or just the flop and turn',
+      'Exact result when the board is complete',
+      'Save your sessions and reload them whenever you want'
+    ],
+    tags: ['Equity', 'Ranges', 'Preflop'],
+    howto: [
+      'Add as many players as you need with the matching button.',
+      'Assign exact cards or define a range for each one.',
+      'Tap the board slots if you want to fix the community cards.',
+      'Press "Start" and see the win percentage instantly.'
+    ]
+  },
+  {
+    id: 'preflop',
+    url: '/tool/preflop',
+    icon: '📋',
+    badge: 'Training',
+    title: 'Preflop Lab',
+    subtitle: 'Charts · Trainer',
+    color: '#a78bfa',
+    color2: '#7c3aed',
+    priority: 2,
+    short: 'Build your preflop range charts and train your memory with automatic scoring.',
+    description: 'Visual preflop strategy editor with a 13×13 matrix. Paint ranges, set frequencies and practice until you memorize them. When you think you know them, switch to training mode and check your score.',
+    features: [
+      'Paint ranges on a clear, intuitive grid',
+      'Set frequencies per hand: limp, call, raise, all-in…',
+      'Configure position, stack and situation without limits',
+      'Training mode with scoring by combos',
+      'Load and save your charts whenever you want'
+    ],
+    tags: ['Preflop', 'Ranges', 'Trainer'],
+    howto: [
+      'Set the position, stack and situation you want to edit.',
+      'Paint the ranges with the brush and adjust the frequencies.',
+      'Switch to Train mode to practice from memory.',
+      'Rebuild the range and press "Check" to see your score.'
+    ]
+  },
+  {
+    id: 'feltlab',
+    url: '/tool/feltlab',
+    icon: '🔬',
+    badge: 'Analysis',
+    title: 'Hand Lab',
+    subtitle: 'Replay · Stats · Notes',
+    color: '#f0c14b',
+    color2: '#d4a017',
+    priority: 3,
+    short: 'Load your hand histories, review every hand step by step and analyze how you really play.',
+    description: 'Your personal lab for reviewing hands. Load your room logs and replay each hand on a virtual table, see your stats and write notes to improve.',
+    features: [
+      'Works with the main poker rooms',
+      'Replay each hand step by step on the table',
+      'Clear stats on your game (VPIP, PFR, 3-Bet…)',
+      'Add notes and tags to any hand',
+      'Jump quickly to any hand with the filters'
+    ],
+    tags: ['Replay', 'Stats', 'Notes'],
+    howto: [
+      'Open the side menu and press "Import".',
+      'Drag in your .txt or .log files.',
+      'If there are several tournaments, choose which ones to import.',
+      'Replay each hand and add notes wherever you need them.'
+    ]
+  },
+  {
+    id: 'range-analyzer',
+    url: '/tool/range-analyzer',
+    icon: '📊',
+    badge: 'Analysis',
+    title: 'Range Lab',
+    subtitle: 'Leaks · Heatmaps · GTO',
+    color: '#db61a2',
+    color2: '#f97316',
+    priority: 4,
+    short: 'Find leaks in your game and compare them with ideal ranges to see where you are losing money.',
+    description: 'Analyze your real ranges against the ideal ones and discover which hands you are playing wrong. With per-hand heatmaps and a prioritized list of leaks, you will know exactly what to fix.',
+    features: [
+      'Clear heatmap by hand and position',
+      'Direct comparison with reference ranges',
+      'Prioritized list of your leaks with advice',
+      'Everything calculated from your own histories',
+      'Demo mode to try it without logs'
+    ],
+    tags: ['GTO', 'Leaks', 'Heatmap'],
+    howto: [
+      'Open Range Lab from the portal.',
+      'Import your logs or paste your hands.',
+      'Review the summary, the leaks and the heatmap.',
+      'Turn on the comparison with ideal ranges to see deviations.'
+    ]
+  },
+  {
+    id: 'mtt-exploiter',
+    url: '/tool/mtt-exploiter',
+    icon: '🎫',
+    badge: 'Exploits',
+    title: 'MTT Exploiter',
+    subtitle: 'Pool · Opponents',
+    color: '#f97316',
+    color2: '#a78bfa',
+    priority: 5,
+    short: 'Analyze how the field plays and profile each opponent with concrete advice to exploit them.',
+    description: 'Exploitation tool for tournaments. Turns your histories into opponent profiles: how they play, which mistakes they make and how you should adjust your strategy against them.',
+    features: [
+      'Profile each opponent with their real stats',
+      'Classify opponents by type and playing style',
+      'Concrete advice on how to exploit each one',
+      'Aggregated view of the field to spot trends',
+      'Works directly with your histories'
+    ],
+    tags: ['MTT', 'Exploits', 'Opponents'],
+    howto: [
+      'Import your hands or load them from Hand Lab.',
+      'Explore Pool mode to see how the field plays.',
+      'Switch to the profile of a specific opponent.',
+      'Apply the advice to exploit them at the table.'
+    ]
+  },
+  {
+    id: 'ailab',
+    url: '/tool/ailab',
+    icon: '🤖',
+    badge: 'Play',
+    title: 'AI Table',
+    subtitle: 'vs AI · Hand Lab',
+    color: '#f2a83c',
+    color2: '#9b8bf4',
+    priority: 4,
+    short: 'Sit down at a mobile-style table and play Hold\'em against AI opponents. 8/9-max tournaments, saved to Hand Lab for replay.',
+    description: 'Practice table with a mobile-client design. Cash or SNG up to 9-max. The bots use your Hand Lab stats, and each hand can be saved to replay later in Hand Lab.',
+    features: [
+      'Tables 3 / 6 / 8 / 9-max · Cash or SNG tournament',
+      'AI calibrated to your Hand Lab stats',
+      'Progressive blinds in tournaments · stacks 15–100 BB',
+      'Save hands to Hand Lab and replay them',
+      'Free'
+    ],
+    tags: ['AI', 'Tournament', 'Hand Lab'],
+    howto: [
+      'Import hands into Hand Lab (optional but recommended).',
+      'Choose 8 or 9-max + SNG tournament if you want MTT format.',
+      'Turn on "Save to Hand Lab" and sit down.',
+      'Open Hand Lab afterwards to review the hands you played.'
+    ]
+  },
+  {
+    id: 'tracker',
+    url: '/tool/tracker',
+    icon: '💰',
+    badge: 'Management',
+    title: 'Bankroll Lab',
+    subtitle: 'Bankroll · Tournaments',
+    color: '#34d399',
+    color2: '#059669',
+    priority: 6,
+    short: 'Log your tournaments, track deposits and withdrawals, and watch your bankroll grow.',
+    description: 'Full control of your poker money. Log every tournament, deposit and withdrawal, and check your key stats without wasting time on spreadsheets.',
+    features: [
+      'Log every tournament with all its details',
+      'Track deposits and withdrawals with history',
+      'Check your stats instantly',
+      'See your progress on a clear chart',
+      'Filter by today, week, month or any range you want'
+    ],
+    tags: ['Bankroll', 'Tournaments', 'ROI'],
+    howto: [
+      'Enter your starting bankroll the first time you open the app.',
+      'Log each tournament with its cost, winnings and finish.',
+      'Use the deposit/withdraw buttons to adjust the bankroll.',
+      'Check the summary to see your ROI, ITM and progress.'
+    ]
+  }
+];
+
+const TOOLS = TOOLS_ALL.filter(t => IS_ADMIN || (ALLOWED_TOOLS && ALLOWED_TOOLS.indexOf(t.id) !== -1));
+
+/* ═══════════════════════════════════════════════════════════════
+   PIN SYSTEM (localStorage)
+   ═══════════════════════════════════════════════════════════════ */
+const PIN_KEY = 'rangelab-pinned-tools';
+const PIN_HINT_KEY = 'rangelab-pin-hint-seen';
+
+function loadPinned() {
+  try {
+    const raw = localStorage.getItem(PIN_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.filter(id => TOOLS.some(t => t.id === id)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePinned(ids) {
+  try {
+    localStorage.setItem(PIN_KEY, JSON.stringify(ids));
+  } catch {}
+}
+
+let pinnedIds = loadPinned();
+
+function isPinned(id) {
+  return pinnedIds.includes(id);
+}
+
+function togglePin(id) {
+  if (isPinned(id)) {
+    pinnedIds = pinnedIds.filter(x => x !== id);
+    showToast('Tool unpinned', '');
+  } else {
+    /* Orden de fijado: se añaden al final en el orden en que el usuario las fija */
+    pinnedIds = [...pinnedIds.filter(x => x !== id), id];
+    showToast('Pinned to top ✓', 'ok');
+  }
+  savePinned(pinnedIds);
+  markHintSeen();
+  renderAll();
+}
+
+function markHintSeen() {
+  try { localStorage.setItem(PIN_HINT_KEY, '1'); } catch {}
+  document.getElementById('pinHint')?.classList.remove('show');
+}
+
+function shouldShowHint() {
+  try {
+    return !localStorage.getItem(PIN_HINT_KEY) && pinnedIds.length === 0;
+  } catch {
+    return pinnedIds.length === 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SPLASH
+   ═══════════════════════════════════════════════════════════════ */
+setTimeout(() => {
+  document.getElementById('splash')?.classList.add('hide');
+  if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+}, 900);
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════════════════════════════ */
+const toolsGrid = document.getElementById('toolsGrid');
+const pinnedSection = document.getElementById('pinnedSection');
+const pinHint = document.getElementById('pinHint');
+const toolsCountHint = document.getElementById('toolsCountHint');
+
+const PIN_SVG = `
+  <svg class="ico-pin-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>
+  </svg>
+  <svg class="ico-pin-fill" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+    <path d="M16 1a1 1 0 0 1 0 2 1 1 0 0 0-1 1v3.76a2 2 0 0 0 1.11 1.79l1.78.9A2 2 0 0 1 19 12.24V13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-.76a2 2 0 0 1 1.11-1.79l1.78-.9A2 2 0 0 0 9 7.76V4a1 1 0 0 0-1-1 1 1 0 1 1 0-2h8zM12 15v6"/>
+  </svg>
+`;
+
+function shortName(t) {
+  // Nombre corto para el círculo (sin "Lab")
+  return (t.title || '').replace(/\s*Lab\s*$/i, '').trim() || t.title;
+}
+
+function circleHTML(t) {
+  return `
+    <button type="button" class="pin-circle" data-launch="${t.id}" style="--tool-color: ${t.color}; --tool-color-2: ${t.color2};" title="Open ${t.title}" aria-label="Open ${t.title}">
+      <span class="pin-circle-icon">${t.icon}</span>
+      <span class="pin-circle-name">${shortName(t)}</span>
+    </button>
+  `;
+}
+
+function cardHTML(t) {
+  const pinned = isPinned(t.id);
+  return `
+    <article class="tool-card${pinned ? ' is-pinned' : ''}" data-id="${t.id}" tabindex="0" role="button" aria-label="Open ${t.title}" style="--tool-color: ${t.color}; --tool-color-2: ${t.color2};">
+      <button class="btn-pin${pinned ? ' pinned' : ''}" type="button" data-pin="${t.id}" title="${pinned ? 'Unpin' : 'Pin to top'}" aria-label="${pinned ? 'Unpin ' + t.title : 'Pin ' + t.title + ' to top'}">
+        ${PIN_SVG}
+      </button>
+      <div class="tool-body">
+        <div class="tool-head">
+          <div class="tool-icon">${t.icon}</div>
+          <div class="tool-head-text">
+            <div class="tool-badge">${t.badge}</div>
+            <h3 class="tool-title">${t.title}</h3>
+            <div class="tool-subtitle">${t.subtitle}</div>
+          </div>
+        </div>
+
+        <p class="tool-desc">${t.short}</p>
+
+        <div class="feature-list">
+          ${t.features.slice(0, 2).map(f => `
+            <div class="feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>${f}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="tool-tags">
+          ${t.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+        </div>
+
+        <div class="tool-footer">
+          <button class="btn-launch" data-launch="${t.id}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Open
+          </button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function sortedTools() {
+  return [...TOOLS].sort((a, b) => (a.priority || 99) - (b.priority || 99) || a.title.localeCompare(b.title));
+}
+
+function renderAll() {
+  const sorted = sortedTools();
+  const pinned = pinnedIds.map(id => TOOLS.find(t => t.id === id)).filter(Boolean);
+
+  // Dock de círculos (acceso directo)
+  if (pinned.length > 0) {
+    pinnedSection.innerHTML = `
+      <div class="pinned-dock" role="list" aria-label="Pinned tools">
+        ${pinned.map(t => circleHTML(t)).join('')}
+      </div>
+    `;
+  } else {
+    pinnedSection.innerHTML = '';
+  }
+
+  // Todas las herramientas en el grid (las fijadas también, con pin activo)
+  toolsGrid.innerHTML = sorted.map(t => cardHTML(t)).join('');
+
+  const statToolsEl = document.getElementById('statToolsCount');
+  if (statToolsEl) statToolsEl.textContent = TOOLS.length;
+
+  if (toolsCountHint) {
+    toolsCountHint.textContent = pinned.length
+      ? `${pinned.length} pinned`
+      : `${TOOLS.length} disponibles`;
+  }
+
+  if (shouldShowHint()) {
+    pinHint.classList.add('show');
+  } else {
+    pinHint.classList.remove('show');
+  }
+
+  const head = document.getElementById('allToolsHead');
+  if (head) {
+    const h2 = head.querySelector('h2');
+    const p = head.querySelector('p');
+    if (h2) h2.textContent = 'Tools';
+    if (p) p.textContent = pinned.length
+      ? 'Tap a circle at the top to open instantly'
+      : 'Tap a card to see details or press Open';
+  }
+}
+
+renderAll();
+
+/* Clicks: pin / launch / detail */
+function handleGridClick(e) {
+  const pinBtn = e.target.closest('[data-pin]');
+  if (pinBtn) {
+    e.stopPropagation();
+    e.preventDefault();
+    togglePin(pinBtn.dataset.pin);
+    return;
+  }
+  const launchBtn = e.target.closest('[data-launch]');
+  if (launchBtn) {
+    e.stopPropagation();
+    openViewer(launchBtn.dataset.launch);
+    return;
+  }
+  const card = e.target.closest('.tool-card');
+  if (card) openDetail(card.dataset.id);
+}
+
+toolsGrid.addEventListener('click', handleGridClick);
+pinnedSection.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-launch]');
+  if (btn) openViewer(btn.dataset.launch);
+});
+
+/* Teclado */
+function handleKeydown(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    const card = e.target.closest('.tool-card');
+    if (card && !e.target.closest('[data-pin], [data-launch]')) {
+      e.preventDefault();
+      openDetail(card.dataset.id);
+    }
+  }
+}
+toolsGrid.addEventListener('keydown', handleKeydown);
+pinnedSection.addEventListener('keydown', handleKeydown);
+
+/* ═══════════════════════════════════════════════════════════════
+   MODAL DETALLE
+   ═══════════════════════════════════════════════════════════════ */
+const detailModal = document.getElementById('detailModal');
+const detailModalContent = document.getElementById('detailModalContent');
+
+function openDetail(id) {
+  const t = TOOLS.find(x => x.id === id);
+  if (!t) return;
+
+  const pinned = isPinned(t.id);
+
+  detailModalContent.style.setProperty('--tool-color', t.color);
+  detailModalContent.style.setProperty('--tool-color-2', t.color2);
+
+  detailModalContent.innerHTML = `
+    <div class="modal-hero">
+      <button class="modal-close" id="modalClose" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18"/>
+          <path d="m6 6 12 12"/>
+        </svg>
+      </button>
+      <div class="modal-hero-inner">
+        <div class="modal-icon">${t.icon}</div>
+        <div class="modal-hero-text">
+          <h2>${t.title}</h2>
+          <div class="sub">${t.subtitle}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">Description</div>
+        <p>${t.description}</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">What you can do</div>
+        <div class="feature-list" style="margin-bottom: 0;">
+          ${t.features.map(f => `
+            <div class="feature-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>${f}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Getting started</div>
+        <div class="how-to-list">
+          ${t.howto.map((step, i) => `
+            <div class="how-to-item">
+              <div class="how-to-num">${i + 1}</div>
+              <p>${step}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-launch" data-launch-modal="${t.id}" style="flex:1;min-width:140px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Open ${t.title}
+      </button>
+      <button type="button" id="modalPinBtn" class="btn-pin${pinned ? ' pinned' : ''}" style="position:static;width:auto;height:auto;padding:12px 16px;border-radius:12px;gap:8px;display:inline-flex;align-items:center;font-size:13px;font-weight:600;" data-pin-modal="${t.id}">
+        ${PIN_SVG}
+        <span>${pinned ? 'Unpin' : 'Pin to top'}</span>
+      </button>
+    </div>
+  `;
+
+  detailModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  document.getElementById('modalClose').onclick = closeDetail;
+  detailModalContent.querySelector('[data-launch-modal]').onclick = () => {
+    closeDetail();
+    setTimeout(() => openViewer(t.id), 120);
+  };
+  detailModalContent.querySelector('[data-pin-modal]').onclick = (e) => {
+    e.stopPropagation();
+    togglePin(t.id);
+    // Refresh modal button state
+    const btn = document.getElementById('modalPinBtn');
+    if (btn) {
+      const nowPinned = isPinned(t.id);
+      btn.classList.toggle('pinned', nowPinned);
+      btn.querySelector('span').textContent = nowPinned ? 'Unpin' : 'Pin to top';
+    }
+  };
+}
+
+function closeDetail() {
+  detailModal.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+detailModal.addEventListener('click', (e) => {
+  if (e.target === detailModal) closeDetail();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   ABRIR HERRAMIENTA (navegación directa)
+   ═══════════════════════════════════════════════════════════════ */
+function openViewer(id) {
+  const t = TOOLS.find(x => x.id === id);
+  if (!t) return;
+  window.location.href = t.url;
+}
+
+window.addEventListener('load', () => {
+  const hash = location.hash.replace('#', '');
+  if (hash && TOOLS.some(t => t.id === hash)) {
+    const t = TOOLS.find(x => x.id === hash);
+    if (t) window.location.replace(t.url);
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   CAMBIO DE CONTRASEÑA
+   ═══════════════════════════════════════════════════════════════ */
+const pwdModal = document.getElementById('pwdModal');
+const pwdError = document.getElementById('pwdError');
+const pwdSuccess = document.getElementById('pwdSuccess');
+
+function openPwdModal() {
+  pwdError.classList.remove('show');
+  pwdSuccess.classList.remove('show');
+  document.getElementById('pwdOld').value = '';
+  document.getElementById('pwdNew').value = '';
+  document.getElementById('pwdNew2').value = '';
+  pwdModal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('pwdOld').focus(), 200);
+}
+
+function closePwdModal() {
+  pwdModal.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+var _btnPwdLegacy = document.getElementById('btnChangePassword');
+if (_btnPwdLegacy) _btnPwdLegacy.addEventListener('click', openPwdModal);
+document.getElementById('pwdCancel').addEventListener('click', closePwdModal);
+pwdModal.addEventListener('click', (e) => {
+  if (e.target === pwdModal) closePwdModal();
+});
+
+document.getElementById('pwdSave').addEventListener('click', async () => {
+  pwdError.classList.remove('show');
+  pwdSuccess.classList.remove('show');
+
+  const oldPassword = document.getElementById('pwdOld').value;
+  const newPassword = document.getElementById('pwdNew').value;
+  const newPassword2 = document.getElementById('pwdNew2').value;
+
+  if (!oldPassword || !newPassword || !newPassword2) {
+    pwdError.textContent = 'Fill in all fields';
+    pwdError.classList.add('show');
+    return;
+  }
+  if (newPassword.length < 8) {
+    pwdError.textContent = 'The new password must be at least 8 characters';
+    pwdError.classList.add('show');
+    return;
+  }
+  if (newPassword !== newPassword2) {
+    pwdError.textContent = 'The new passwords do not match';
+    pwdError.classList.add('show');
+    return;
+  }
+
+  const btn = document.getElementById('pwdSave');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  try {
+    const res = await fetch('/api/auth/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) throw new Error(data.error || 'Error');
+
+    pwdSuccess.textContent = '✓ Password changed successfully';
+    pwdSuccess.classList.add('show');
+    setTimeout(closePwdModal, 1500);
+  } catch (err) {
+    pwdError.textContent = err.message || 'Could not change the password';
+    pwdError.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar';
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   LOGOUT (+ mobile)
+   ═══════════════════════════════════════════════════════════════ */
+async function doLogout() {
+  if (!confirm((window.RangeLabI18n && RangeLabI18n.t('common.logoutConfirm')) || 'Sign out?')) return;
+  try { await FeltLabAPI.auth.logout(); } catch {}
+  window.location.href = '/login';
+}
+var _btnLogout = document.getElementById('btnLogout');
+if (_btnLogout) _btnLogout.addEventListener('click', doLogout);
+var _btnLogoutMobile = document.getElementById('btnLogoutMobile');
+if (_btnLogoutMobile) _btnLogoutMobile.addEventListener('click', doLogout);
+
+/* ═══════════════════════════════════════════════════════════════
+   ATAJOS DE TECLADO
+   ═══════════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (detailModal.classList.contains('show')) {
+      closeDetail();
+    } else if (pwdModal.classList.contains('show')) {
+      closePwdModal();
+    }
+  }
+});
+</script>
+
+
+
+<script>
+(function () {
+  var portalUser = {{ user | tojson }};
+  var drawer = document.getElementById('portalDrawer');
+  var backdrop = document.getElementById('portalDrawerBackdrop');
+  var burger = document.getElementById('btnPortalMenu');
+
+  function openPortalDrawer() {
+    if (!drawer) return;
+    if (backdrop) backdrop.classList.add('show');
+    drawer.classList.add('show');
+    drawer.setAttribute('aria-hidden', 'false');
+    if (burger) {
+      burger.classList.add('is-open');
+      burger.setAttribute('aria-expanded', 'true');
+    }
+    document.body.style.overflow = 'hidden';
+  }
+  function closePortalDrawer() {
+    if (!drawer) return;
+    drawer.classList.remove('show');
+    drawer.setAttribute('aria-hidden', 'true');
+    if (backdrop) backdrop.classList.remove('show');
+    if (burger) {
+      burger.classList.remove('is-open');
+      burger.setAttribute('aria-expanded', 'false');
+    }
+    document.body.style.overflow = '';
+  }
+  window.closePortalDrawer = closePortalDrawer;
+
+  if (burger) {
+    burger.addEventListener('click', function () {
+      if (drawer && drawer.classList.contains('show')) closePortalDrawer();
+      else openPortalDrawer();
+    });
+  }
+  var sheetMenuBtn = document.getElementById('btnPortalSheetMenu');
+  if (sheetMenuBtn) {
+    sheetMenuBtn.addEventListener('click', function () {
+      if (drawer && drawer.classList.contains('show')) closePortalDrawer();
+      else openPortalDrawer();
+    });
+  }
+  var btnClose = document.getElementById('btnPortalDrawerClose');
+  if (btnClose) btnClose.addEventListener('click', closePortalDrawer);
+  if (backdrop) backdrop.addEventListener('click', closePortalDrawer);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && drawer && drawer.classList.contains('show')) closePortalDrawer();
+  });
+
+  function bootProfile() {
+    if (!window.RangeLabProfile || !window.RangeLabI18n) {
+      setTimeout(bootProfile, 50);
+      return;
+    }
+    RangeLabI18n.applyDom();
+    RangeLabI18n.wireLangButtons();
+    if (portalUser && portalUser.preferred_lang) {
+      try {
+        var stored = localStorage.getItem('rangelab-lang');
+        if (!stored) RangeLabI18n.setLang(portalUser.preferred_lang, true);
+      } catch (e) {}
+    }
+    ['userChip', 'userChipMobile'].forEach(function (id) {
+      var chip = document.getElementById(id);
+      if (!chip) return;
+      chip.style.cursor = 'pointer';
+      chip.addEventListener('click', function () { window.location.href = '/profile'; });
+    });
+    function openProfile() {
+      window.location.href = '/profile';
+    }
+    var btnP = document.getElementById('btnProfile');
+    if (btnP) btnP.addEventListener('click', openProfile);
+    var btnPM = document.getElementById('btnProfileMobile');
+    if (btnPM) btnPM.addEventListener('click', openProfile);
+    var btnPwd = document.getElementById('btnChangePassword');
+    if (btnPwd) btnPwd.addEventListener('click', openProfile);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootProfile);
+  else bootProfile();
+
+  window.addEventListener('rangelab:langchange', function () {
+    if (window.RangeLabI18n) RangeLabI18n.applyDom();
+  });
+})();
+</script>
+
+<script>
+(function(){
+  if (window.RangeLabSkeleton) RangeLabSkeleton.registerSW('/sw.js');
+  else if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>

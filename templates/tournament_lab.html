@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Tournament Lab — RangeLab</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+<style>
+body.tool-tlab{margin:0;min-height:100dvh;background:var(--bg,#07090f);color:var(--text,#e8ecf4);font-family:var(--font,system-ui,-apple-system,sans-serif);-webkit-font-smoothing:antialiased;padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+body.tool-tlab *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body.tool-tlab .tl-header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:rgba(12,16,26,.92);border-bottom:1px solid rgba(255,255,255,.06)}
+body.tool-tlab .tl-brand{display:flex;align-items:center;gap:10px}
+body.tool-tlab .tl-mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#1a1200}
+body.tool-tlab .tl-title{font-size:1rem;font-weight:800;letter-spacing:-.02em}
+body.tool-tlab .tl-sub{font-size:.65rem;color:var(--text-3,#6b7590);font-weight:600}
+body.tool-tlab .tl-tabs{display:flex;gap:6px;padding:12px 14px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+body.tool-tlab .tl-tab{flex-shrink:0;padding:9px 14px;border-radius:12px;border:1px solid var(--border,#232a3c);background:transparent;color:var(--text-2,#a4acc0);font-size:.8rem;font-weight:700;cursor:pointer}
+body.tool-tlab .tl-tab.active{background:color-mix(in srgb,#f59e0b 18%,transparent);border-color:#f59e0b;color:#f59e0b}
+body.tool-tlab .tl-main{padding:4px 14px 20px;max-width:640px;margin:0 auto}
+body.tool-tlab .tl-panel{display:none}
+body.tool-tlab .tl-panel.active{display:block;animation:tlFade .25s ease}
+@keyframes tlFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+body.tool-tlab .tl-card{background:var(--bg-1,#10131d);border:1px solid var(--border,#232a3c);border-radius:16px;padding:14px;margin-bottom:12px}
+body.tool-tlab .tl-card h3{margin:0 0 12px;font-size:.85rem;font-weight:700;color:var(--text-2,#a4acc0);text-transform:uppercase;letter-spacing:.04em}
+body.tool-tlab .tl-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+body.tool-tlab .tl-field label{display:block;font-size:.7rem;font-weight:700;color:var(--text-3,#6b7590);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+body.tool-tlab .tl-field input,body.tool-tlab .tl-field select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border,#232a3c);background:var(--bg,#0a0c13);color:var(--text);font-size:16px;font-weight:600}
+body.tool-tlab .tl-field input:focus,body.tool-tlab .tl-field select:focus{outline:none;border-color:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,.15)}
+body.tool-tlab .tl-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border-radius:12px;border:none;font-weight:800;font-size:.9rem;cursor:pointer}
+body.tool-tlab .tl-btn-primary{background:linear-gradient(135deg,#f59e0b,#d97706);color:#1a1200;width:100%;margin-top:12px;box-shadow:0 4px 16px rgba(245,158,11,.3)}
+body.tool-tlab .tl-btn-primary:active{transform:scale(.98)}
+body.tool-tlab .tl-btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:.8rem;padding:8px 12px}
+body.tool-tlab .tl-btn-danger{background:color-mix(in srgb,#f2685f 15%,transparent);color:#f2685f;border:1px solid rgba(242,104,95,.3)}
+body.tool-tlab .tl-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+body.tool-tlab .tl-stat{background:var(--bg,#0a0c13);border:1px solid var(--border,#232a3c);border-radius:14px;padding:12px}
+body.tool-tlab .tl-stat .val{font-size:1.25rem;font-weight:800;font-variant-numeric:tabular-nums}
+body.tool-tlab .tl-stat .val.good{color:#34d399}
+body.tool-tlab .tl-stat .val.warn{color:#f59e0b}
+body.tool-tlab .tl-stat .val.bad{color:#f2685f}
+body.tool-tlab .tl-stat .val.cyan{color:#33d2e3}
+body.tool-tlab .tl-stat .lbl{font-size:.7rem;color:var(--text-3);margin-top:2px;font-weight:600}
+body.tool-tlab .tl-stat .sub{font-size:.65rem;color:var(--text-3);opacity:.8;margin-top:2px}
+body.tool-tlab .tl-alert{border-radius:12px;padding:12px 14px;margin-top:10px;font-size:.82rem;line-height:1.45;font-weight:600}
+body.tool-tlab .tl-alert.info{background:color-mix(in srgb,#34d399 12%,transparent);border:1px solid rgba(52,211,153,.25);color:#34d399}
+body.tool-tlab .tl-alert.warn{background:color-mix(in srgb,#f59e0b 12%,transparent);border:1px solid rgba(245,158,11,.25);color:#f59e0b}
+body.tool-tlab .tl-alert.danger{background:color-mix(in srgb,#f2685f 12%,transparent);border:1px solid rgba(242,104,95,.25);color:#f2685f}
+body.tool-tlab .tl-chip{padding:6px 10px;border-radius:8px;font-size:.72rem;font-weight:700;background:var(--bg);border:1px solid var(--border);color:var(--text-2);display:inline-block;margin:2px}
+body.tool-tlab .tl-chip.on{border-color:#f59e0b;color:#f59e0b;background:color-mix(in srgb,#f59e0b 12%,transparent)}
+body.tool-tlab .tl-list-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);margin-bottom:8px;cursor:pointer}
+body.tool-tlab .tl-li-icon{width:40px;height:40px;border-radius:12px;background:color-mix(in srgb,#f59e0b 15%,transparent);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+body.tool-tlab .tl-li-body{flex:1;min-width:0}
+body.tool-tlab .tl-li-name{font-weight:700;font-size:.9rem}
+body.tool-tlab .tl-li-meta{font-size:.72rem;color:var(--text-3);margin-top:2px}
+body.tool-tlab .tl-pf-table{width:100%;border-collapse:collapse;font-size:.78rem}
+body.tool-tlab .tl-pf-table th{text-align:left;padding:8px 6px;color:var(--text-3);font-size:.65rem;text-transform:uppercase;border-bottom:1px solid var(--border)}
+body.tool-tlab .tl-pf-table td{padding:8px 6px;border-bottom:1px solid color-mix(in srgb,var(--border) 50%,transparent);font-weight:600}
+body.tool-tlab .tl-pf-table .push{color:#34d399}
+body.tool-tlab .tl-pf-table .fold{color:#f2685f}
+body.tool-tlab .tl-pf-table .call{color:#33d2e3}
+body.tool-tlab .tl-level-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+body.tool-tlab .tl-level-row input{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-weight:600}
+body.tool-tlab .empty{text-align:center;padding:28px 12px;color:var(--text-3);font-size:.85rem}
+body.tool-tlab .tl-section-title{font-size:.9rem;font-weight:800;margin:16px 0 8px}
+/* 1.4.1 · Escritorio: con resultados, formulario a la izquierda y análisis a la derecha.
+   Sin resultados, la calculadora sigue centrada como antes. Móvil sin cambios. */
+@media (min-width: 900px) {
+  body.tool-tlab .tl-main:has(#liveResults:not([style*="none"])){max-width:1160px;padding:8px 28px 32px}
+  body.tool-tlab #panel-live.active:has(#liveResults:not([style*="none"])){display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);gap:18px;align-items:start}
+  body.tool-tlab #panel-live.active:has(#liveResults:not([style*="none"])) > *{min-width:0}
+  body.tool-tlab #panel-live.active:has(#liveResults:not([style*="none"])) > .tl-card{position:sticky;top:76px}
+  body.tool-tlab #panel-live.active:has(#liveResults:not([style*="none"])) > #liveResults{grid-column:2;grid-row:1 / span 6;margin-top:0}
+}
+</style>
+</head>
+<body class="tool-tlab rl-loading">
+<div id="splash">
+  <div class="splash-logo"><img class="rl-brand-img" src="/static/icons/icon-192.png" alt="" width="192" height="192"></div>
+  <div class="splash-title">Tournament <span>Lab</span></div>
+  <div class="splash-sub">ITM · Bubble · Push/Fold · Stack</div>
+  <div class="splash-loader"></div>
+</div>
+<header class="tl-header">
+  <div class="tl-brand">
+    <div class="tl-mark"><img class="rl-brand-img" src="/static/icons/icon-192.png" alt="" width="192" height="192"></div>
+    <div>
+      <div class="tl-title">Tournament Lab</div>
+      <div class="tl-sub">RangeLab Suite · Calculadora de torneos</div>
+    </div>
+  </div>
+  <div class="tl-actions">
+    <button class="theme-toggle" type="button" title="Tema" aria-label="Tema">
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
+  </div>
+</header>
+<div class="tl-tabs" role="tablist">
+  <button type="button" class="tl-tab active" data-tab="live">Análisis en vivo</button>
+  <button type="button" class="tl-tab" data-tab="pushfold">Push / Fold</button>
+  <button type="button" class="tl-tab" data-tab="edit">Crear / Editar</button>
+  <button type="button" class="tl-tab" data-tab="list">Mis torneos</button>
+</div>
+<main class="tl-main">
+  <div class="tl-panel active" id="panel-live">
+    <div class="tl-card">
+      <div class="tl-grid2">
+        <div class="tl-field"><label>Torneo</label><select id="liveTournament"></select></div>
+        <div class="tl-field"><label>Nivel actual</label><select id="liveLevel"></select></div>
+        <div class="tl-field"><label>Jug. restantes</label><input type="number" id="liveRemaining" min="2" value="220"></div>
+        <div class="tl-field"><label>Tu stack</label><input type="number" id="liveStack" min="1" value="17000"></div>
+        <div class="tl-field"><label>Stack promedio</label><input type="number" id="liveAvg" min="1" value="15000"></div>
+        <div class="tl-field"><label>Jug. iniciales</label><input type="number" id="liveInitial" min="2" value="560"></div>
+      </div>
+      <button type="button" class="tl-btn tl-btn-primary" id="btnCalc">Calcular</button>
+    </div>
+    <div id="liveResults" style="display:none">
+      <div class="tl-stats">
+        <div class="tl-stat"><div class="val cyan" id="resBB">—</div><div class="lbl">Tu stack</div><div class="sub" id="resM">—</div></div>
+        <div class="tl-stat"><div class="val" id="resZone">—</div><div class="lbl">Zona</div><div class="sub" id="resZoneSub">—</div></div>
+        <div class="tl-stat"><div class="val" id="resAvgBB">—</div><div class="lbl">Promedio</div><div class="sub" id="resAvgChips">—</div></div>
+        <div class="tl-stat"><div class="val" id="resITM">—</div><div class="lbl">Media ITM</div><div class="sub" id="resITMPays">—</div></div>
+        <div class="tl-stat"><div class="val" id="resFT">—</div><div class="lbl">Media FT</div><div class="sub" id="resFTSub">—</div></div>
+        <div class="tl-stat"><div class="val" id="resBubble">—</div><div class="lbl">Bubble Factor</div><div class="sub" id="resBubbleSub">—</div></div>
+      </div>
+      <div id="liveAlerts"></div>
+      <div class="tl-section-title">Vida del stack / Proyección</div>
+      <div class="tl-stats">
+        <div class="tl-stat"><div class="val" id="resOrbits">—</div><div class="lbl">Órbitas de vida</div></div>
+        <div class="tl-stat"><div class="val warn" id="resBustLevel">—</div><div class="lbl">Te quedas sin fichas en</div></div>
+      </div>
+      <div class="tl-card" style="margin-top:10px"><h3>Próximos niveles (proyección)</h3><div id="levelProjection"></div></div>
+    </div>
+  </div>
+  <div class="tl-panel" id="panel-pushfold">
+    <div class="tl-card">
+      <div class="tl-grid2">
+        <div class="tl-field"><label>Tu stack (BB)</label><input type="number" id="pfBB" min="1" max="40" value="10" step="0.5"></div>
+        <div class="tl-field"><label>Posición</label><select id="pfPos"><option>UTG</option><option>HJ</option><option>CO</option><option selected>BTN</option><option>SB</option><option>BB</option></select></div>
+        <div class="tl-field"><label>Jugadores detrás</label><input type="number" id="pfBehind" min="0" max="8" value="2"></div>
+        <div class="tl-field"><label>Bubble factor</label><input type="number" id="pfBF" min="1" max="5" value="1.4" step="0.1"></div>
+      </div>
+      <button type="button" class="tl-btn tl-btn-primary" id="btnPF">Generar rangos</button>
+    </div>
+    <div class="tl-card" id="pfResults" style="display:none">
+      <h3>Rangos sugeridos (aprox.)</h3>
+      <div id="pfSummary"></div>
+      <div style="overflow-x:auto;margin-top:10px"><table class="tl-pf-table" id="pfTable"></table></div>
+      <p style="font-size:.72rem;color:var(--text-3);margin-top:10px;line-height:1.4">Guía orientativa short-stack. No sustituye un solver ICM.</p>
+    </div>
+  </div>
+  <div class="tl-panel" id="panel-edit">
+    <div class="tl-card">
+      <div class="tl-field" style="margin-bottom:10px"><label>Nombre del torneo</label><input type="text" id="edName" placeholder="Ej. 2freeroll, Sunday Million…"></div>
+      <div class="tl-grid2">
+        <div class="tl-field"><label>Buy-in</label><input type="text" id="edBuyin" placeholder="Free / $11"></div>
+        <div class="tl-field"><label>Jug. iniciales</label><input type="number" id="edInitial" min="2" value="560"></div>
+        <div class="tl-field"><label>Stack inicial</label><input type="number" id="edStartStack" min="100" value="10000"></div>
+        <div class="tl-field"><label>% ITM (pagos)</label><input type="number" id="edITMpct" min="1" max="50" value="15" step="0.5"></div>
+        <div class="tl-field"><label>Jug. mesa</label><input type="number" id="edTableSize" min="2" max="10" value="9"></div>
+        <div class="tl-field"><label>Minutos / nivel</label><input type="number" id="edLevelMin" min="1" value="5"></div>
+      </div>
+    </div>
+    <div class="tl-card">
+      <h3>Estructura de blinds</h3>
+      <p style="font-size:.75rem;color:var(--text-3);margin:0 0 10px">SB / BB / Ante</p>
+      <div id="edLevels"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button type="button" class="tl-btn tl-btn-ghost" id="btnAddLevel">+ Nivel</button>
+        <button type="button" class="tl-btn tl-btn-ghost" id="btnPreset">Plantilla rápida</button>
+      </div>
+    </div>
+    <button type="button" class="tl-btn tl-btn-primary" id="btnSaveTournament">Guardar torneo</button>
+    <input type="hidden" id="edId" value="">
+  </div>
+  <div class="tl-panel" id="panel-list">
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button type="button" class="tl-btn tl-btn-ghost" id="btnExportJSON">Export JSON</button>
+      <button type="button" class="tl-btn tl-btn-ghost" id="btnImportJSON">Import JSON</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    </div>
+    <div id="tournamentList"></div>
+  </div>
+</main>
+<nav class="rl-bottom-nav" aria-label="Navegación">
+  <a href="/" class="rl-nav-item"><span class="rl-nav-ico">🏠</span><span class="rl-nav-label">Portal</span></a>
+  <button type="button" class="rl-nav-item active"><span class="rl-nav-ico">♠</span><span class="rl-nav-label">Torneos</span></button>
+  <button type="button" class="rl-nav-item" onclick="document.querySelector('.tl-tab[data-tab=list]')?.click()"><span class="rl-nav-ico">📋</span><span class="rl-nav-label">Lista</span></button>
+  <a href="/profile" class="rl-nav-item"><span class="rl-nav-ico">👤</span><span class="rl-nav-label">Perfil</span></a>
+</nav>
+<script>
+(function(){
+'use strict';
+var SK='rangelab-tournaments-v1';
+function defLevels(){return[{sb:10,bb:20,ante:0},{sb:15,bb:30,ante:0},{sb:25,bb:50,ante:0},{sb:50,bb:100,ante:0},{sb:75,bb:150,ante:0},{sb:100,bb:200,ante:25},{sb:150,bb:300,ante:30},{sb:200,bb:400,ante:50},{sb:300,bb:600,ante:75},{sb:400,bb:800,ante:100},{sb:500,bb:1000,ante:100},{sb:700,bb:1400,ante:150},{sb:1000,bb:2000,ante:200},{sb:1500,bb:3000,ante:300},{sb:2000,bb:4000,ante:400},{sb:3000,bb:6000,ante:600},{sb:5000,bb:10000,ante:1000},{sb:7000,bb:14000,ante:1400},{sb:10000,bb:20000,ante:2000},{sb:15000,bb:30000,ante:3000}];}
+function defT(){return[{id:'demo-freeroll',name:'2freeroll',buyin:'Free',initial:560,startStack:10000,itmPct:15,tableSize:9,levelMin:5,levels:defLevels(),created:Date.now()}];}
+function loadT(){try{var r=localStorage.getItem(SK);if(r){var a=JSON.parse(r);if(Array.isArray(a)&&a.length)return a;}}catch(e){}var d=defT();saveT(d);return d;}
+function saveT(a){try{localStorage.setItem(SK,JSON.stringify(a));}catch(e){}}
+var tournaments=loadT();
+document.querySelectorAll('.tl-tab').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.tl-tab').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.tl-panel').forEach(function(p){p.classList.remove('active');});btn.classList.add('active');var p=document.getElementById('panel-'+btn.dataset.tab);if(p)p.classList.add('active');if(btn.dataset.tab==='list')renderList();if(btn.dataset.tab==='live')fillLive();});});
+function fillLive(){var sel=document.getElementById('liveTournament');var cur=sel.value;sel.innerHTML='';tournaments.forEach(function(t){var o=document.createElement('option');o.value=t.id;o.textContent=t.name+(t.buyin?' · '+t.buyin:'');sel.appendChild(o);});if(cur&&[].some.call(sel.options,function(o){return o.value===cur;}))sel.value=cur;fillLevels();}
+function fillLevels(){var t=getT();var sel=document.getElementById('liveLevel');var cur=sel.value;sel.innerHTML='';if(!t||!t.levels)return;t.levels.forEach(function(lv,i){var o=document.createElement('option');o.value=i;o.textContent='N'+(i+1)+': '+lv.sb+'/'+lv.bb+(lv.ante?'/'+lv.ante:'')+' ('+(t.levelMin||5)+'m)';sel.appendChild(o);});if(cur!==''&&sel.options[cur])sel.value=cur;if(t)document.getElementById('liveInitial').value=t.initial||560;}
+function getT(){var id=document.getElementById('liveTournament').value;return tournaments.find(function(t){return t.id===id;});}
+document.getElementById('liveTournament').addEventListener('change',fillLevels);
+function fmt(n){if(n==null||isNaN(n))return'—';if(Math.abs(n)>=1000)return Math.round(n).toLocaleString('es-ES');return(Math.round(n*10)/10).toLocaleString('es-ES');}
+function calcLive(){
+var t=getT(),remaining=+document.getElementById('liveRemaining').value||2,stack=+document.getElementById('liveStack').value||1,avg=+document.getElementById('liveAvg').value||1,initial=+document.getElementById('liveInitial').value||remaining,levelIdx=+document.getElementById('liveLevel').value||0;
+var levels=(t&&t.levels)||defLevels(),lv=levels[levelIdx]||levels[0],bb=lv.bb||100,ante=lv.ante||0,tableSize=(t&&t.tableSize)||9;
+var costPerOrbit=(bb*1.5)+(ante*tableSize);if(costPerOrbit<bb)costPerOrbit=bb*1.5;
+var stackBB=stack/bb,avgBB=avg/bb,mFactor=stack/costPerOrbit,pctOfAvg=(stack/avg)*100;
+var itmPct=(t&&t.itmPct)||15,itmPays=Math.max(1,Math.round(initial*(itmPct/100)));
+var totalChips=(t&&t.startStack)?initial*t.startStack:avg*remaining;
+var avgITM=totalChips/itmPays,ftPlayers=Math.min(tableSize,itmPays),avgFT=totalChips/ftPlayers;
+var dist=remaining-itmPays,bf=1;
+if(dist>0&&dist<=itmPays*0.5){bf=1+(itmPays/remaining)*(avg/stack);bf=Math.min(3.5,Math.max(1.1,bf));}
+else if(dist>0){bf=1+0.3*(avg/Math.max(stack,1));bf=Math.min(2,Math.max(1,bf));}
+var zone,zc,zs;
+if(stackBB>=40){zone='Cómodo';zc='good';zs=Math.round(pctOfAvg)+'% del promedio';}
+else if(stackBB>=20){zone='Estándar';zc='cyan';zs=Math.round(pctOfAvg)+'% del promedio';}
+else if(stackBB>=12){zone='Push zone';zc='warn';zs=Math.round(pctOfAvg)+'% del promedio';}
+else if(stackBB>=6){zone='Short';zc='warn';zs='Prioriza push/fold';}
+else{zone='Critical';zc='bad';zs='All-in o fold';}
+var orbits=costPerOrbit>0?stack/costPerOrbit:0,sim=stack,bust=levelIdx;
+for(var i=levelIdx;i<levels.length;i++){var L=levels[i],c=(L.bb*1.5)+((L.ante||0)*tableSize);if(c<1)c=L.bb*1.5;var opl=Math.max(2,Math.round(30/tableSize));if(sim<=c*opl){bust=i;break;}sim-=c*opl;bust=i+1;}
+if(bust>=levels.length)bust=levels.length-1;
+document.getElementById('liveResults').style.display='';
+document.getElementById('resBB').textContent=stackBB.toFixed(1)+' BB';
+document.getElementById('resM').textContent='M='+mFactor.toFixed(1)+' · '+fmt(stack);
+var zEl=document.getElementById('resZone');zEl.textContent=zone;zEl.className='val '+zc;
+document.getElementById('resZoneSub').textContent=zs;
+document.getElementById('resAvgBB').textContent=avgBB.toFixed(1)+' BB';
+document.getElementById('resAvgChips').textContent=fmt(avg);
+document.getElementById('resITM').textContent=fmt(avgITM);
+document.getElementById('resITMPays').textContent=itmPays+' pagos';
+document.getElementById('resFT').textContent=fmt(avgFT);
+document.getElementById('resFTSub').textContent='~'+ftPlayers+' jug.';
+document.getElementById('resBubble').textContent=bf.toFixed(2);
+document.getElementById('resBubbleSub').textContent=bf>=2?'Presión alta':bf<1.3?'Presión baja':'Presión media';
+document.getElementById('resOrbits').textContent=orbits.toFixed(1);
+document.getElementById('resBustLevel').textContent='N'+(bust+1);
+var alerts=document.getElementById('liveAlerts');alerts.innerHTML='';
+var need=avgITM-stack;
+if(remaining>itmPays){if(need>0)alerts.innerHTML+='<div class="tl-alert info">Faltan <strong>'+fmt(need)+'</strong> para media ITM.</div>';else alerts.innerHTML+='<div class="tl-alert info">Por encima de la media ITM estimada.</div>';
+if(stackBB<12&&dist>5)alerts.innerHTML+='<div class="tl-alert danger">Con fold puro no llegas al ITM estimado (N'+(bust+1)+'). Necesitas ganar fichas.</div>';
+else if(stackBB<20&&dist<=Math.ceil(itmPays*0.3))alerts.innerHTML+='<div class="tl-alert warn">Zona de burbuja. Ajusta rangos (BF '+bf.toFixed(2)+').</div>';}
+else alerts.innerHTML+='<div class="tl-alert info">En el dinero (ITM). ICM y laddering.</div>';
+var html='<table class="tl-pf-table"><thead><tr><th>Nivel</th><th>Blinds</th><th>BB*</th><th>Órbitas</th></tr></thead><tbody>',s=stack;
+for(var j=levelIdx;j<Math.min(levelIdx+8,levels.length);j++){var L2=levels[j],c2=(L2.bb*1.5)+((L2.ante||0)*tableSize);html+='<tr><td>N'+(j+1)+'</td><td>'+L2.sb+'/'+L2.bb+(L2.ante?'/'+L2.ante:'')+'</td><td>'+(s/L2.bb).toFixed(1)+'</td><td>'+(c2>0?s/c2:0).toFixed(1)+'</td></tr>';s=Math.max(0,s-c2*Math.max(2,Math.round(30/tableSize)));}
+html+='</tbody></table><p style="font-size:.65rem;color:var(--text-3);margin-top:6px">* Fold puro (solo blinds/antes)</p>';
+document.getElementById('levelProjection').innerHTML=html;
+}
+document.getElementById('btnCalc').addEventListener('click',calcLive);
+
+var PF={UTG:{15:8,12:10,10:12,8:15,6:20,4:30,2:50},HJ:{15:10,12:12,10:15,8:18,6:25,4:35,2:55},CO:{15:14,12:18,10:22,8:28,6:35,4:45,2:65},BTN:{15:20,12:28,10:35,8:42,6:50,4:60,2:75},SB:{15:35,12:45,10:55,8:65,6:75,4:85,2:95},BB:{15:5,12:8,10:12,8:18,6:28,4:40,2:60}};
+var HG=[{name:'Premium',hands:'AA KK QQ AKs AKo',pct:2.5},{name:'Fuerte',hands:'JJ TT AQs AJs KQs AQo',pct:5},{name:'Medio+',hands:'99 88 ATs KJs QJs AJo KQo',pct:8},{name:'Medio',hands:'77 66 A9s-A2s KTs QTs JTs',pct:12},{name:'Amplio',hands:'55-22 suited connectors',pct:20},{name:'Any two',hands:'Rango very wide',pct:50}];
+function calcPF(){var bb=+document.getElementById('pfBB').value||10,pos=document.getElementById('pfPos').value,behind=+document.getElementById('pfBehind').value||0,bf=+document.getElementById('pfBF').value||1.4;
+var table=PF[pos]||PF.BTN,keys=Object.keys(table).map(Number).sort(function(a,b){return b-a;}),base=table[keys[keys.length-1]];
+for(var i=0;i<keys.length;i++)if(bb>=keys[i]){base=table[keys[i]];break;}
+var adj=Math.max(2,Math.min(90,base*(1-behind*0.04)/Math.sqrt(bf)));
+document.getElementById('pfResults').style.display='';
+document.getElementById('pfSummary').innerHTML='<span class="tl-chip on">Push ~'+adj.toFixed(0)+'% manos</span><span class="tl-chip">'+bb+' BB · '+pos+'</span><span class="tl-chip">BF '+bf.toFixed(1)+'</span>';
+var html='<thead><tr><th>Grupo</th><th>Manos</th><th>Acción</th></tr></thead><tbody>',cum=0;
+HG.forEach(function(g){cum+=g.pct;var a,c;if(cum<=adj*0.5){a='PUSH';c='push';}else if(cum<=adj){a='PUSH / call';c='call';}else{a='FOLD';c='fold';}html+='<tr><td>'+g.name+'</td><td>'+g.hands+'</td><td class="'+c+'">'+a+'</td></tr>';});
+document.getElementById('pfTable').innerHTML=html+'</tbody>';}
+document.getElementById('btnPF').addEventListener('click',calcPF);
+function renderEd(levels){var box=document.getElementById('edLevels');box.innerHTML='';(levels||[]).forEach(function(lv,i){var row=document.createElement('div');row.className='tl-level-row';row.innerHTML='<span style="font-size:.7rem;color:var(--text-3);width:28px">N'+(i+1)+'</span><input type="number" data-i="'+i+'" data-k="sb" value="'+lv.sb+'"><input type="number" data-i="'+i+'" data-k="bb" value="'+lv.bb+'"><input type="number" data-i="'+i+'" data-k="ante" value="'+(lv.ante||0)+'"><button type="button" class="tl-btn tl-btn-danger" data-del="'+i+'" style="padding:6px 10px;font-size:.75rem">✕</button>';box.appendChild(row);});
+box.querySelectorAll('input').forEach(function(inp){inp.addEventListener('change',function(){var i=+inp.dataset.i,k=inp.dataset.k;if(!window._edL[i])window._edL[i]={sb:0,bb:0,ante:0};window._edL[i][k]=+inp.value||0;});});
+box.querySelectorAll('[data-del]').forEach(function(btn){btn.addEventListener('click',function(){window._edL.splice(+btn.dataset.del,1);renderEd(window._edL);});});}
+window._edL=defLevels().slice(0,12);renderEd(window._edL);
+document.getElementById('btnAddLevel').addEventListener('click',function(){var last=window._edL[window._edL.length-1]||{sb:50,bb:100,ante:0};window._edL.push({sb:last.sb*1.5|0,bb:last.bb*1.5|0,ante:last.ante?(last.ante*1.5|0):0});renderEd(window._edL);});
+document.getElementById('btnPreset').addEventListener('click',function(){window._edL=defLevels().slice(0,15);renderEd(window._edL);});
+document.getElementById('btnSaveTournament').addEventListener('click',function(){var name=(document.getElementById('edName').value||'').trim();if(!name){alert('Pon un nombre');return;}
+var obj={id:document.getElementById('edId').value||('t-'+Date.now()),name:name,buyin:document.getElementById('edBuyin').value||'',initial:+document.getElementById('edInitial').value||100,startStack:+document.getElementById('edStartStack').value||10000,itmPct:+document.getElementById('edITMpct').value||15,tableSize:+document.getElementById('edTableSize').value||9,levelMin:+document.getElementById('edLevelMin').value||5,levels:window._edL.map(function(l){return{sb:+l.sb,bb:+l.bb,ante:+l.ante||0};}),created:Date.now()};
+var idx=tournaments.findIndex(function(t){return t.id===obj.id;});if(idx>=0)tournaments[idx]=obj;else tournaments.push(obj);saveT(tournaments);document.getElementById('edId').value='';document.getElementById('edName').value='';fillLive();document.querySelector('.tl-tab[data-tab=list]').click();});
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
+function renderList(){var box=document.getElementById('tournamentList');if(!tournaments.length){box.innerHTML='<div class="empty">No hay torneos. Crea uno en Crear / Editar.</div>';return;}
+box.innerHTML=tournaments.map(function(t){return'<div class="tl-list-item" data-id="'+t.id+'"><div class="tl-li-icon">♠</div><div class="tl-li-body"><div class="tl-li-name">'+esc(t.name)+'</div><div class="tl-li-meta">'+(t.buyin||'—')+' · '+(t.initial||'?')+' jug. · ITM '+(t.itmPct||15)+'% · '+(t.levels||[]).length+' niveles</div></div><button type="button" class="tl-btn tl-btn-ghost" data-edit="'+t.id+'">Editar</button><button type="button" class="tl-btn tl-btn-danger" data-rm="'+t.id+'" style="padding:8px">✕</button></div>';}).join('');
+box.querySelectorAll('[data-edit]').forEach(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();var t=tournaments.find(function(x){return x.id===btn.dataset.edit;});if(!t)return;document.getElementById('edId').value=t.id;document.getElementById('edName').value=t.name;document.getElementById('edBuyin').value=t.buyin||'';document.getElementById('edInitial').value=t.initial||100;document.getElementById('edStartStack').value=t.startStack||10000;document.getElementById('edITMpct').value=t.itmPct||15;document.getElementById('edTableSize').value=t.tableSize||9;document.getElementById('edLevelMin').value=t.levelMin||5;window._edL=(t.levels||defLevels()).map(function(l){return Object.assign({},l);});renderEd(window._edL);document.querySelector('.tl-tab[data-tab=edit]').click();});});
+box.querySelectorAll('[data-rm]').forEach(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();if(!confirm('¿Eliminar?'))return;tournaments=tournaments.filter(function(t){return t.id!==btn.dataset.rm;});saveT(tournaments);renderList();fillLive();});});
+box.querySelectorAll('.tl-list-item').forEach(function(el){el.addEventListener('click',function(){document.getElementById('liveTournament').value=el.dataset.id;fillLevels();document.querySelector('.tl-tab[data-tab=live]').click();});});}
+document.getElementById('btnExportJSON').addEventListener('click',function(){var blob=new Blob([JSON.stringify({version:1,tournaments:tournaments},null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rangelab-tournaments.json';a.click();});
+document.getElementById('btnImportJSON').addEventListener('click',function(){document.getElementById('importFile').click();});
+document.getElementById('importFile').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);var a=d.tournaments||d;if(!Array.isArray(a))throw new Error('Formato inválido');tournaments=a;saveT(tournaments);renderList();fillLive();alert('Importados '+a.length+' torneos');}catch(err){alert('Error: '+err.message);}};r.readAsText(f);});
+fillLive();
+setTimeout(function(){var s=document.getElementById('splash');if(s)s.classList.add('hide');document.body.classList.remove('rl-loading');},700);
+})();
+</script>
+</body>
+</html>

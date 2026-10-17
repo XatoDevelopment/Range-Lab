@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Mi perfil — RangeLab</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+<script src="/static/js/api-client.js" defer></script>
+<script src="/static/js/offline-pack.js" defer></script>
+<style>
+  body.page-profile {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg, #07090f);
+    color: var(--text, #eef1f7);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* ── Header (mismo patrón que portal / tools) ── */
+  .pf-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 16px;
+    padding-top: calc(12px + var(--safe-top, 0px));
+    background: color-mix(in srgb, var(--bg, #07090f) 88%, transparent);
+     
+    border-bottom: 1px solid var(--border-soft, var(--border, #1e2636));
+  }
+  .pf-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .pf-back {
+    width: 40px; height: 40px; border-radius: 11px;
+    border: 1px solid var(--border, #1e2636); background: var(--bg-1, #10131d);
+    color: var(--text-2, #a4acc0); display: flex; align-items: center; justify-content: center;
+    text-decoration: none; flex-shrink: 0; transition: all .15s;
+  }
+  .pf-back:hover { color: var(--accent, #f2a83c); border-color: var(--accent, #f2a83c); }
+  .pf-back svg { width: 18px; height: 18px; }
+  .pf-brand-mark {
+    width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent, #f2a83c), var(--accent-2, #9b8bf4));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 16px; color: #1a1400;
+    box-shadow: 0 0 18px color-mix(in srgb, var(--accent, #f2a83c) 30%, transparent);
+  }
+  .pf-brand-text { min-width: 0; }
+  .pf-brand-title {
+    font-size: 15px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.15;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pf-brand-sub {
+    font-size: 10px; color: var(--text-3, #6b7590); font-weight: 600;
+    letter-spacing: 0.04em; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pf-header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* ── Main ── */
+  .pf-main {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 16px 14px 48px;
+    padding-top: calc(72px + var(--safe-top, 0px));
+  }
+
+  /* ── Hero card ── */
+  .pf-hero {
+    background: var(--bg-1, #10131d);
+    border: 1px solid var(--border, #1e2636);
+    border-radius: 16px;
+    padding: 20px 18px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .pf-avatar {
+    width: 56px; height: 56px; border-radius: 16px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent, #f2a83c), var(--accent-2, #9b8bf4));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 22px; color: #1a1400;
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--accent, #f2a83c) 35%, transparent);
+  }
+  .pf-hero-info { min-width: 0; flex: 1; }
+  .pf-hero-name {
+    font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em;
+    line-height: 1.2; margin: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pf-hero-meta {
+    font-size: 12px; color: var(--text-3, #6b7590); margin-top: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pf-hero-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .pf-badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+    background: rgba(51, 210, 227, 0.14); color: var(--cyan, #33d2e3);
+  }
+  .pf-badge.admin { background: rgba(240, 193, 75, 0.18); color: var(--amber, #f0c14b); }
+  .pf-badge.plan { background: rgba(53, 212, 136, 0.14); color: var(--green, #35d488); }
+
+  /* ── Section cards ── */
+  .pf-card {
+    background: var(--bg-1, #10131d);
+    border: 1px solid var(--border, #1e2636);
+    border-radius: 14px;
+    padding: 16px 16px 14px;
+    margin-bottom: 12px;
+  }
+  .pf-card-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--text-3, #6b7590);
+    margin: 0 0 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pf-card-title::before {
+    content: ''; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--cyan, #33d2e3); flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(51, 210, 227, 0.45);
+  }
+  .pf-card-title.amber::before { background: var(--amber, #f0c14b); box-shadow: 0 0 8px rgba(240,193,75,.45); }
+  .pf-card-title.green::before { background: var(--green, #35d488); box-shadow: 0 0 8px rgba(53,212,136,.45); }
+  .pf-card-title.purple::before { background: var(--accent-2, #9b8bf4); box-shadow: 0 0 8px rgba(155,139,244,.45); }
+  .pf-card-title.red::before { background: var(--red, #f2685f); box-shadow: 0 0 8px rgba(242,104,95,.4); }
+
+  .pf-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-soft, rgba(30,38,54,.6));
+    font-size: 13px;
+  }
+  .pf-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .pf-row:first-of-type { padding-top: 0; }
+  .pf-row .lbl { color: var(--text-2, #a4acc0); font-weight: 500; }
+  .pf-row .val { font-weight: 700; text-align: right; word-break: break-word; color: var(--text, #eef1f7); }
+
+  .pf-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .pf-tool {
+    font-size: 11px; padding: 5px 10px; border-radius: 8px;
+    border: 1px solid var(--border, #1e2636); background: var(--bg, #07090f);
+    color: var(--text-3, #6b7590); font-weight: 600;
+  }
+  .pf-tool.on {
+    color: var(--green, #35d488);
+    border-color: rgba(53, 212, 136, 0.45);
+    background: rgba(53, 212, 136, 0.12);
+  }
+
+  .pf-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .pf-stat {
+    background: var(--bg, #07090f);
+    border: 1px solid var(--border, #1e2636);
+    border-radius: 12px; padding: 12px 10px; text-align: center;
+  }
+  .pf-stat .num {
+    font-size: 1.25rem; font-weight: 800;
+    font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+    color: var(--cyan, #33d2e3); line-height: 1.2;
+  }
+  .pf-stat .lbl {
+    font-size: 10px; color: var(--text-3, #6b7590);
+    margin-top: 4px; font-weight: 600; line-height: 1.3;
+  }
+
+  .pf-lang { display: flex; gap: 8px; }
+  .pf-lang button {
+    flex: 1; padding: 12px 10px; border-radius: 11px;
+    border: 1px solid var(--border, #1e2636); background: var(--bg, #07090f);
+    color: var(--text-2, #a4acc0); font-weight: 700; cursor: pointer;
+    font-size: 13px; font-family: inherit; transition: all .15s;
+  }
+  .pf-lang button.active {
+    border-color: var(--cyan, #33d2e3);
+    background: rgba(51, 210, 227, 0.14);
+    color: var(--cyan, #33d2e3);
+  }
+  .pf-hint { font-size: 11px; color: var(--text-3, #6b7590); margin: 10px 0 0; line-height: 1.4; }
+
+  .pf-field { margin-bottom: 12px; }
+  .pf-field:last-of-type { margin-bottom: 0; }
+  .pf-field label {
+    display: block; font-size: 11px; font-weight: 700;
+    margin-bottom: 6px; color: var(--text-3, #6b7590);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .pf-field input {
+    width: 100%; padding: 12px 14px; border-radius: 11px;
+    border: 1px solid var(--border, #1e2636); background: var(--bg, #07090f);
+    color: var(--text, #eef1f7); font: inherit; font-size: 14px;
+    box-sizing: border-box; transition: border-color .15s;
+  }
+  .pf-field input:focus {
+    outline: none; border-color: var(--cyan, #33d2e3);
+    box-shadow: 0 0 0 3px rgba(51, 210, 227, 0.16);
+  }
+
+  .pf-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .pf-btn {
+    padding: 11px 16px; border-radius: 11px;
+    border: 1px solid var(--border, #1e2636); background: var(--bg, #07090f);
+    color: var(--text-2, #a4acc0); font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit; transition: all .15s;
+  }
+  .pf-btn:active { transform: scale(0.97); }
+  .pf-btn.primary {
+    background: var(--cyan, #33d2e3); color: #0a0c13; border-color: transparent;
+  }
+  .pf-btn.primary:hover { filter: brightness(1.08); }
+  .pf-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  .pf-msg {
+    font-size: 12px; margin-top: 10px; display: none;
+    padding: 9px 12px; border-radius: 9px; font-weight: 600;
+  }
+  .pf-msg.show { display: block; }
+  .pf-msg.ok {
+    color: var(--green, #35d488);
+    background: rgba(53, 212, 136, 0.12);
+    border: 1px solid rgba(53, 212, 136, 0.3);
+  }
+  .pf-msg.err {
+    color: var(--red, #f2685f);
+    background: rgba(242, 104, 95, 0.12);
+    border: 1px solid rgba(242, 104, 95, 0.3);
+  }
+
+  @media (min-width: 640px) {
+    .pf-main { padding: 24px 20px 60px; padding-top: calc(88px + var(--safe-top, 0px)); }
+    .pf-hero { padding: 24px; }
+  }
+</style>
+</head>
+<body class="rl-loading page-profile">
+
+<header class="pf-header">
+  <div class="pf-header-left">
+    <a href="/" class="pf-back" title="Volver al portal" data-i18n-title="common.backPortal" aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+    </a>
+    <div class="pf-brand-mark" id="pfAvatarSmall">{{ (user.display_name or user.username or '?')[0]|upper }}</div>
+    <div class="pf-brand-text">
+      <div class="pf-brand-title" data-i18n="profile.title">Mi perfil</div>
+      <div class="pf-brand-sub">@{{ user.username }}</div>
+    </div>
+  </div>
+  <div class="pf-header-actions">
+    <div class="rl-lang-toggle" role="group" aria-label="Language">
+      <button type="button" data-lang-set="es" title="Español">ES</button>
+      <button type="button" data-lang-set="en" title="English">EN</button>
+    </div>
+    <button class="theme-toggle" type="button" data-i18n-title="common.theme" title="Tema" aria-label="Tema">
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="pf-main">
+
+  <!-- Hero -->
+  <section class="pf-hero">
+    <div class="pf-avatar" id="pfAvatar">{{ (user.display_name or user.username or '?')[0]|upper }}</div>
+    <div class="pf-hero-info">
+      <h1 class="pf-hero-name" id="pfDisplayName">{{ user.display_name or user.username }}</h1>
+      <div class="pf-hero-meta" id="pfMeta">@{{ user.username }}</div>
+      <div class="pf-hero-badges">
+        {% if user.is_admin %}
+        <span class="pf-badge admin" data-i18n="profile.roleAdmin">Administrador</span>
+        {% else %}
+        <span class="pf-badge" data-i18n="profile.roleUser">User</span>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Account -->
+  <section class="pf-card">
+    <h2 class="pf-card-title" data-i18n="profile.sectionAccount">Account</h2>
+    <div class="pf-row"><span class="lbl" data-i18n="profile.username">Username</span><span class="val" id="rowUsername">{{ user.username }}</span></div>
+    <div class="pf-row"><span class="lbl" data-i18n="profile.displayName">Display name</span><span class="val" id="rowDisplay">{{ user.display_name or user.username }}</span></div>
+    <div class="pf-row"><span class="lbl" data-i18n="profile.created">Account created</span><span class="val" id="rowCreated">—</span></div>
+    <div class="pf-row"><span class="lbl" data-i18n="profile.lastLogin">Last sign-in</span><span class="val" id="rowLastLogin">—</span></div>
+  </section>
+
+  <!-- Membership -->
+  <section class="pf-card">
+    <h2 class="pf-card-title amber" data-i18n="profile.sectionMembership">Membership</h2>
+    <div style="margin-top:12px">
+      <div class="lbl" style="font-size:11px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px" data-i18n="profile.toolsAccess">Herramientas disponibles</div>
+      <div class="pf-tools" id="pfTools"></div>
+    </div>
+  </section>
+
+  <!-- Saved data -->
+  <section class="pf-card">
+    <h2 class="pf-card-title green" data-i18n="profile.sectionData">Datos guardados</h2>
+    <div class="pf-grid" id="pfDataGrid">
+      <div class="pf-stat"><div class="num" id="stEquity">—</div><div class="lbl" data-i18n="profile.dataEquity">Sesiones Equity</div></div>
+      <div class="pf-stat"><div class="num" id="stPreflop">—</div><div class="lbl" data-i18n="profile.dataPreflop">Tablas Preflop</div></div>
+      <div class="pf-stat"><div class="num" id="stTournaments">—</div><div class="lbl" data-i18n="profile.dataTournaments">Torneos</div></div>
+      <div class="pf-stat"><div class="num" id="stTransactions">—</div><div class="lbl" data-i18n="profile.dataTransactions">Movimientos</div></div>
+      <div class="pf-stat"><div class="num" id="stHands">—</div><div class="lbl" data-i18n="profile.dataHands">Manos (Hand Lab)</div></div>
+      <div class="pf-stat"><div class="num" id="stNotes">—</div><div class="lbl" data-i18n="profile.dataNotes">Hand notes</div></div>
+      <div class="pf-stat"><div class="num" id="stFavorites">—</div><div class="lbl" data-i18n="profile.dataFavorites">Favoritos</div></div>
+    </div>
+  </section>
+
+  <!-- Language -->
+  <section class="pf-card">
+    <h2 class="pf-card-title purple" data-i18n="profile.sectionLang">Idioma</h2>
+    <div class="pf-lang">
+      <button type="button" data-lang-set="es" id="langEs">ES · Español</button>
+      <button type="button" data-lang-set="en" id="langEn">EN · English</button>
+    </div>
+    <p class="pf-hint" data-i18n="profile.langHint">The language applies immediately across the suite.</p>
+  </section>
+
+  <!-- Edit account -->
+  <section class="pf-card">
+    <h2 class="pf-card-title" data-i18n="profile.sectionEdit">Edit account</h2>
+    <div class="pf-field">
+      <label for="editDisplay" data-i18n="profile.displayName">Display name</label>
+      <input id="editDisplay" type="text" maxlength="80" value="{{ user.display_name or '' }}" data-i18n-placeholder="login.displayNamePh" placeholder="Opcional">
+    </div>
+    <div class="pf-field">
+      <label for="editUsername" data-i18n="profile.username">Username</label>
+      <input id="editUsername" type="text" minlength="3" maxlength="40" value="{{ user.username }}" data-i18n-placeholder="login.usernamePh" placeholder="min. 3 caracteres">
+    </div>
+    <div class="pf-actions">
+      <button type="button" class="pf-btn primary" id="btnSaveProfile" data-i18n="profile.saveProfile">Save changes</button>
+    </div>
+    <div class="pf-msg" id="msgProfile"></div>
+  </section>
+
+  <!-- Security -->
+  <section class="pf-card">
+    <h2 class="pf-card-title red" data-i18n="profile.sectionSecurity">Seguridad</h2>
+    <div class="pf-field">
+      <label for="oldPwd" data-i18n="profile.oldPassword">Current password</label>
+      <input id="oldPwd" type="password" autocomplete="current-password">
+    </div>
+    <div class="pf-field">
+      <label for="newPwd" data-i18n="profile.newPassword">New password</label>
+      <input id="newPwd" type="password" autocomplete="new-password">
+    </div>
+    <div class="pf-field">
+      <label for="newPwd2" data-i18n="profile.confirmPassword">Confirm new password</label>
+      <input id="newPwd2" type="password" autocomplete="new-password">
+    </div>
+    <div class="pf-actions">
+      <button type="button" class="pf-btn primary" id="btnSavePwd" data-i18n="profile.changePassword">Change password</button>
+    </div>
+    <div class="pf-msg" id="msgPwd"></div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  var USER = {{ user | tojson }};
+  var ALL_TOOLS = ['equity', 'preflop', 'tracker', 'feltlab', 'range-analyzer', 'mtt-exploiter'];
+  var TOOL_KEYS = {
+    equity: 'tool.equity',
+    preflop: 'tool.preflop',
+    tracker: 'tool.tracker',
+    feltlab: 'tool.feltlab',
+    'range-analyzer': 'tool.range-analyzer',
+    'mtt-exploiter': 'tool.mtt-exploiter'
+  };
+
+  function t(k, fb) {
+    return (window.RangeLabI18n && RangeLabI18n.t) ? RangeLabI18n.t(k, fb) : (fb || k);
+  }
+
+  function fmtDate(s) {
+    if (!s) return '—';
+    try {
+      var d = new Date(String(s).replace(' ', 'T') + (String(s).indexOf('Z') >= 0 ? '' : 'Z'));
+      if (isNaN(d.getTime())) d = new Date(s);
+      return d.toLocaleString(window.RangeLabI18n ? RangeLabI18n.getLang() : 'es', {
+        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+    } catch (e) { return s; }
+  }
+
+  function showMsg(id, text, ok) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'pf-msg show ' + (ok ? 'ok' : 'err');
+  }
+
+  function renderTools() {
+    var box = document.getElementById('pfTools');
+    if (!box) return;
+    var allowed = USER.allowed_tools || [];
+    var isAdmin = !!USER.is_admin;
+    box.innerHTML = ALL_TOOLS.map(function (id) {
+      var on = isAdmin || allowed.indexOf(id) >= 0;
+      return '<span class="pf-tool' + (on ? ' on' : '') + '">' + t(TOOL_KEYS[id], id) + '</span>';
+    }).join('');
+  }
+
+  function renderDates() {
+    document.getElementById('rowCreated').textContent = fmtDate(USER.created_at);
+    document.getElementById('rowLastLogin').textContent = fmtDate(USER.last_login);
+  }
+
+  function syncLangButtons() {
+    var lang = (window.RangeLabI18n && RangeLabI18n.getLang()) || 'es';
+    document.querySelectorAll('[data-lang-set]').forEach(function (btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-lang-set') === lang);
+    });
+  }
+
+  async function loadSummary() {
+    try {
+      var res = await fetch('/api/auth/data-summary', { credentials: 'same-origin' });
+      var data = await res.json();
+      var s = (data && data.summary) || {};
+      document.getElementById('stEquity').textContent = s.equity_sessions || 0;
+      document.getElementById('stPreflop').textContent = s.preflop_tables || 0;
+      document.getElementById('stTournaments').textContent = s.tournaments || 0;
+      document.getElementById('stTransactions').textContent = s.transactions || 0;
+      document.getElementById('stHands').textContent = s.hands || 0;
+      document.getElementById('stNotes').textContent = s.hand_notes || 0;
+      document.getElementById('stFavorites').textContent = s.hand_favorites || 0;
+    } catch (e) {
+      ['stEquity','stPreflop','stTournaments','stTransactions','stHands','stNotes','stFavorites'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = '0';
+      });
+    }
+  }
+
+  document.getElementById('btnSaveProfile').addEventListener('click', async function () {
+    var btn = this;
+    var display_name = (document.getElementById('editDisplay').value || '').trim();
+    var username = (document.getElementById('editUsername').value || '').trim().toLowerCase();
+    btn.disabled = true;
+    try {
+      var res = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ display_name: display_name, username: username })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(data.error || 'Error');
+      USER = data.user;
+      document.getElementById('rowUsername').textContent = USER.username;
+      document.getElementById('rowDisplay').textContent = USER.display_name;
+      document.getElementById('pfDisplayName').textContent = USER.display_name || USER.username;
+      document.getElementById('pfMeta').textContent = '@' + USER.username;
+      var initial = (USER.display_name || USER.username || '?').charAt(0).toUpperCase();
+      document.getElementById('pfAvatar').textContent = initial;
+      document.getElementById('pfAvatarSmall').textContent = initial;
+      showMsg('msgProfile', t('profile.profileSaved'), true);
+    } catch (err) {
+      showMsg('msgProfile', err.message || t('common.error'), false);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('btnSavePwd').addEventListener('click', async function () {
+    var btn = this;
+    var oldP = document.getElementById('oldPwd').value;
+    var newP = document.getElementById('newPwd').value;
+    var newP2 = document.getElementById('newPwd2').value;
+    if (!oldP || !newP || !newP2) {
+      showMsg('msgPwd', t('profile.fillAll'), false);
+      return;
+    }
+    if (newP.length < 4) {
+      showMsg('msgPwd', t('profile.pwdMin'), false);
+      return;
+    }
+    if (newP !== newP2) {
+      showMsg('msgPwd', t('profile.pwdMismatch'), false);
+      return;
+    }
+    btn.disabled = true;
+    try {
+      var res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ old_password: oldP, new_password: newP })
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (!res.ok) throw new Error(data.error || 'Error');
+      document.getElementById('oldPwd').value = '';
+      document.getElementById('newPwd').value = '';
+      document.getElementById('newPwd2').value = '';
+      showMsg('msgPwd', t('profile.pwdSaved'), true);
+    } catch (err) {
+      showMsg('msgPwd', err.message || t('common.error'), false);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  function boot() {
+    if (!window.RangeLabI18n) {
+      setTimeout(boot, 40);
+      return;
+    }
+    if (USER.preferred_lang) {
+      try {
+        var stored = localStorage.getItem('rangelab-lang');
+        if (!stored) RangeLabI18n.setLang(USER.preferred_lang, true);
+      } catch (e) {}
+    }
+    RangeLabI18n.applyDom();
+    RangeLabI18n.wireLangButtons();
+    syncLangButtons();
+    renderTools();
+    renderDates();
+    loadSummary();
+  }
+
+  window.addEventListener('rangelab:langchange', function () {
+    if (window.RangeLabI18n) {
+      RangeLabI18n.applyDom();
+      syncLangButtons();
+      renderTools();
+      renderDates();
+    }
+  });
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+<script>
+(function(){
+  if (window.RangeLabSkeleton) RangeLabSkeleton.registerSW('/sw.js');
+  else if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+
+<script>
+(function(){
+  function rlReady(){
+    if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+    else document.body.classList.remove('rl-loading');
+  }
+  if (document.readyState === 'complete') setTimeout(rlReady, 300);
+  else window.addEventListener('load', function(){ setTimeout(rlReady, 300); });
+})();
+</script>
+
+<nav class="rl-bottom-nav" aria-label="Navigation">
+
+  <a href="/" class="rl-nav-item"><span class="rl-nav-ico">🏠</span><span class="rl-nav-label">Portal</span></a>
+  <a href="/profile" class="rl-nav-item active"><span class="rl-nav-ico">👤</span><span class="rl-nav-label">Perfil</span></a>
+  <button type="button" class="rl-nav-item" onclick="document.querySelector('.theme-toggle')?.click()"><span class="rl-nav-ico">🌓</span><span class="rl-nav-label">Tema</span></button>
+
+</nav>
+
+</body>
+</html>

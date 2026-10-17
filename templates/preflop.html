@@ -1,0 +1,3112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#07090f" />
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Preflop Lab — RangeLab</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/profile.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+<style>
+  /* ═══════════════════════════════════════════════════════
+     CSS EXCLUSIVO PREFLOP LAB
+     Scoped a body.tool-preflop para no afectar otras tools.
+     ═══════════════════════════════════════════════════════ */
+
+  body.tool-preflop {
+    background: var(--bg) !important;
+    padding: 0 !important;
+    padding-top: 0 !important;
+    margin: 0 !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-x: clip !important;
+  }
+
+  body.tool-preflop .sticky-top-wrapper {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 300 !important;
+    background: var(--bg) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+  }
+
+  body.tool-preflop .sticky-top-wrapper .app-header {
+    order: 1 !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+    background: var(--bg) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  body.tool-preflop .sticky-top-wrapper .top-fixed {
+    order: 2 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    top: auto !important;
+    z-index: auto !important;
+    background: var(--bg) !important;
+    border-bottom: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar {
+    order: 1 !important;
+    display: block !important;
+    position: relative !important;
+    top: auto !important;
+    margin: 0 !important;
+    padding: 8px 10px 4px !important;
+    background: var(--bg) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    z-index: 5 !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .context-btn {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+    background: var(--panel-2) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .context-info {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .ctx-pos,
+  body.tool-preflop .top-fixed .context-bar .ctx-stack,
+  body.tool-preflop .top-fixed .context-bar .ctx-sit,
+  body.tool-preflop .top-fixed .context-bar .ctx-vs {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .ctx-pos {
+    background: var(--gold) !important;
+    color: var(--bg) !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    border-radius: 7px !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .ctx-stack {
+    background: var(--bg-3) !important;
+    color: var(--cyan) !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    border-radius: 7px !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .ctx-sit {
+    color: var(--text-2) !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .ctx-vs {
+    color: var(--text-2) !important;
+    font-size: 12px !important;
+  }
+
+  body.tool-preflop .top-fixed .context-bar .chevron {
+    width: 18px !important;
+    height: 18px !important;
+    flex: 0 0 auto !important;
+    opacity: 0.7 !important;
+  }
+
+  body.tool-preflop .top-fixed .range-tools {
+    order: 2 !important;
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 6px 10px 10px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: var(--bg) !important;
+    position: relative !important;
+    z-index: 5 !important;
+    min-height: 44px !important;
+  }
+
+  body.tool-preflop .top-fixed .range-tools .rt-btn {
+    padding: 6px 14px !important;
+    border-radius: 9px !important;
+    border: 1px solid rgba(255,255,255,0.16) !important;
+    background: var(--bg-3) !important;
+    color: var(--text) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    font-family: inherit !important;
+    cursor: pointer !important;
+    min-height: 34px !important;
+    flex: 0 0 auto !important;
+  }
+
+  body.tool-preflop .top-fixed .range-tools .rt-btn:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+  }
+
+  body.tool-preflop .top-fixed .range-tools .rt-btn.danger {
+    color: var(--red) !important;
+    border-color: rgba(248,113,113,0.4) !important;
+  }
+
+  body.tool-preflop .right-panel .range-tools-desktop {
+    display: none;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    width: 100%;
+  }
+
+  body.tool-preflop .right-panel .range-tools-desktop .rt-btn {
+    padding: 7px 10px;
+    border-radius: 9px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: var(--bg-3);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    min-height: 36px;
+    flex: 1 1 0;
+    text-align: center;
+  }
+
+  body.tool-preflop .right-panel .range-tools-desktop .rt-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  body.tool-preflop .right-panel .range-tools-desktop .rt-btn.danger {
+    color: var(--red);
+    border-color: rgba(248,113,113,0.4);
+  }
+
+  @media (min-width: 901px) {
+    body.tool-preflop .right-panel .range-tools-desktop {
+      display: flex !important;
+    }
+    body.tool-preflop .top-fixed .range-tools {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      overflow: hidden !important;
+    }
+  }
+
+  body.tool-preflop .app-main {
+    display: flex !important;
+    flex-direction: row !important;
+    grid-template-columns: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    overflow: visible !important;
+    max-height: none !important;
+    flex: 1 1 auto !important;
+  }
+
+  body.tool-preflop .grid-area {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    padding: 24px 12px 12px !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    margin-top: 0 !important;
+  }
+
+  body.tool-preflop .grid-wrapper {
+    width: min(100%, 920px, calc(100vh - 320px)) !important;
+    max-width: min(100%, 920px, calc(100vh - 320px)) !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  body.tool-preflop .hand-grid {
+    display: grid !important;
+    grid-template-columns: repeat(13, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(13, minmax(0, 1fr)) !important;
+    grid-auto-rows: unset !important;
+    gap: 1.5px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.tool-preflop .hand-grid .cell {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body.tool-preflop .hand-grid .cell .label {
+    line-height: 1 !important;
+    padding: 0 1px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+  }
+  @media (min-width: 420px) {
+    body.tool-preflop .hand-grid .cell .label { font-size: 11px !important; }
+  }
+  @media (min-width: 520px) {
+    body.tool-preflop .hand-grid .cell .label { font-size: 12px !important; }
+  }
+  @media (min-width: 700px) {
+    body.tool-preflop .hand-grid .cell .label { font-size: 13px !important; }
+  }
+  @media (min-width: 1024px) {
+    body.tool-preflop .hand-grid .cell .label { font-size: 13px !important; }
+  }
+  @media (min-width: 1400px) {
+    body.tool-preflop .hand-grid .cell .label { font-size: 15px !important; }
+  }
+
+  @media (min-width: 1024px) {
+    body.tool-preflop .sidebar {
+      width: 220px !important;
+      min-width: 220px !important;
+      max-width: 220px !important;
+    }
+    body.tool-preflop .right-panel {
+      width: 260px !important;
+      min-width: 260px !important;
+      max-width: 260px !important;
+    }
+    body.tool-preflop .grid-area {
+      padding: 28px 12px 16px !important;
+    }
+    body.tool-preflop .grid-wrapper {
+      width: min(100%, 920px, calc(100vh - 300px)) !important;
+      max-width: min(100%, 920px, calc(100vh - 300px)) !important;
+      overflow: hidden !important;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    body.tool-preflop .grid-wrapper {
+      width: min(100%, 1000px, calc(100vh - 280px)) !important;
+      max-width: min(100%, 1000px, calc(100vh - 280px)) !important;
+    }
+    body.tool-preflop .sidebar {
+      width: 240px !important;
+      min-width: 240px !important;
+      max-width: 240px !important;
+    }
+    body.tool-preflop .right-panel {
+      width: 300px !important;
+      min-width: 300px !important;
+      max-width: 300px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body.tool-preflop .grid-area {
+      padding: 16px 6px 10px !important;
+    }
+    body.tool-preflop .grid-wrapper {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 0 !important;
+    }
+    body.tool-preflop .hand-grid { gap: 1px !important; }
+  }
+
+  @media (max-height: 640px) and (min-width: 481px) {
+    body.tool-preflop .grid-wrapper {
+      width: min(100%, calc(100vh - 280px)) !important;
+      max-width: min(100%, calc(100vh - 280px)) !important;
+    }
+  }
+
+  body.tool-preflop .bottom-bar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 250 !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+
+  @media (min-width: 901px) {
+    body.tool-preflop .bottom-bar {
+      display: none !important;
+    }
+  }
+  @media (max-width: 900px) {
+    body.tool-preflop .bottom-bar {
+      display: flex !important;
+    }
+  }
+
+  body.tool-preflop .sidebar,
+  body.tool-preflop .right-panel {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+
+  body.tool-preflop #splash,
+  body.tool-preflop .loading-overlay,
+  body.tool-preflop .toast,
+  body.tool-preflop .sheet-overlay,
+  body.tool-preflop .trainer-overlay,
+  body.tool-preflop .import-modal,
+  body.tool-preflop .info-modal {
+    position: fixed !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════
+     FIX: info-modal SIEMPRE visible cuando tiene .visible
+     ═══════════════════════════════════════════════════════ */
+  body.tool-preflop .info-modal {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 9500;
+  }
+  body.tool-preflop .info-modal.visible {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 9500 !important;
+    pointer-events: auto !important;
+  }
+  body.tool-preflop .info-modal .info-card {
+    background: var(--bg-1);
+    color: var(--text);
+    max-width: 520px;
+    width: min(92vw, 520px);
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    z-index: 9501;
+    position: relative;
+  }
+  body.tool-preflop .info-modal .info-card h2 {
+    color: var(--accent);
+    margin: 0 0 14px;
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+  body.tool-preflop .info-modal .info-card p {
+    margin: 0 0 10px;
+    color: var(--text-2);
+    line-height: 1.6;
+    font-size: 0.86rem;
+  }
+  body.tool-preflop .info-modal .info-close {
+    margin-top: 14px;
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  body.tool-preflop .info-modal .info-close:hover {
+    filter: brightness(1.1);
+  }
+
+  body.tool-preflop .sheet-overlay.visible { z-index: 9000 !important; }
+
+  body.tool-preflop #sheet-actions {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    width: min(360px, 88vw) !important;
+    max-width: min(360px, 88vw) !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border-top: none !important;
+    border-right: 1px solid var(--border) !important;
+    background: var(--bg-1) !important;
+    transform: translateX(-105%) !important;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    box-shadow: 6px 0 30px rgba(0,0,0,0.5) !important;
+    z-index: 9100 !important;
+    overflow-y: auto !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  body.tool-preflop #sheet-actions.open {
+    transform: translateX(0) !important;
+  }
+
+  body.tool-preflop #sheet-actions .sheet-handle { display: none !important; }
+
+  body.tool-preflop #sheet-actions .sheet-head.drawer-style-head {
+    padding: 22px 18px 18px !important;
+    gap: 12px !important;
+    border-bottom: 1px solid var(--border-soft) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-shrink: 0 !important;
+  }
+  body.tool-preflop #sheet-actions .drawer-head-brand {
+    display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1;
+  }
+  body.tool-preflop #sheet-actions .drawer-logo-mark {
+    width: 52px; height: 52px; border-radius: 15px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #1a1400; font-weight: 900;
+    box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 40%, transparent);
+    flex-shrink: 0;
+  }
+  body.tool-preflop #sheet-actions .drawer-brand-text { min-width: 0; }
+  body.tool-preflop #sheet-actions .drawer-brand-title {
+    font-size: 16px; font-weight: 900; line-height: 1.15;
+    color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  body.tool-preflop #sheet-actions .drawer-brand-title span {
+    background: linear-gradient(90deg, var(--accent), var(--accent-h));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  body.tool-preflop #sheet-actions .drawer-brand-sub {
+    font-size: 10px; color: var(--text-3); font-weight: 700;
+    letter-spacing: 1.1px; text-transform: uppercase; margin-top: 3px;
+  }
+  body.tool-preflop #sheet-actions .sheet-close {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--bg-2); border: 1px solid var(--border);
+    color: var(--text-2); font-size: 18px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  body.tool-preflop #sheet-actions .sheet-close:hover {
+    color: var(--red); border-color: var(--red);
+  }
+  body.tool-preflop #sheet-actions .sheet-body {
+    padding: 10px 12px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  body.tool-preflop .brand-text { display: inline !important; }
+  @media (max-width: 380px) {
+    body.tool-preflop .brand-text { font-size: 0.82rem; }
+  }
+
+  @media (max-width: 720px) {
+    body.tool-preflop .conn-indicator { display: none !important; }
+    body.tool-preflop .user-chip .uname { display: inline !important; max-width: 90px; }
+    body.tool-preflop .user-chip { padding: 7px 10px; max-width: 130px; }
+  }
+
+  body.tool-preflop .bb-btn[data-legacy="menu"] { display: none !important; }
+
+  body.tool-preflop .grid-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  body.tool-preflop .hand-grid .cell.selected {
+    outline: 2.5px solid var(--gold) !important;
+    outline-offset: -2px !important;
+    box-shadow: 0 0 8px rgba(240,193,75,0.35) !important;
+    z-index: 2 !important;
+    position: relative !important;
+  }
+
+  body.tool-preflop .sheet-overlay.visible {
+    background: rgba(0,0,0,0.75) !important;
+    z-index: 9000 !important;
+  }
+  body.tool-preflop #sheet-config,
+  body.tool-preflop #sheet-freq {
+    background: var(--bg-1) !important;
+    color: var(--text) !important;
+    z-index: 9200 !important;
+    pointer-events: auto !important;
+    
+    
+    filter: none !important;
+    opacity: 1 !important;
+  }
+  body.tool-preflop #sheet-config .sheet-head,
+  body.tool-preflop #sheet-freq .sheet-head,
+  body.tool-preflop #sheet-config .sheet-body,
+  body.tool-preflop #sheet-freq .sheet-body {
+    background: var(--bg-1) !important;
+    color: var(--text) !important;
+    filter: none !important;
+    opacity: 1 !important;
+  }
+  body.tool-preflop #sheet-config .sheet-title,
+  body.tool-preflop #sheet-freq .sheet-title {
+    color: #fff !important;
+    font-weight: 800 !important;
+  }
+  body.tool-preflop #sheet-config .sheet-close,
+  body.tool-preflop #sheet-freq .sheet-close {
+    color: var(--text-2) !important;
+    font-size: 22px !important;
+  }
+  body.tool-preflop #sheet-config .sheet-label {
+    color: var(--text-2) !important;
+    font-weight: 700 !important;
+  }
+  body.tool-preflop #sheet-config .chip,
+  body.tool-preflop #sheet-config .sit-item {
+    background: var(--bg-2) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(255,255,255,0.14) !important;
+  }
+  body.tool-preflop #sheet-config .chip.active,
+  body.tool-preflop #sheet-config .chip.active-vs,
+  body.tool-preflop #sheet-config .js-stack-btn.active,
+  body.tool-preflop #sheet-config .sit-item.active {
+    background: var(--gold) !important;
+    color: var(--bg) !important;
+    border-color: var(--gold) !important;
+  }
+  body.tool-preflop #sheet-config .input,
+  body.tool-preflop #sheet-config input {
+    background: var(--bg-2) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(255,255,255,0.16) !important;
+  }
+  body.tool-preflop #sheet-config label { color: var(--text-2) !important; }
+  body.tool-preflop #sheet-freq .freq-row label,
+  body.tool-preflop #sheet-freq .freq-num,
+  body.tool-preflop #sheet-freq .freq-total,
+  body.tool-preflop #sheet-freq .freq-total b {
+    color: var(--text) !important;
+  }
+  body.tool-preflop #sheet-freq .freq-track { background: var(--border-2) !important; }
+  body.tool-preflop #sheet-freq .freq-step {
+    background: var(--bg-2) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(255,255,255,0.14) !important;
+  }
+  body.tool-preflop #sheet-freq .freq-presets button,
+  body.tool-preflop #sheet-freq .q100-btn {
+    background: var(--bg-2) !important;
+    color: var(--text) !important;
+    border: 1px solid rgba(255,255,255,0.14) !important;
+  }
+  body.tool-preflop #sheet-freq .freq-panel {
+    background: var(--bg-1) !important;
+    border-color: rgba(255,255,255,0.1) !important;
+  }
+
+  body.tool-preflop .js-vs-section.is-or [data-pos="BB"] {
+    display: none !important;
+  }
+  body.tool-preflop .js-hero-btn.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  @media (max-width: 900px) {
+    body.tool-preflop .context-bar {
+      padding: 6px 8px 2px !important;
+    }
+    body.tool-preflop .context-bar .context-btn {
+      padding: 9px 11px !important;
+    }
+    body.tool-preflop .top-fixed .range-tools {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      padding: 4px 8px 10px !important;
+      gap: 6px !important;
+      height: auto !important;
+      min-height: 44px !important;
+    }
+    body.tool-preflop .range-tools .rt-btn {
+      padding: 6px 12px !important;
+      font-size: 11.5px !important;
+      min-height: 32px !important;
+    }
+    body.tool-preflop .right-panel .range-tools-desktop {
+      display: none !important;
+    }
+    body.tool-preflop .grid-area {
+      padding: 16px 8px 8px !important;
+    }
+    body.tool-preflop .grid-header {
+      display: flex !important;
+      justify-content: flex-end !important;
+      min-height: 0 !important;
+      padding: 0 4px 2px !important;
+      margin: 0 !important;
+    }
+    body.tool-preflop .grid-header > div:first-child {
+      display: none !important;
+    }
+    body.tool-preflop .grid-wrapper {
+      padding-top: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+</style>
+<link rel="stylesheet" href="/static/css/rangelab-menus.css">
+</head>
+<body class="rl-loading tool-preflop">
+
+<!-- ═══════════════════════ SPLASH ═══════════════════════ -->
+<div id="splash">
+  <div class="splash-logo">📋</div>
+  <div class="splash-title">Preflop <span>Lab</span></div>
+  <div class="splash-sub">RangeLab Suite · Tablas · Trainer · 8-MAX</div>
+  <div class="splash-credits">Cargando herramienta…</div>
+  <div class="splash-bar"></div>
+  <div class="splash-credit">
+    <span class="rl-site-footer">Creado por RangeSoft® · © 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════ LOADING ═══════════════════════ -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- ═══════════════════════ TOAST ═══════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════ STICKY WRAPPER ═══════════════════════ -->
+<div class="sticky-top-wrapper" id="stickyTopWrapper">
+  <header class="app-header">
+    <div class="header-left">
+      <button class="btn-icon" id="btnMenu" title="Menú" data-i18n-title="nav.menu" data-i18n-aria="nav.menu" aria-label="Menú">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        </svg>
+        <span class="brand-text">Preflop <b>Lab</b></span>
+      </div>
+    </div>
+
+    <div class="mode-switch" id="modeSwitch" style="display:none;" aria-hidden="true">
+      <button data-app-mode="editor" class="active">Editor</button>
+      <button data-app-mode="trainer">Entrenar</button>
+    </div>
+
+    <div class="header-tools">
+      <button class="theme-toggle" type="button" title="Tema claro/oscuro" data-i18n-title="common.theme" data-i18n-aria="common.theme" aria-label="Cambiar tema claro/oscuro">
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+      <div class="conn-indicator" id="connIndicator" title="Estado del servidor" data-i18n-title="nav.serverStatus">
+        <span class="dot"></span>
+        <span class="ctext">—</span>
+      </div>
+      <div class="user-chip" title="Sesión actual" data-i18n-title="nav.session">
+        <span class="udot"></span>
+        <span class="uname" id="userName">—</span>
+      </div>
+      <button class="btn-icon" id="btnUndo" title="Deshacer (Ctrl+Z)" data-i18n-title="pf.undo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="top-fixed" id="topFixed">
+    <div class="context-bar">
+      <button class="context-btn" id="btnContextBar" type="button">
+        <div class="context-info">
+          <span class="ctx-pos" id="ctxHero">UTG</span>
+          <span class="ctx-vs" id="ctxVsWrap" style="display:none">vs <span id="ctxVs">BTN</span></span>
+          <span class="ctx-stack" id="ctxStack">60bb</span>
+          <span class="ctx-sit" id="ctxSit">Open Raise</span>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+    <div class="range-tools" id="rangeTools">
+      <button type="button" class="rt-btn" id="btnCopyGrid" title="Copiar rango" data-i18n-title="pf.copyRange">Copiar</button>
+      <button type="button" class="rt-btn" id="btnPasteGrid" title="Pegar rango" data-i18n-title="pf.pasteRange" disabled>Pegar</button>
+      <button type="button" class="rt-btn danger" id="btnClearGrid" title="Limpiar tabla" data-i18n-title="pf.clearTable">Limpiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main class="app-main">
+  <aside class="sidebar">
+    <div class="panel-section">
+      <h3 class="panel-title">Hero Position</h3>
+      <div class="chip-row js-hero-row">
+        <button class="chip js-hero-btn" data-pos="UTG">UTG</button>
+        <button class="chip js-hero-btn" data-pos="UTG+1">UTG+1</button>
+        <button class="chip js-hero-btn" data-pos="LJ">LJ</button>
+        <button class="chip js-hero-btn" data-pos="HJ">HJ</button>
+        <button class="chip js-hero-btn" data-pos="CO">CO</button>
+        <button class="chip js-hero-btn" data-pos="BTN">BTN</button>
+        <button class="chip js-hero-btn" data-pos="SB">SB</button>
+        <button class="chip js-hero-btn" data-pos="BB">BB</button>
+      </div>
+    </div>
+    <div class="panel-section js-vs-section">
+      <h3 class="panel-title">Vs Position</h3>
+      <div class="chip-row js-vs-row">
+        <button class="chip js-vs-btn" data-pos="UTG">UTG</button>
+        <button class="chip js-vs-btn" data-pos="UTG+1">UTG+1</button>
+        <button class="chip js-vs-btn" data-pos="LJ">LJ</button>
+        <button class="chip js-vs-btn" data-pos="HJ">HJ</button>
+        <button class="chip js-vs-btn" data-pos="CO">CO</button>
+        <button class="chip js-vs-btn" data-pos="BTN">BTN</button>
+        <button class="chip js-vs-btn" data-pos="SB">SB</button>
+        <button class="chip js-vs-btn" data-pos="BB">BB</button>
+      </div>
+    </div>
+    <div class="panel-section">
+      <h3 class="panel-title">Stack Size</h3>
+      <div class="chip-row js-stack-row">
+        <button class="chip js-stack-btn sm" data-stack="5">5bb</button>
+        <button class="chip js-stack-btn sm" data-stack="10">10bb</button>
+        <button class="chip js-stack-btn sm" data-stack="15">15bb</button>
+        <button class="chip js-stack-btn sm" data-stack="20">20bb</button>
+        <button class="chip js-stack-btn sm" data-stack="40">40bb</button>
+        <button class="chip js-stack-btn sm" data-stack="60">60bb</button>
+      </div>
+      <div class="input-row">
+        <label>Custom:</label>
+        <input type="number" class="input sm js-custom-stack" min="1" max="500" placeholder="bb" />
+      </div>
+    </div>
+    <div class="panel-section">
+      <h3 class="panel-title">Situación</h3>
+      <div class="sit-list js-sit-list">
+        <button class="sit-item js-sit-btn" data-sit="OR"><span class="dot"></span> Open Raise (OR)</button>
+        <button class="sit-item js-sit-btn" data-sit="vsOR"><span class="dot"></span> vs Open Raise</button>
+        <button class="sit-item js-sit-btn" data-sit="vsCC"><span class="dot"></span> vs Cold-Call</button>
+        <button class="sit-item js-sit-btn" data-sit="vs3B"><span class="dot"></span> vs 3-Bet</button>
+        <button class="sit-item js-sit-btn" data-sit="vs4B"><span class="dot"></span> vs 4-Bet</button>
+        <button class="sit-item js-sit-btn" data-sit="vsJAM"><span class="dot"></span> vs Jam / All-in</button>
+        <button class="sit-item js-sit-btn" data-sit="vsLimp"><span class="dot"></span> vs Limp (SB)</button>
+        <button class="sit-item js-sit-btn" data-sit="vsROL"><span class="dot"></span> vs Raise Over Limp</button>
+      </div>
+    </div>
+    <div class="panel-section">
+      <h3 class="panel-title">Secuencia / Notas</h3>
+      <input type="text" class="input js-sequence" placeholder="Ej: Vs 3B 7.5BB · Jam 40BB" />
+      <div class="input-row">
+        <label>Raise:</label>
+        <input type="text" class="input sm js-raise-size" placeholder="15.75bb" />
+      </div>
+    </div>
+  </aside>
+
+  <section class="grid-area">
+    <header class="grid-header">
+      <div>
+        <h1 class="grid-title" id="gridTitle">UTG · 60bb</h1>
+        <p class="grid-sub" id="gridSub">Open Raise</p>
+      </div>
+      <div class="grid-header-actions">
+        <button class="btn-ghost" id="btnCorrect" style="display:none;background:var(--purple);color:#fff;border-color:var(--purple);">✓ Corregir</button>
+      </div>
+    </header>
+    <div class="grid-wrapper">
+      <div class="hand-grid" id="handGrid"></div>
+    </div>
+    <footer class="grid-footer">
+      <div class="legend">
+        <span class="legend-item"><i class="legend-dot limp"></i>Limp</span>
+        <span class="legend-item"><i class="legend-dot call"></i>Call</span>
+        <span class="legend-item"><i class="legend-dot fold"></i>Fold</span>
+        <span class="legend-item"><i class="legend-dot raise"></i>Raise</span>
+        <span class="legend-item"><i class="legend-dot allin"></i>All-in</span>
+      </div>
+      <div class="stats">
+        <span class="stat-pill"><i class="bullet" style="background: var(--teal)"></i><b id="pctLimp">0%</b></span>
+        <span class="stat-pill"><i class="bullet" style="background: var(--green)"></i><b id="pctCall">0%</b></span>
+        <span class="stat-pill"><i class="bullet" style="background: var(--blue)"></i><b id="pctFold">0%</b></span>
+        <span class="stat-pill"><i class="bullet" style="background: var(--orange)"></i><b id="pctRaise">0%</b></span>
+        <span class="stat-pill"><i class="bullet" style="background: var(--red)"></i><b id="pctAllin">0%</b></span>
+        <span class="stat-pill"><b id="comboCount">0</b>/1326</span>
+      </div>
+    </footer>
+  </section>
+
+  <aside class="right-panel">
+    <div class="panel-section">
+      <h3 class="panel-title">Modo</h3>
+      <div class="mode-toggle">
+        <button id="modePaint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+          Pintar
+        </button>
+        <button id="modeSelect" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+          Seleccionar
+        </button>
+      </div>
+      <div class="range-tools-desktop" id="rangeToolsDesktop">
+        <button type="button" class="rt-btn" id="btnCopyGridDesktop" title="Copiar rango" data-i18n-title="pf.copyRange">Copiar</button>
+        <button type="button" class="rt-btn" id="btnPasteGridDesktop" title="Pegar rango" data-i18n-title="pf.pasteRange" disabled>Pegar</button>
+        <button type="button" class="rt-btn danger" id="btnClearGridDesktop" title="Limpiar tabla" data-i18n-title="pf.clearTable">Limpiar</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h3 class="panel-title">Frecuencias</h3>
+      <div class="freq-panel">
+        <div class="freq-row" data-action="limp">
+          <label class="limp">Limp</label>
+          <div class="freq-track" data-action="limp"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+          <button class="freq-step" data-step="-1" data-action="limp">−</button>
+          <span class="freq-num" data-action="limp">0%</span>
+        </div>
+        <div class="freq-row" data-action="call">
+          <label class="call">Call</label>
+          <div class="freq-track" data-action="call"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+          <button class="freq-step" data-step="-1" data-action="call">−</button>
+          <span class="freq-num" data-action="call">100%</span>
+        </div>
+        <div class="freq-row" data-action="fold">
+          <label class="fold">Fold</label>
+          <div class="freq-track" data-action="fold"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+          <button class="freq-step" data-step="-1" data-action="fold">−</button>
+          <span class="freq-num" data-action="fold">0%</span>
+        </div>
+        <div class="freq-row" data-action="raise">
+          <label class="raise">Raise</label>
+          <div class="freq-track" data-action="raise"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+          <button class="freq-step" data-step="-1" data-action="raise">−</button>
+          <span class="freq-num" data-action="raise">0%</span>
+        </div>
+        <div class="freq-row" data-action="allin">
+          <label class="allin">All-in</label>
+          <div class="freq-track" data-action="allin"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+          <button class="freq-step" data-step="-1" data-action="allin">−</button>
+          <span class="freq-num" data-action="allin">0%</span>
+        </div>
+        <div class="freq-total" id="freqTotal">
+          <span>Total</span><b id="freqTotalVal">100%</b>
+        </div>
+        <div class="freq-quick100-desktop" id="desktopQuick100" style="display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:10px;font-weight:800;color:var(--text-3);">100%</span>
+          <button type="button" class="q100-btn" data-mix="100,0,0,0,0" style="--qc:#14b8a6;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">L</button>
+          <button type="button" class="q100-btn" data-mix="0,100,0,0,0" style="--qc:#2ea043;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">C</button>
+          <button type="button" class="q100-btn" data-mix="0,0,100,0,0" style="--qc:#388bfd;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">F</button>
+          <button type="button" class="q100-btn" data-mix="0,0,0,100,0" style="--qc:#eab308;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">R</button>
+          <button type="button" class="q100-btn" data-mix="0,0,0,0,100" style="--qc:#e5484d;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">A</button>
+        </div>
+        <div class="freq-presets js-presets">
+          <button type="button" data-mix="100,0,0,0,0">100L</button>
+          <button type="button" data-mix="0,100,0,0,0">100C</button>
+          <button type="button" data-mix="0,0,100,0,0">100F</button>
+          <button type="button" data-mix="0,0,0,100,0">100R</button>
+          <button type="button" data-mix="0,0,0,0,100">100A</button>
+          <button type="button" data-mix="0,70,0,30,0">70C/30R</button>
+          <button type="button" data-mix="0,50,0,50,0">50C/50R</button>
+          <button type="button" data-mix="0,60,0,0,40">60C/40A</button>
+          <button type="button" data-mix="0,0,70,30,0">70F/30R</button>
+          <button type="button" data-mix="50,0,0,50,0">50L/50R</button>
+          <button type="button" data-mix="0,0,0,0,0">—</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <h3 class="panel-title">Atajos</h3>
+      <div class="shortcuts">
+        <div><kbd>L</kbd> Limp · <kbd>C</kbd> Call · <kbd>F</kbd> Fold · <kbd>R</kbd> Raise · <kbd>A</kbd> All-in</div>
+        <div><kbd>X</kbd> Limpiar · <kbd>⌘Z</kbd> Deshacer</div>
+        <div>Arrastra para pintar · Shift+click multi</div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ═══════════════════════ BOTTOM BAR ═══════════════════════ -->
+<nav class="bottom-bar">
+  <button class="bb-btn" id="bbMode">
+    <svg id="bbModeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+    <span id="bbModeLabel">Seleccionar</span>
+    <span class="sel-badge" id="bbSelBadge" style="display:none">0</span>
+  </button>
+  <div class="bb-quick100" id="bbQuick100" title="Aplicar 100% a selección" data-i18n-title="pf.apply100">
+    <span class="q100-label">100%</span>
+    <button type="button" class="q100-btn" data-mix="100,0,0,0,0" style="--qc:#14b8a6" title="100% Limp">L</button>
+    <button type="button" class="q100-btn" data-mix="0,100,0,0,0" style="--qc:#2ea043" title="100% Call">C</button>
+    <button type="button" class="q100-btn" data-mix="0,0,100,0,0" style="--qc:#388bfd" title="100% Fold">F</button>
+    <button type="button" class="q100-btn" data-mix="0,0,0,100,0" style="--qc:#eab308" title="100% Raise">R</button>
+    <button type="button" class="q100-btn" data-mix="0,0,0,0,100" style="--qc:#e5484d" title="100% All-in">A</button>
+  </div>
+  <button class="bb-btn accent" id="bbFreq">
+    <div class="freq-preview" id="bbFreqPreview"></div>
+    <span>Frecuencias</span>
+  </button>
+  <button class="bb-btn" id="bbSave">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    <span>Guardar</span>
+  </button>
+  <button class="bb-btn" id="bbMenu" type="button" title="Menú" aria-label="Menú" onclick="document.getElementById('btnMenu')?.click()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <span>Menú</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════ SHEETS ═══════════════════════ -->
+<div class="sheet-overlay" id="sheetOverlay"></div>
+
+<!-- Config Sheet -->
+<div class="sheet" id="sheet-config">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 class="sheet-title">Configuración · 8-max</h2>
+    <button class="sheet-close" data-close-sheet>×</button>
+  </div>
+  <div class="sheet-body">
+    <div class="sheet-section">
+      <h3 class="sheet-label">Posición Hero</h3>
+      <div class="chip-row js-hero-row">
+        <button class="chip js-hero-btn" data-pos="UTG">UTG</button>
+        <button class="chip js-hero-btn" data-pos="UTG+1">UTG+1</button>
+        <button class="chip js-hero-btn" data-pos="LJ">LJ</button>
+        <button class="chip js-hero-btn" data-pos="HJ">HJ</button>
+        <button class="chip js-hero-btn" data-pos="CO">CO</button>
+        <button class="chip js-hero-btn" data-pos="BTN">BTN</button>
+        <button class="chip js-hero-btn" data-pos="SB">SB</button>
+        <button class="chip js-hero-btn" data-pos="BB">BB</button>
+      </div>
+    </div>
+    <div class="sheet-section js-vs-section">
+      <h3 class="sheet-label">Vs Position</h3>
+      <div class="chip-row js-vs-row">
+        <button class="chip js-vs-btn" data-pos="UTG">UTG</button>
+        <button class="chip js-vs-btn" data-pos="UTG+1">UTG+1</button>
+        <button class="chip js-vs-btn" data-pos="LJ">LJ</button>
+        <button class="chip js-vs-btn" data-pos="HJ">HJ</button>
+        <button class="chip js-vs-btn" data-pos="CO">CO</button>
+        <button class="chip js-vs-btn" data-pos="BTN">BTN</button>
+        <button class="chip js-vs-btn" data-pos="SB">SB</button>
+        <button class="chip js-vs-btn" data-pos="BB">BB</button>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <h3 class="sheet-label">Stack Size</h3>
+      <div class="chip-row js-stack-row">
+        <button class="chip js-stack-btn" data-stack="5">5bb</button>
+        <button class="chip js-stack-btn" data-stack="10">10bb</button>
+        <button class="chip js-stack-btn" data-stack="15">15bb</button>
+        <button class="chip js-stack-btn" data-stack="20">20bb</button>
+        <button class="chip js-stack-btn" data-stack="40">40bb</button>
+        <button class="chip js-stack-btn" data-stack="60">60bb</button>
+      </div>
+      <div class="input-row">
+        <label>Custom:</label>
+        <input type="number" class="input sm js-custom-stack" min="1" max="500" placeholder="bb" />
+      </div>
+    </div>
+    <div class="sheet-section">
+      <h3 class="sheet-label">Situación</h3>
+      <div class="sit-list js-sit-list">
+        <button class="sit-item js-sit-btn" data-sit="OR"><span class="dot"></span> Open Raise (OR)</button>
+        <button class="sit-item js-sit-btn" data-sit="vsOR"><span class="dot"></span> vs Open Raise</button>
+        <button class="sit-item js-sit-btn" data-sit="vsCC"><span class="dot"></span> vs Cold-Call</button>
+        <button class="sit-item js-sit-btn" data-sit="vs3B"><span class="dot"></span> vs 3-Bet</button>
+        <button class="sit-item js-sit-btn" data-sit="vs4B"><span class="dot"></span> vs 4-Bet</button>
+        <button class="sit-item js-sit-btn" data-sit="vsJAM"><span class="dot"></span> vs Jam / All-in</button>
+        <button class="sit-item js-sit-btn" data-sit="vsLimp"><span class="dot"></span> vs Limp (SB)</button>
+        <button class="sit-item js-sit-btn" data-sit="vsROL"><span class="dot"></span> vs Raise Over Limp</button>
+      </div>
+    </div>
+    <div class="sheet-section">
+      <h3 class="sheet-label">Secuencia / Notas</h3>
+      <input type="text" class="input js-sequence" placeholder="Ej: Vs 3B 7.5BB · Jam 40BB" />
+      <div class="input-row">
+        <label>Raise:</label>
+        <input type="text" class="input sm js-raise-size" placeholder="15.75bb" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Freq Sheet -->
+<div class="sheet" id="sheet-freq">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 class="sheet-title">Frecuencias del pincel</h2>
+    <button class="sheet-close" data-close-sheet>×</button>
+  </div>
+  <div class="sheet-body">
+    <div class="freq-panel" style="background: var(--bg-1); border-color: var(--border-soft);">
+      <div class="freq-row" data-action="limp">
+        <label class="limp">Limp</label>
+        <div class="freq-track" data-action="limp"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+        <button class="freq-step" data-step="-1" data-action="limp">−</button>
+        <span class="freq-num" data-action="limp">0%</span>
+      </div>
+      <div class="freq-row" data-action="call">
+        <label class="call">Call</label>
+        <div class="freq-track" data-action="call"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+        <button class="freq-step" data-step="-1" data-action="call">−</button>
+        <span class="freq-num" data-action="call">100%</span>
+      </div>
+      <div class="freq-row" data-action="fold">
+        <label class="fold">Fold</label>
+        <div class="freq-track" data-action="fold"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+        <button class="freq-step" data-step="-1" data-action="fold">−</button>
+        <span class="freq-num" data-action="fold">0%</span>
+      </div>
+      <div class="freq-row" data-action="raise">
+        <label class="raise">Raise</label>
+        <div class="freq-track" data-action="raise"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+        <button class="freq-step" data-step="-1" data-action="raise">−</button>
+        <span class="freq-num" data-action="raise">0%</span>
+      </div>
+      <div class="freq-row" data-action="allin">
+        <label class="allin">All-in</label>
+        <div class="freq-track" data-action="allin"><div class="freq-fill"></div><div class="freq-thumb"></div></div>
+        <button class="freq-step" data-step="-1" data-action="allin">−</button>
+        <span class="freq-num" data-action="allin">0%</span>
+      </div>
+      <div class="freq-total" id="freqTotalM">
+        <span>Total</span><b id="freqTotalValM">100%</b>
+      </div>
+      <div class="freq-quick100-desktop" id="desktopQuick100" style="display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:10px;font-weight:800;color:var(--text-3);">100%</span>
+          <button type="button" class="q100-btn" data-mix="100,0,0,0,0" style="--qc:#14b8a6;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">L</button>
+          <button type="button" class="q100-btn" data-mix="0,100,0,0,0" style="--qc:#2ea043;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">C</button>
+          <button type="button" class="q100-btn" data-mix="0,0,100,0,0" style="--qc:#388bfd;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">F</button>
+          <button type="button" class="q100-btn" data-mix="0,0,0,100,0" style="--qc:#eab308;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">R</button>
+          <button type="button" class="q100-btn" data-mix="0,0,0,0,100" style="--qc:#e5484d;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--qc) 22%,transparent);border:1px solid color-mix(in srgb,var(--qc) 55%,transparent);color:var(--qc);font-weight:900;font-size:11px;">A</button>
+        </div>
+        <div class="freq-presets js-presets">
+        <button type="button" data-mix="100,0,0,0,0">100L</button>
+        <button type="button" data-mix="0,100,0,0,0">100C</button>
+        <button type="button" data-mix="0,0,100,0,0">100F</button>
+        <button type="button" data-mix="0,0,0,100,0">100R</button>
+        <button type="button" data-mix="0,0,0,0,100">100A</button>
+        <button type="button" data-mix="0,70,0,30,0">70C/30R</button>
+        <button type="button" data-mix="0,50,0,50,0">50C/50R</button>
+        <button type="button" data-mix="0,60,0,0,40">60C/40A</button>
+        <button type="button" data-mix="0,0,70,30,0">70F/30R</button>
+        <button type="button" data-mix="50,0,0,50,0">50L/50R</button>
+        <button type="button" data-mix="0,0,0,0,0">Limpiar</button>
+      </div>
+    </div>
+    <p style="font-size:0.75rem; color:var(--text-3); margin-top:14px; text-align:center; line-height:1.5;">
+      Arrastra el punto amarillo o toca la pista para ajustar.<br>
+      En modo <b style="color:var(--accent)">Seleccionar</b>, se aplica a la selección actual.
+    </p>
+  </div>
+</div>
+
+<!-- Actions Sheet -->
+<div class="sheet" id="sheet-actions">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head drawer-style-head">
+    <div class="drawer-head-brand">
+      <div class="drawer-logo-mark"><img class="rl-brand-img" src="/static/icons/icon-192.png" alt="" width="192" height="192"></div>
+      <div class="drawer-brand-text">
+        <div class="drawer-brand-title">Preflop <span>Lab</span></div>
+        <div class="drawer-brand-sub">6-max · 8-max · Trainer</div>
+      </div>
+    </div>
+    <button class="sheet-close" data-close-sheet aria-label="Cerrar">×</button>
+  </div>
+  <div class="sheet-body">
+    <div class="action-list">
+      <div class="drawer-section-label" data-i18n="nav.navigation">Navegación</div>
+      <button class="action-btn" id="btnBackPortal" onclick="window.location.href='/'">
+        <span class="action-ico">🏠</span>
+        <div><div data-i18n="nav.backPortal">Volver al portal</div><small data-i18n="nav.backPortalDesc">RangeLab Suite</small></div>
+      </button>
+      <div class="drawer-section-label" data-i18n="pf.strategy">Estrategia</div>
+      <button class="action-btn primary" id="btnSaveCurrent">
+        <span class="action-ico">💾</span>
+        <div><div data-i18n="pf.saveTable">Guardar tabla actual</div><small data-i18n="pf.saveTableDesc">Sincronizar con el servidor</small></div>
+      </button>
+      <button class="action-btn" id="btnNewM">
+        <span class="action-ico">✨</span>
+        <div><div data-i18n="pf.newStrategy">Nueva estrategia</div><small data-i18n="pf.newStrategyDesc">Empezar desde cero</small></div>
+      </button>
+      <button class="action-btn" id="btnExportM">
+        <span class="action-ico">📤</span>
+        <div><div data-i18n="common.exportJson">Exportar JSON</div><small data-i18n="pf.exportDesc">Descarga toda la estrategia</small></div>
+      </button>
+      <button class="action-btn" id="btnImportM">
+        <span class="action-ico">📥</span>
+        <div><div>Importar JSON / UPI / Monker</div><small>Reemplaza la sesión actual</small></div>
+      </button>
+      <button class="action-btn" id="btnStatsM">
+        <span class="action-ico">📋</span>
+        <div><div>Tablas guardadas</div><small>Ver todas tus tablas en el servidor</small></div>
+      </button>
+      <button class="action-btn" id="btnSyncM">
+        <span class="action-ico">🔄</span>
+        <div><div>Sincronizar</div><small>Recargar del servidor</small></div>
+      </button>
+      <button class="action-btn danger" id="btnClearM">
+        <span class="action-ico">🗑️</span>
+        <div><div>Limpiar tabla actual</div><small>Borra solo el contexto actual</small></div>
+      </button>
+      <div class="drawer-section-label">Modos</div>
+      <button class="action-btn" id="btnEditorM">
+        <span class="action-ico">✏️</span>
+        <div><div>Modo Editor</div><small>Editar y pintar rangos</small></div>
+      </button>
+      <button class="action-btn action-btn-trainer" id="btnTrainerM">
+        <span class="action-ico">⭐</span>
+        <div><div>Modo Entrenamiento</div><small>Practica de memoria y recibe score</small></div>
+      </button>
+      <div class="drawer-section-label" data-i18n="common.language">Idioma</div>
+      <div class="lang-menu-row">
+        <span class="lmr-label">
+          <span class="lmr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+          <span data-i18n="common.language">Idioma</span>
+        </span>
+        <div class="rl-lang-toggle" role="group" aria-label="Language">
+          <button type="button" data-lang-set="es" title="Español">ES</button>
+          <button type="button" data-lang-set="en" title="English">EN</button>
+        </div>
+      </div>
+      <div class="drawer-section-label">Más</div>
+      <button class="action-btn" id="btnHelpM">
+        <span class="action-ico">❓</span>
+        <div><div data-i18n="nav.help">Ayuda</div><small>Cómo usar la app</small></div>
+      </button>
+      <button class="action-btn" id="btnCreditsM">
+        <span class="action-ico">♥</span>
+        <div><div data-i18n="nav.credits">Créditos</div><small><span class="rl-site-brand-name">Acerca de RangeSoft®</span></small></div>
+      </button>
+      <button class="action-btn danger" id="btnLogoutM">
+        <span class="action-ico">🚪</span>
+        <div><div data-i18n="nav.logout">Cerrar sesión</div><small id="logoutUser">—</small></div>
+      </button>
+    </div>
+    <div class="drawer-footer-note">Preflop Lab · <span class="rl-site-footer">Creado por RangeSoft® · © 2026</span></div>
+  </div>
+</div>
+
+<!-- Trainer Overlay -->
+<div class="trainer-overlay" id="trainerOverlay">
+  <div class="trainer-card">
+    <div class="trainer-score">
+      <div class="trainer-score-value" id="trainerScore">—</div>
+      <div class="trainer-score-label" id="trainerScoreLabel">Puntuación</div>
+    </div>
+    <div class="trainer-errors" id="trainerErrors"></div>
+    <div class="trainer-actions">
+      <button class="btn-review" id="btnReview">Ver solución</button>
+      <button class="btn-retry" id="btnRetry">Reintentar</button>
+      <button class="btn-exit" id="btnExitTrainer">Salir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="import-modal" id="importModal">
+  <div class="import-card">
+    <h2 class="import-title">Importar rango</h2>
+    <p class="import-subtitle">Acepta JSON nativo, texto UPI (GTO Wizard, Pio, GTO+) o formato MonkerSolver.</p>
+
+    <div class="import-tabs">
+      <button class="active" data-import-tab="paste">Pegar texto</button>
+      <button data-import-tab="file">Archivo</button>
+    </div>
+
+    <div class="import-tab-content active" id="importTabPaste">
+      <textarea class="import-textarea" id="importText" placeholder="Pega aquí el rango...&#10;&#10;Ejemplos:&#10;AA,KK,QQ,AKs,AQs&#10;raise:AA,KK,QQ&#10;call:JJ,TT,99&#10;AKs:0.8,AQo:0.5"></textarea>
+      <div class="import-format-hint">
+        Formatos soportados: lista simple, <b>UPI</b> con prefijos de acción, o Monker con pesos (:0.5).
+      </div>
+    </div>
+
+    <div class="import-tab-content" id="importTabFile">
+      <input type="file" class="import-file-input" id="importFile" accept=".json,.txt,.rng,.csv" />
+      <div class="import-format-hint">Selecciona un archivo .json, .txt, .rng o .csv.</div>
+    </div>
+
+    <div class="import-preview" id="importPreview">
+      <div class="import-preview-title" id="importPreviewTitle"></div>
+      <div id="importPreviewBody"></div>
+    </div>
+
+    <div class="import-actions">
+      <button class="btn-cancel" id="btnImportCancel">Cancelar</button>
+      <button class="btn-confirm" id="btnImportConfirm">Importar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Modal -->
+<div class="info-modal" id="statsModal">
+  <div class="info-card">
+    <h2>📋 Tablas guardadas</h2>
+    <div id="statsContent" style="font-size:0.85rem;line-height:1.7;color:var(--text-2);"></div>
+    <button class="info-close" onclick="closeInfoModal('statsModal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- Help Modal -->
+<div class="info-modal" id="helpModal">
+  <div class="info-card">
+    <h2>❓ Ayuda</h2>
+    <p><strong>📋 ¿Qué es?</strong> Editor y entrenador de estrategias preflop 8-max. Construye tablas de rangos y practica tu memoria.</p>
+    <p><strong>🎨 Editor</strong> Pinta manos con el modo <b>Pintar</b> o selecciona varias con <b>Seleccionar</b> y aplica frecuencias.</p>
+    <p><strong>⚙️ Configuración</strong> Cambia posición, vs posición, stack y situación. Cada combinación es una tabla independiente.</p>
+    <p><strong>🎯 Entrenamiento</strong> Cambia a "Entrenar" y reconstruye el rango de memoria. Pulsa "Corregir" para ver tu score.</p>
+    <p><strong>💾 Guardado</strong> Todo se guarda en tu cuenta del servidor. Sincroniza entre dispositivos con tu usuario y contraseña.</p>
+    <p><strong>📥 Importar</strong> Soporta formato JSON, UPI (GTO Wizard, Pio) y Monker con pesos.</p>
+    <button class="info-close" onclick="closeInfoModal('helpModal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- Credits Modal -->
+<div class="info-modal" id="creditsModal">
+  <div class="info-card">
+    <h2>💡 Créditos</h2>
+    <div style="text-align:center;padding:8px 0;">
+      <div style="font-size:40px;margin-bottom:12px;">📋</div>
+      <div style="font-size:18px;font-weight:900;background:linear-gradient(90deg,var(--accent),var(--accent-h));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px;">PREFLOP STRATEGY</div>
+      <div style="font-size:11px;color:var(--text-2);margin-top:4px;letter-spacing:1px;">RangeLab · Preflop Lab</div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:16px 0;"></div>
+      <div style="font-size:14px;font-weight:700;">Creado por <span style="color:var(--accent)">RangeSoft®</span></div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:16px 0;"></div>
+      <div style="font-size:10px;color:var(--text-3);"><span class="rl-site-footer">© RangeSoft®. Código abierto · uso no comercial (ver LICENSE).</span></div>
+    </div>
+    <button class="info-close" onclick="closeInfoModal('creditsModal')">Cerrar</button>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="/static/js/api-client.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════
+   CONSTANTES · SOLO 8-MAX
+   ═══════════════════════════════════════════════════════ */
+const RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+const ACTIONS = ['limp','call','fold','raise','allin'];
+const COLORS = { limp: '#14b8a6', call: '#2ea043', fold: '#388bfd', raise: '#eab308', allin: '#e5484d' };
+const SITUATIONS = {
+  OR: 'Open Raise', vsOR: 'vs Open Raise', vsCC: 'vs Cold-Call', vs3B: 'vs 3-Bet',
+  vs4B: 'vs 4-Bet', vsJAM: 'vs Jam / All-in', vsLimp: 'vs Limp (SB)', vsROL: 'vs Raise Over Limp'
+};
+const POS_ORDER_8 = ['UTG','UTG+1','LJ','HJ','CO','BTN','SB','BB'];
+const POS_ORDER = POS_ORDER_8;
+const TABLE_SIZE = 8;
+const MAX_HISTORY = 40;
+
+/* ═══════════════════════════════════════════════════════
+   UTILS
+   ═══════════════════════════════════════════════════════ */
+const posIndex = p => POS_ORDER.indexOf(p);
+const validVsPositions = hero => { const hi = posIndex(hero); return hi <= 0 ? [] : POS_ORDER.slice(0, hi); };
+const isOpenRaise = sit => sit === 'OR';
+const comboCount = h => h.length === 2 ? 6 : (h.endsWith('s') ? 4 : 12);
+const emptyFreq = () => ({ limp: 0, call: 0, fold: 0, raise: 0, allin: 0 });
+const pure = a => { const f = emptyFreq(); if (a && a !== 'none') f[a] = 100; return f; };
+const isEmpty = f => !f || ACTIONS.every(a => !f[a]);
+const isPureFold = f => !!f && (f.fold || 0) === 100 && ACTIONS.every(a => a === 'fold' || !(f[a]));
+const totalFreq = f => !f ? 0 : ACTIONS.reduce((s, a) => s + (f[a] || 0), 0);
+function dominantAction(f) {
+  if (isEmpty(f)) return null;
+  let best = null, max = -1;
+  ACTIONS.forEach(a => { if ((f[a] || 0) > max) { max = f[a]; best = a; } });
+  return best;
+}
+function getHandCorrect(row, col) {
+  const r1 = RANKS[row], r2 = RANKS[col];
+  if (row === col) return r1 + r2;
+  return row < col ? r1 + r2 + 's' : r2 + r1 + 'o';
+}
+function makeEmptyRange() {
+  const r = {};
+  for (let i = 0; i < 13; i++)
+    for (let j = 0; j < 13; j++)
+      r[getHandCorrect(i, j)] = pure('fold');
+  return r;
+}
+function tableKey(hero, vs, stack, sit) {
+  const v = isOpenRaise(sit) ? '-' : (vs || '-');
+  return `${TABLE_SIZE}|${hero}|${v}|${stack}|${sit}`;
+}
+function parseTableKey(key) {
+  const parts = String(key).split('|');
+  if (parts.length === 5) {
+    return {
+      tableSize: parseInt(parts[0], 10) || TABLE_SIZE,
+      hero: parts[1],
+      vs: parts[2] === '-' ? null : parts[2],
+      stack: parseInt(parts[3], 10),
+      situation: parts[4]
+    };
+  }
+  return {
+    tableSize: TABLE_SIZE,
+    hero: parts[0],
+    vs: parts[1] === '-' ? null : parts[1],
+    stack: parseInt(parts[2], 10),
+    situation: parts[3]
+  };
+}
+const rangeHasData = r => r && Object.values(r).some(f => f && !isEmpty(f) && !isPureFold(f));
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ═══════════════════════════════════════════════════════
+   UI HELPERS
+   ═══════════════════════════════════════════════════════ */
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function setLoading(on) {
+  document.getElementById('loadingOverlay').classList.toggle('show', on);
+  if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(on);
+  else document.body.classList.toggle('rl-loading', !!on);
+}
+
+function setConnStatus(status, text) {
+  const el = document.getElementById('connIndicator');
+  if (el) {
+    el.classList.remove('online', 'offline');
+    if (status) el.classList.add(status);
+    const ct = el.querySelector('.ctext');
+    if (ct) ct.textContent = text || '—';
+  }
+  const udot = document.querySelector('.user-chip .udot');
+  if (udot) {
+    udot.style.background = status === 'online' ? 'var(--green)' : (status === 'offline' ? 'var(--red)' : 'var(--text-3)');
+    udot.style.boxShadow = status === 'online' ? '0 0 8px var(--green)' : 'none';
+  }
+  const chip = document.querySelector('.user-chip');
+  if (chip) {
+    chip.classList.remove('online', 'offline');
+    if (status) chip.classList.add(status);
+    chip.title = status === 'online' ? 'Conectado · Sesión actual' : (status === 'offline' ? 'Sesión actual' : 'Sesión actual');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   INFO MODALS
+   ═══════════════════════════════════════════════════════ */
+function openInfoModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('visible');
+  el.style.display = 'flex';
+  el.style.zIndex = '9500';
+}
+function closeInfoModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('visible');
+  el.style.display = '';
+}
+function openHelpModal() { openInfoModal('helpModal'); }
+function openCreditsModal() { openInfoModal('creditsModal'); }
+
+/* ═══════════════════════════════════════════════════════
+   ESTADO
+   ═══════════════════════════════════════════════════════ */
+const state = {
+  tables: {},
+  hero: 'UTG', vs: null, stack: 60, situation: 'OR',
+  sequence: '', raiseSize: '',
+  mode: 'select',
+  appMode: 'editor',
+  mix: { limp: 0, call: 100, fold: 0, raise: 0, allin: 0 },
+  range: makeEmptyRange(),
+  selected: new Set(),
+  isPainting: false,
+  history: [],
+  historyIndex: -1,
+  solutionRange: null,
+  trainerResult: null,
+  trainerErrors: []
+};
+
+let currentUser = null;
+let dirtyTables = new Set();
+
+const currentKey = () => tableKey(state.hero, state.vs, state.stack, state.situation);
+
+/* ═══════════════════════════════════════════════════════
+   FIX: ensureValidVs estricto
+   ═══════════════════════════════════════════════════════ */
+function ensureValidVs() {
+  if (!state.situation || isOpenRaise(state.situation)) {
+    state.vs = null;
+    return;
+  }
+  const allowed = validVsPositions(state.hero);
+  if (!allowed.length) {
+    state.vs = null;
+    return;
+  }
+  if (!state.vs || !allowed.includes(state.vs)) {
+    state.vs = allowed[allowed.length - 1];
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   HISTORY (undo local)
+   ═══════════════════════════════════════════════════════ */
+function snapshot() { return JSON.stringify({ tables: state.tables, range: state.range }); }
+function pushHistory() {
+  const snap = snapshot();
+  if (state.historyIndex >= 0 && state.history[state.historyIndex] === snap) return;
+  state.history = state.history.slice(0, state.historyIndex + 1);
+  state.history.push(snap);
+  if (state.history.length > MAX_HISTORY) state.history.shift();
+  state.historyIndex = state.history.length - 1;
+}
+function undo() {
+  if (state.historyIndex <= 0) return;
+  state.historyIndex--;
+  const snap = JSON.parse(state.history[state.historyIndex]);
+  state.range = snap.range;
+  state.tables = snap.tables;
+  renderGrid(); updateSituationDots(); syncUIFromState();
+}
+
+/* ═══════════════════════════════════════════════════════
+   SERVIDOR
+   ═══════════════════════════════════════════════════════ */
+async function loadUser() {
+  try {
+    const me = await FeltLabAPI.auth.me();
+    if (!me.authenticated) {
+      window.location.href = '/login';
+      return false;
+    }
+    currentUser = me.user;
+    document.getElementById('userName').textContent = me.user.display_name || me.user.username;
+    const lu = document.getElementById('logoutUser');
+    if (lu) lu.textContent = '@' + me.user.username;
+    return true;
+  } catch (e) {
+    console.error('Error cargando usuario:', e);
+    return false;
+  }
+}
+
+async function syncFromServer(silent = false) {
+  if (!silent) setLoading(true);
+  try {
+    const list = await FeltLabAPI.preflop.list(true);
+    state.tables = {};
+    for (const full of list) {
+      const ts = full.table_size || TABLE_SIZE;
+      if (ts !== TABLE_SIZE) continue;
+      const key = tableKey(full.hero, full.vs, full.stack, full.situation);
+      state.tables[key] = {
+        range: full.range || {},
+        sequence: full.sequence || '',
+        raiseSize: full.raise_size || ''
+      };
+    }
+    dirtyTables.clear();
+    loadTableFromStrategy(currentKey());
+    state.selected.clear();
+    syncUIFromState();
+    renderGrid();
+    updateSituationDots();
+    setConnStatus('online', 'Online');
+    if (!silent) showToast('Sincronizado ✓', 'success');
+    return true;
+  } catch (e) {
+    console.error('Error sincronizando:', e);
+    setConnStatus('offline', 'Offline');
+    if (!silent) showToast('Error de conexión', 'error');
+    return false;
+  } finally {
+    if (!silent) setLoading(false);
+  }
+}
+
+async function saveTableToServer(hero, vs, stack, sit, data) {
+  try {
+    await FeltLabAPI.preflop.upsert({
+      hero, vs, stack, situation: sit,
+      sequence: data.sequence || '',
+      raise_size: data.raiseSize || '',
+      range: data.range,
+      table_size: TABLE_SIZE
+    });
+    dirtyTables.delete(tableKey(hero, vs, stack, sit));
+  } catch (e) {
+    console.error('Error guardando tabla:', e);
+    throw e;
+  }
+}
+
+async function deleteTableFromServer(hero, vs, stack, sit) {
+  try {
+    const list = await FeltLabAPI.preflop.list();
+    const match = list.find(t =>
+      t.hero === hero &&
+      (t.vs || null) === (vs || null) &&
+      t.stack === stack &&
+      t.situation === sit &&
+      (t.table_size || TABLE_SIZE) === TABLE_SIZE
+    );
+    if (match) {
+      await FeltLabAPI.preflop.remove(match.id);
+    }
+  } catch (e) {
+    console.error('Error borrando tabla:', e);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   TABLA: SAVE / LOAD
+   ═══════════════════════════════════════════════════════ */
+function saveCurrentTableToStrategy() {
+  const key = currentKey();
+  if (rangeHasData(state.range) || state.sequence || state.raiseSize) {
+    state.tables[key] = {
+      range: JSON.parse(JSON.stringify(state.range)),
+      sequence: state.sequence || '',
+      raiseSize: state.raiseSize || ''
+    };
+    dirtyTables.add(key);
+  } else {
+    delete state.tables[key];
+    dirtyTables.delete(key);
+  }
+}
+
+function normalizeRange(src) {
+  const r = makeEmptyRange();
+  if (!src) return r;
+  Object.keys(r).forEach(h => {
+    const f = src[h];
+    if (!f || isEmpty(f)) r[h] = pure('fold');
+    else r[h] = { limp: f.limp || 0, call: f.call || 0, fold: f.fold || 0, raise: f.raise || 0, allin: f.allin || 0 };
+  });
+  return r;
+}
+
+function loadTableFromStrategy(key) {
+  const t = state.tables[key];
+  if (t) {
+    state.range = normalizeRange(t.range);
+    state.sequence = t.sequence || '';
+    state.raiseSize = t.raiseSize || '';
+  } else {
+    state.range = makeEmptyRange();
+    state.sequence = '';
+    state.raiseSize = '';
+  }
+  document.querySelectorAll('.js-sequence').forEach(el => el.value = state.sequence);
+  document.querySelectorAll('.js-raise-size').forEach(el => el.value = state.raiseSize);
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIX: switchContext blindado contra undefined
+   ═══════════════════════════════════════════════════════ */
+async function switchContext(hero, vs, stack, sit) {
+  saveCurrentTableToStrategy();
+
+  // Blindaje: nunca permitir undefined
+  hero  = hero  || state.hero  || 'UTG';
+  stack = stack || state.stack || 60;
+  sit   = sit   || state.situation || 'OR';
+  vs    = (vs === undefined) ? state.vs : vs;
+
+  // Si es OR, vs debe ser null SIEMPRE
+  if (isOpenRaise(sit)) vs = null;
+
+  const oldKey = currentKey();
+  if (state.tables[oldKey] && dirtyTables.has(oldKey)) {
+    const t = state.tables[oldKey];
+    try {
+      const pk = parseTableKey(oldKey);
+      await saveTableToServer(pk.hero, pk.vs, pk.stack, pk.situation, t);
+    } catch (e) {
+      showToast('Error guardando tabla anterior', 'error');
+    }
+  }
+
+  state.hero = hero;
+  state.vs = vs;
+  state.stack = stack;
+  state.situation = sit;
+  ensureValidVs();
+  loadTableFromStrategy(currentKey());
+  state.selected.clear();
+  syncUIFromState();
+  renderGrid();
+  updateSituationDots();
+}
+
+async function saveCurrentContext() {
+  saveCurrentTableToStrategy();
+  const key = currentKey();
+  const t = state.tables[key];
+  if (!t) {
+    showToast('Nada que guardar', 'error');
+    return;
+  }
+  setLoading(true);
+  try {
+    const pk = parseTableKey(key);
+    await saveTableToServer(pk.hero, pk.vs, pk.stack, pk.situation, t);
+    showToast('Guardado ✓', 'success');
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   GRID
+   ═══════════════════════════════════════════════════════ */
+function buildGrid() {
+  const grid = document.getElementById('handGrid');
+  const frag = document.createDocumentFragment();
+  for (let row = 0; row < 13; row++) {
+    for (let col = 0; col < 13; col++) {
+      const hand = getHandCorrect(row, col);
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.hand = hand;
+      cell.innerHTML = `<div class="cell-bg"></div><span class="label">${hand}</span>`;
+      cell.addEventListener('pointerdown', onCellPointerDown);
+      cell.addEventListener('pointerenter', onCellPointerEnter);
+      cell.addEventListener('pointerleave', hideTooltip);
+      frag.appendChild(cell);
+    }
+  }
+  grid.appendChild(frag);
+}
+
+/* Orden visual izq -> der: acciones jugadas primero, fold al final. */
+const PAINT_ORDER = ['limp', 'call', 'raise', 'allin', 'fold'];
+function freqPaintGradient(f) {
+  const src = f || {};
+  let acc = 0;
+  const stops = [];
+  PAINT_ORDER.forEach(a => {
+    const pct = Number(src[a]) || 0;
+    if (pct <= 0) return;
+    const start = acc;
+    acc += pct;
+    stops.push(`${COLORS[a]} ${start}%`, `${COLORS[a]} ${acc}%`);
+  });
+  if (acc < 100) {
+    stops.push(`${COLORS.fold} ${acc}%`, `${COLORS.fold} 100%`);
+  }
+  if (!stops.length) return COLORS.fold;
+  return `linear-gradient(to right, ${stops.join(', ')})`;
+}
+
+function renderCell(cell) {
+  const hand = cell.dataset.hand;
+  const f = state.range[hand];
+  const bg = cell.querySelector('.cell-bg');
+  const selected = state.selected.has(hand);
+  cell.classList.toggle('selected', selected);
+
+  cell.classList.remove('score-perfect', 'score-good', 'score-bad', 'score-missed', 'score-false');
+
+  if (state.appMode === 'trainer' && state.trainerResult) {
+    const r = state.trainerResult.hands[hand];
+    if (r) {
+      if (r.score >= 90) cell.classList.add('score-perfect');
+      else if (r.score >= 70) cell.classList.add('score-good');
+      else if (r.status === 'missed') cell.classList.add('score-missed');
+      else if (r.status === 'false') cell.classList.add('score-false');
+      else cell.classList.add('score-bad');
+    }
+  }
+
+  bg.innerHTML = '';
+  if (!f || isEmpty(f)) {
+    bg.style.background = COLORS.fold;
+    return;
+  }
+  /* Un solo degradado anclado a la izquierda: 25% call queda en el primer cuarto. */
+  bg.style.background = freqPaintGradient(f);
+}
+
+function renderGrid() {
+  document.querySelectorAll('.cell').forEach(renderCell);
+  updateStats(); updateTitle(); updateBottomBarFreq(); updateSelectionBadge();
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIX: updateTitle defensivo (nunca "UTG vs UTG" en OR)
+   ═══════════════════════════════════════════════════════ */
+function updateTitle() {
+  const sit = SITUATIONS[state.situation] || state.situation || '—';
+  const isOR = isOpenRaise(state.situation);
+  let title, sub;
+
+  if (isOR || !state.vs) {
+    title = `${state.hero} · ${state.stack}bb`;
+  } else {
+    title = `${state.hero} vs ${state.vs} · ${state.stack}bb`;
+  }
+  sub = sit;
+  if (state.sequence) sub += ` · ${state.sequence}`;
+  if (state.raiseSize && String(state.raiseSize).trim()) sub += ` · ${String(state.raiseSize).trim()}`;
+
+  document.getElementById('gridTitle').textContent = title;
+  document.getElementById('gridSub').textContent = sub;
+  document.getElementById('ctxHero').textContent = state.hero;
+
+  const vsWrap = document.getElementById('ctxVsWrap');
+  if (isOR || !state.vs) {
+    vsWrap.style.display = 'none';
+    document.getElementById('ctxVs').textContent = '';
+  } else {
+    vsWrap.style.display = '';
+    document.getElementById('ctxVs').textContent = state.vs;
+  }
+  document.getElementById('ctxStack').textContent = state.stack + 'bb';
+  document.getElementById('ctxSit').textContent = sit;
+}
+
+function updateStats() {
+  let limpC = 0, callC = 0, foldC = 0, raiseC = 0, allinC = 0, used = 0;
+  for (const [hand, f] of Object.entries(state.range)) {
+    if (isEmpty(f)) continue;
+    const c = comboCount(hand);
+    const t = totalFreq(f) || 100;
+    limpC += c * (f.limp || 0) / t; callC += c * (f.call || 0) / t; foldC += c * (f.fold || 0) / t;
+    raiseC += c * (f.raise || 0) / t; allinC += c * (f.allin || 0) / t;
+    used += c;
+  }
+  const tot = limpC + callC + foldC + raiseC + allinC || 1;
+  const pct = n => Math.round((n / tot) * 100);
+  document.getElementById('pctLimp').textContent = pct(limpC) + '%';
+  document.getElementById('pctCall').textContent = pct(callC) + '%';
+  document.getElementById('pctFold').textContent = pct(foldC) + '%';
+  document.getElementById('pctRaise').textContent = pct(raiseC) + '%';
+  document.getElementById('pctAllin').textContent = pct(allinC) + '%';
+  document.getElementById('comboCount').textContent = Math.round(used);
+}
+
+/* ═══════════════════════════════════════════════════════
+   APPLY FREQ
+   ═══════════════════════════════════════════════════════ */
+function applyFreq(hand, freqObj) {
+  if (isEmpty(freqObj) || totalFreq(freqObj) === 0) {
+    state.range[hand] = pure('fold');
+    return;
+  }
+  const t = totalFreq(freqObj);
+  if (t !== 100) {
+    const n = emptyFreq();
+    ACTIONS.forEach(a => { n[a] = Math.round((freqObj[a] || 0) * 100 / t); });
+    const diff = 100 - totalFreq(n);
+    if (diff !== 0) { const main = dominantAction(n); if (main) n[main] += diff; }
+    state.range[hand] = n;
+  } else {
+    state.range[hand] = { ...freqObj };
+  }
+}
+const getPaintFreq = () => ({ ...state.mix });
+
+function freqsEqual(a, b) {
+  if (!a && !b) return true;
+  if (!a || !b) return false;
+  return ACTIONS.every(act => (a[act] || 0) === (b[act] || 0));
+}
+
+/* ═══════════════════════════════════════════════════════
+   CELL INTERACTIONS
+   ═══════════════════════════════════════════════════════ */
+let paintAction = 'apply';
+let paintLastHand = null;
+let activePointerId = null;
+
+function applyPaintOrClear(hand) {
+  if (paintAction === 'clear') {
+    state.range[hand] = pure('fold');
+  } else {
+    applyFreq(hand, getPaintFreq());
+  }
+}
+
+function endPaintStroke() {
+  if (!state.isPainting) return;
+  state.isPainting = false;
+  activePointerId = null;
+  paintLastHand = null;
+  pushHistory();
+  updateSituationDots();
+}
+
+function decidePaintAction(hand) {
+  const current = state.range[hand];
+  const paint = getPaintFreq();
+  if (!isPureFold(current) && freqsEqual(current, paint)) {
+    return 'clear';
+  }
+  return 'apply';
+}
+
+function onCellPointerDown(e) {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  e.preventDefault();
+  e.stopPropagation();
+
+  const hand = e.currentTarget.dataset.hand;
+
+  if (state.mode === 'paint') {
+    paintAction = decidePaintAction(hand);
+    paintLastHand = hand;
+    state.isPainting = true;
+    activePointerId = e.pointerId;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
+    applyPaintOrClear(hand);
+    renderGrid();
+  } else {
+    toggleSelection(hand, e.shiftKey);
+  }
+}
+
+function onCellPointerEnter(e) {
+  if (e.pointerType === 'mouse' && !state.isPainting) {
+    const hand = e.currentTarget.dataset.hand;
+    const f = state.range[hand];
+    const tip = document.getElementById('tooltip');
+    let txt = `${hand} · ${comboCount(hand)} combos`;
+    if (!isEmpty(f)) {
+      txt += '\n' + ACTIONS.filter(a => f[a] > 0).map(a => `${a} ${f[a]}%`).join(' · ');
+    } else {
+      txt += '\n—';
+    }
+    tip.textContent = txt;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(e.clientX + 14, window.innerWidth - 200) + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  }
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+function toggleSelection(hand, additive) {
+  if (additive) {
+    if (state.selected.has(hand)) state.selected.delete(hand);
+    else state.selected.add(hand);
+  } else {
+    if (state.selected.size === 1 && state.selected.has(hand)) state.selected.clear();
+    else { state.selected.clear(); state.selected.add(hand); }
+  }
+  const f = state.range[hand];
+  if (state.selected.size === 1 && f && !isEmpty(f)) setMixSliders(f);
+  renderGrid();
+}
+
+document.addEventListener('pointermove', e => {
+  if (!state.isPainting || state.mode !== 'paint') return;
+  if (activePointerId !== null && e.pointerId !== activePointerId) return;
+  e.preventDefault();
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const cell = el && (el.classList.contains('cell') ? el : el.closest && el.closest('.cell'));
+  if (!cell) return;
+  const hand = cell.dataset.hand;
+  if (hand && hand !== paintLastHand) {
+    paintLastHand = hand;
+    applyPaintOrClear(hand);
+    renderGrid();
+  }
+}, { passive: false });
+
+document.addEventListener('pointerup', e => {
+  if (activePointerId !== null && e.pointerId !== activePointerId) return;
+  endPaintStroke();
+});
+
+document.addEventListener('pointercancel', e => {
+  if (activePointerId !== null && e.pointerId !== activePointerId) return;
+  endPaintStroke();
+});
+
+document.getElementById('handGrid')?.addEventListener('contextmenu', e => e.preventDefault());
+
+/* ═══════════════════════════════════════════════════════
+   SLIDERS
+   ═══════════════════════════════════════════════════════ */
+function updateTrackVisual(track, value) {
+  const fill = track.querySelector('.freq-fill');
+  const thumb = track.querySelector('.freq-thumb');
+  const v = Math.max(0, Math.min(100, value));
+  fill.style.width = v + '%';
+  thumb.style.left = v + '%';
+}
+
+function refreshSliderUI() {
+  document.querySelectorAll('.freq-track').forEach(track => {
+    const action = track.dataset.action;
+    updateTrackVisual(track, state.mix[action] || 0);
+  });
+  document.querySelectorAll('.freq-num').forEach(el => {
+    el.textContent = (state.mix[el.dataset.action] || 0) + '%';
+  });
+  const t = totalFreq(state.mix);
+  const cls = t === 100 ? 'ok' : (t === 0 ? '' : 'bad');
+  const pcT = document.getElementById('freqTotal');
+  const mT = document.getElementById('freqTotalM');
+  if (pcT) pcT.className = 'freq-total ' + cls;
+  if (mT) mT.className = 'freq-total ' + cls;
+  const pcTV = document.getElementById('freqTotalVal');
+  const mTV = document.getElementById('freqTotalValM');
+  if (pcTV) pcTV.textContent = t + '%';
+  if (mTV) mTV.textContent = t + '%';
+  updateBottomBarFreq();
+}
+
+function applyMixToSelection() {
+  if (state.mode === 'select' && state.selected.size) {
+    state.selected.forEach(h => applyFreq(h, { ...state.mix }));
+    renderGrid();
+    updateSituationDots();
+  }
+}
+
+function setMixSliders(f) {
+  state.mix = {
+    limp: f.limp || 0, call: f.call || 0, fold: f.fold || 0,
+    raise: f.raise || 0, allin: f.allin || 0
+  };
+  refreshSliderUI();
+  applyMixToSelection();
+}
+
+function setActionValue(action, newValue) {
+  const othersSum = ACTIONS.filter(a => a !== action)
+    .reduce((s, a) => s + (state.mix[a] || 0), 0);
+  const maxAllowed = 100 - othersSum;
+  const clamped = Math.max(0, Math.min(maxAllowed, Math.round(newValue)));
+  state.mix[action] = clamped;
+  refreshSliderUI();
+  applyMixToSelection();
+}
+
+function valueFromPointer(track, clientX) {
+  const rect = track.getBoundingClientRect();
+  const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+  return Math.round((x / rect.width) * 100);
+}
+
+function setupTrackDrag(track) {
+  const action = track.dataset.action;
+  let dragging = false;
+  let activePointerId = null;
+
+  const startDrag = (clientX) => {
+    dragging = true;
+    track.classList.add('dragging');
+    setActionValue(action, valueFromPointer(track, clientX));
+  };
+  const moveDrag = (clientX) => {
+    if (!dragging) return;
+    setActionValue(action, valueFromPointer(track, clientX));
+  };
+  const endDrag = () => {
+    if (!dragging) return;
+    dragging = false;
+    track.classList.remove('dragging');
+  };
+
+  if (window.PointerEvent) {
+    track.addEventListener('pointerdown', e => {
+      e.preventDefault(); e.stopPropagation();
+      activePointerId = e.pointerId;
+      try { track.setPointerCapture(activePointerId); } catch (_) {}
+      startDrag(e.clientX);
+    });
+    track.addEventListener('pointermove', e => {
+      if (e.pointerId !== activePointerId) return;
+      e.preventDefault();
+      moveDrag(e.clientX);
+    });
+    const up = e => {
+      if (activePointerId !== null && e.pointerId !== activePointerId) return;
+      try { track.releasePointerCapture(activePointerId); } catch (_) {}
+      activePointerId = null;
+      endDrag();
+    };
+    track.addEventListener('pointerup', up);
+    track.addEventListener('pointercancel', up);
+  } else {
+    track.addEventListener('touchstart', e => {
+      e.preventDefault(); e.stopPropagation();
+      startDrag(e.touches[0].clientX);
+    }, { passive: false });
+    track.addEventListener('touchmove', e => {
+      e.preventDefault();
+      moveDrag(e.touches[0].clientX);
+    }, { passive: false });
+    track.addEventListener('touchend', e => { e.preventDefault(); endDrag(); });
+    track.addEventListener('touchcancel', endDrag);
+    track.addEventListener('mousedown', e => {
+      e.preventDefault(); e.stopPropagation();
+      startDrag(e.clientX);
+      const mm = ev => moveDrag(ev.clientX);
+      const mu = () => {
+        document.removeEventListener('mousemove', mm);
+        document.removeEventListener('mouseup', mu);
+        endDrag();
+      };
+      document.addEventListener('mousemove', mm);
+      document.addEventListener('mouseup', mu);
+    });
+  }
+}
+
+function setupStepButtons() {
+  document.querySelectorAll('.freq-step').forEach(btn => {
+    const action = btn.dataset.action;
+    const step = parseInt(btn.dataset.step, 10);
+    let repeatTimer = null;
+    let delayTimer = null;
+    const tick = () => setActionValue(action, (state.mix[action] || 0) + step);
+    const startRepeat = () => {
+      delayTimer = setTimeout(() => { repeatTimer = setInterval(tick, 60); }, 400);
+    };
+    const stopRepeat = () => {
+      clearTimeout(delayTimer); clearInterval(repeatTimer);
+      delayTimer = repeatTimer = null;
+    };
+    const handler = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      tick(); startRepeat();
+    };
+    btn.addEventListener('pointerdown', handler);
+    btn.addEventListener('pointerup', stopRepeat);
+    btn.addEventListener('pointerleave', stopRepeat);
+    btn.addEventListener('pointercancel', stopRepeat);
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+  });
+}
+
+function initFreqSliders() {
+  document.querySelectorAll('.freq-track').forEach(setupTrackDrag);
+  setupStepButtons();
+  refreshSliderUI();
+}
+
+document.querySelectorAll('.js-presets').forEach(container => {
+  container.addEventListener('click', e => {
+    const btn = e.target.closest('[data-mix]');
+    if (!btn) return;
+    const parts = btn.dataset.mix.split(',').map(Number);
+    if (parts.length === 4) {
+      const [c, f, r, al] = parts;
+      setMixSliders({ limp: 0, call: c, fold: f, raise: r, allin: al });
+    } else {
+      const [l, c, f, r, al] = parts;
+      setMixSliders({ limp: l || 0, call: c || 0, fold: f || 0, raise: r || 0, allin: al || 0 });
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════════════════
+   BOTTOM BAR
+   ═══════════════════════════════════════════════════════ */
+function updateBottomBarFreq() {
+  const preview = document.getElementById('bbFreqPreview');
+  if (!preview) return;
+  preview.innerHTML = '';
+  const t = totalFreq(state.mix);
+  if (t === 0) {
+    preview.style.background = 'var(--border-2)';
+    return;
+  }
+  preview.style.background = freqPaintGradient(state.mix);
+}
+function updateSelectionBadge() {
+  const badge = document.getElementById('bbSelBadge');
+  if (!badge) return;
+  if (state.mode === 'select' && state.selected.size > 0) {
+    badge.textContent = state.selected.size; badge.style.display = 'inline-flex';
+  } else { badge.style.display = 'none'; }
+}
+function updateModeUI() {
+  const paintActive = state.mode === 'paint';
+  const pcPaint = document.getElementById('modePaint');
+  const pcSelect = document.getElementById('modeSelect');
+  if (pcPaint) pcPaint.classList.toggle('active', paintActive);
+  if (pcSelect) pcSelect.classList.toggle('active', !paintActive);
+  const icon = document.getElementById('bbModeIcon');
+  const label = document.getElementById('bbModeLabel');
+  if (icon && label) {
+    if (paintActive) {
+      icon.innerHTML = '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>';
+      label.textContent = 'Pintar';
+    } else {
+      icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/>';
+      label.textContent = 'Seleccionar';
+    }
+  }
+  updateSelectionBadge();
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIX: syncUIFromState - quitar active-vs residual
+   ═══════════════════════════════════════════════════════ */
+function syncUIFromState() {
+  const isOR = isOpenRaise(state.situation);
+
+  document.querySelectorAll('.js-hero-btn').forEach(b => {
+    const pos = b.dataset.pos;
+    const disabled = isOR && pos === 'BB';
+    b.disabled = disabled;
+    b.classList.toggle('disabled', disabled);
+    b.classList.toggle('active', pos === state.hero && !disabled);
+  });
+
+  const allowed = isOR ? [] : validVsPositions(state.hero);
+  document.querySelectorAll('.js-vs-section').forEach(sec => {
+    sec.classList.toggle('is-or', isOR);
+    sec.style.removeProperty('opacity');
+  });
+  document.querySelectorAll('.js-vs-btn').forEach(b => {
+    const pos = b.dataset.pos;
+    const enabled = !isOR && allowed.includes(pos);
+    b.disabled = !enabled;
+    b.classList.toggle('disabled', !enabled);
+    const isActive = enabled && state.vs === pos;
+    b.classList.toggle('active-vs', isActive);
+    if (!isActive) b.classList.remove('active-vs');
+  });
+
+  document.querySelectorAll('.js-stack-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.stack, 10) === state.stack));
+  document.querySelectorAll('.js-sit-btn').forEach(b => b.classList.toggle('active', b.dataset.sit === state.situation));
+  document.querySelectorAll('.js-sequence').forEach(el => el.value = state.sequence || '');
+  document.querySelectorAll('.js-raise-size').forEach(el => el.value = state.raiseSize || '');
+  document.querySelectorAll('.js-custom-stack').forEach(el => {
+    if (![5,10,15,20,40,60].includes(state.stack)) el.value = state.stack; else el.value = '';
+  });
+  document.querySelectorAll('[data-app-mode]').forEach(b => {
+    b.classList.toggle('active', b.dataset.appMode === state.appMode);
+    b.classList.toggle('trainer-active', b.dataset.appMode === 'trainer' && state.appMode === 'trainer');
+  });
+  updateModeUI();
+  updateTrainerUI();
+}
+function updateSituationDots() {
+  saveCurrentTableToStrategy();
+  document.querySelectorAll('.js-sit-btn').forEach(item => {
+    const sit = item.dataset.sit;
+    const key = tableKey(state.hero, state.vs, state.stack, sit);
+    const has = !!state.tables[key] && rangeHasData(state.tables[key].range);
+    item.classList.toggle('has-data', has);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   APP MODE
+   ═══════════════════════════════════════════════════════ */
+function setAppMode(mode) {
+  if (mode === state.appMode) return;
+  if (mode === 'trainer') {
+    if (!rangeHasData(state.range)) {
+      showToast('Primero construye o importa un rango', 'error');
+      return;
+    }
+    state.solutionRange = JSON.parse(JSON.stringify(state.range));
+    state.range = makeEmptyRange();
+    state.selected.clear();
+    state.trainerResult = null;
+    state.trainerErrors = [];
+    state.appMode = 'trainer';
+    closeSheets();
+    renderGrid(); syncUIFromState();
+    setTimeout(() => showToast('Reconstruye el rango de memoria y pulsa "Corregir"', 'success'), 400);
+  } else {
+    if (state.solutionRange) {
+      state.range = JSON.parse(JSON.stringify(state.solutionRange));
+      state.solutionRange = null;
+    }
+    state.trainerResult = null;
+    state.trainerErrors = [];
+    state.appMode = 'editor';
+    renderGrid(); syncUIFromState();
+  }
+}
+
+function scoreHand(playerFreq, solutionFreq) {
+  if (isEmpty(playerFreq) && isEmpty(solutionFreq)) return { score: 100, status: 'perfect' };
+  if (isEmpty(playerFreq) && !isEmpty(solutionFreq)) return { score: 0, status: 'missed' };
+  if (!isEmpty(playerFreq) && isEmpty(solutionFreq)) return { score: 0, status: 'false' };
+  let distance = 0;
+  ACTIONS.forEach(a => { distance += Math.abs((playerFreq[a] || 0) - (solutionFreq[a] || 0)); });
+  const score = Math.max(0, Math.round(100 - (distance / 2)));
+  const playerDom = dominantAction(playerFreq);
+  const solDom = dominantAction(solutionFreq);
+  let status = 'good';
+  if (score >= 90) status = 'perfect';
+  else if (score >= 70) status = 'good';
+  else if (playerDom !== solDom) status = 'wrong-action';
+  else status = 'wrong-freq';
+  return { score, status, playerDom, solDom };
+}
+
+function scoreSession() {
+  const solution = state.solutionRange || {};
+  const player = state.range;
+  let weightedScore = 0, totalWeight = 0;
+  const handResults = {};
+  const allHands = new Set([...Object.keys(player), ...Object.keys(solution)]);
+  allHands.forEach(hand => {
+    const p = player[hand] || emptyFreq();
+    const s = solution[hand] || emptyFreq();
+    if (isEmpty(p) && isEmpty(s)) return;
+    const weight = comboCount(hand);
+    const result = scoreHand(p, s);
+    handResults[hand] = { ...result, weight };
+    weightedScore += result.score * weight;
+    totalWeight += weight;
+  });
+  const finalScore = totalWeight > 0 ? Math.round(weightedScore / totalWeight) : 100;
+  const errors = Object.entries(handResults)
+    .filter(([_, r]) => r.score < 90)
+    .sort((a, b) => (b[1].weight * (100 - b[1].score)) - (a[1].weight * (100 - a[1].score)))
+    .slice(0, 15);
+  return { score: finalScore, hands: handResults, totalCombos: totalWeight, errors };
+}
+
+function showTrainerResult() {
+  const result = scoreSession();
+  state.trainerResult = result;
+  state.trainerErrors = result.errors;
+  const scoreEl = document.getElementById('trainerScore');
+  scoreEl.textContent = result.score;
+  scoreEl.className = 'trainer-score-value ' + (result.score >= 90 ? 'perfect' : result.score >= 70 ? 'good' : 'bad');
+  document.getElementById('trainerScoreLabel').textContent =
+    result.score >= 90 ? 'Excelente' : result.score >= 70 ? 'Buen trabajo' : 'Sigue practicando';
+
+  const errEl = document.getElementById('trainerErrors');
+  errEl.innerHTML = '';
+  if (result.errors.length) {
+    const title = document.createElement('div');
+    title.className = 'trainer-errors-title';
+    title.textContent = `Top errores (${result.errors.length})`;
+    errEl.appendChild(title);
+    result.errors.forEach(([hand, r]) => {
+      const item = document.createElement('div');
+      item.className = 'trainer-error-item';
+      item.innerHTML = `<span class="trainer-error-hand">${hand}</span><span class="trainer-error-score">${r.score}</span>`;
+      errEl.appendChild(item);
+    });
+  } else {
+    const title = document.createElement('div');
+    title.className = 'trainer-errors-title';
+    title.textContent = '¡Perfecto! Sin errores.';
+    errEl.appendChild(title);
+  }
+
+  document.getElementById('trainerOverlay').classList.add('visible');
+  renderGrid();
+}
+
+function updateTrainerUI() {
+  const btn = document.getElementById('btnCorrect');
+  if (btn) btn.style.display = state.appMode === 'trainer' ? '' : 'none';
+}
+
+/* ═══════════════════════════════════════════════════════
+   IMPORT
+   ═══════════════════════════════════════════════════════ */
+function normalizeHand(h) {
+  if (!h) return null;
+  h = h.trim().toUpperCase().replace(/[^AKQJT98765432SO]/g, '');
+  if (h.length === 2) {
+    if (RANKS.includes(h[0]) && RANKS.includes(h[1])) return h[0] + h[1];
+    return null;
+  }
+  if (h.length === 3) {
+    const base = h.slice(0, 2);
+    const suffix = h[2];
+    if (!RANKS.includes(base[0]) || !RANKS.includes(base[1])) return null;
+    if (suffix === 'S') return base + 's';
+    if (suffix === 'O') return base + 'o';
+    return base + 'o';
+  }
+  return null;
+}
+
+function parseUPI(text) {
+  const range = makeEmptyRange();
+  const clean = text.replace(/\s+/g, ' ').trim();
+  const lines = clean.split(/[\n;]+/).map(l => l.trim()).filter(Boolean);
+  let parsed = 0;
+  lines.forEach(line => {
+    const actionMatch = line.match(/^(raise|call|fold|allin|jam|limp|3bet|4bet|5bet):(.+)$/i);
+    if (actionMatch) {
+      let action = actionMatch[1].toLowerCase();
+      if (action === 'jam') action = 'allin';
+      if (['3bet','4bet','5bet'].includes(action)) action = 'raise';
+      actionMatch[2].split(/[, ]+/).forEach(h => {
+        const hand = normalizeHand(h);
+        if (hand && range[hand] !== undefined) { range[hand] = pure(action); parsed++; }
+      });
+    } else {
+      line.split(/[, ]+/).forEach(part => {
+        if (!part) return;
+        const [handRaw, weightStr] = part.split(':');
+        const hand = normalizeHand(handRaw);
+        if (hand && range[hand] !== undefined) {
+          const weight = weightStr ? parseFloat(weightStr) : 1;
+          range[hand] = { limp: 0, call: Math.round(weight * 100), fold: 0, raise: 0, allin: 0 };
+          parsed++;
+        }
+      });
+    }
+  });
+  return { range, parsed, format: 'UPI / texto' };
+}
+
+function parseImportText(text) {
+  text = text.trim();
+  if (!text) throw new Error('Texto vacío');
+  if (text.startsWith('{')) {
+    const data = JSON.parse(text);
+    if (data.tables || data.tables8) return { type: 'native', data };
+    if (data.range) {
+      const range = makeEmptyRange();
+      Object.entries(data.range).forEach(([h, v]) => {
+        const hand = normalizeHand(h);
+        if (hand && range[hand] !== undefined) {
+          if (v === null || v === undefined) range[hand] = null;
+          else if (typeof v === 'string') range[hand] = pure(v === 'none' ? null : v);
+          else range[hand] = v;
+        }
+      });
+      return { type: 'range', range, meta: { hero: data.hero, vs: data.vs, stack: data.stack, situation: data.situation } };
+    }
+  }
+  return { type: 'text', parsed: parseUPI(text) };
+}
+
+let pendingImport = null;
+
+function showImportPreview(result) {
+  const preview = document.getElementById('importPreview');
+  const title = document.getElementById('importPreviewTitle');
+  const body = document.getElementById('importPreviewBody');
+  preview.classList.add('visible');
+  if (result.type === 'native') {
+    const src = result.data;
+    const n = Object.keys(src.tables8 || src.tables || {}).length;
+    title.textContent = '✓ JSON nativo detectado';
+    body.textContent = `${n} tablas 8-max encontradas. Reemplazará toda la sesión.`;
+  } else if (result.type === 'range') {
+    const n = Object.values(result.range).filter(f => !isEmpty(f)).length;
+    title.textContent = '✓ Rango JSON detectado';
+    body.textContent = `${n} manos con acción. Se cargará en el contexto actual.`;
+  } else {
+    const p = result.parsed;
+    title.textContent = `✓ Formato ${p.format} detectado`;
+    body.textContent = `${p.parsed} manos reconocidas. Se cargará en el contexto actual.`;
+  }
+}
+
+function openImportModal() {
+  document.getElementById('importModal').classList.add('visible');
+  document.getElementById('importPreview').classList.remove('visible');
+  pendingImport = null;
+}
+function closeImportModal() {
+  document.getElementById('importModal').classList.remove('visible');
+  pendingImport = null;
+}
+
+document.querySelectorAll('[data-import-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-import-tab]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.import-tab-content').forEach(c => c.classList.remove('active'));
+    const id = 'importTab' + btn.dataset.importTab.charAt(0).toUpperCase() + btn.dataset.importTab.slice(1);
+    document.getElementById(id).classList.add('active');
+  });
+});
+
+document.getElementById('importText').addEventListener('input', e => {
+  const text = e.target.value.trim();
+  if (!text) { document.getElementById('importPreview').classList.remove('visible'); pendingImport = null; return; }
+  try {
+    const result = parseImportText(text);
+    pendingImport = result;
+    showImportPreview(result);
+  } catch (err) {
+    document.getElementById('importPreview').classList.remove('visible');
+    pendingImport = null;
+  }
+});
+
+document.getElementById('importFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const result = parseImportText(ev.target.result);
+      pendingImport = result;
+      showImportPreview(result);
+    } catch (err) { showToast('Error al parsear: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('btnImportCancel').onclick = closeImportModal;
+document.getElementById('btnImportConfirm').onclick = async () => {
+  if (!pendingImport) { showToast('Nada que importar', 'error'); return; }
+
+  setLoading(true);
+  try {
+    if (pendingImport.type === 'native') {
+      const tablesArray = [];
+      const src = pendingImport.data;
+      const pushMap = (map) => {
+        Object.entries(map || {}).forEach(([key, val]) => {
+          const parts = key.split('|');
+          let hero, vs, stack, sit;
+          if (parts.length === 5) {
+            hero=parts[1]; vs=parts[2]==='-'?null:parts[2]; stack=parseInt(parts[3],10); sit=parts[4];
+          } else if (parts.length >= 4) {
+            hero=parts[0]; vs=parts[1]==='-'?null:parts[1]; stack=parseInt(parts[2],10); sit=parts[3];
+          } else return;
+          tablesArray.push({
+            hero, vs, stack, situation: sit, table_size: TABLE_SIZE,
+            sequence: val.sequence || '', raise_size: val.raiseSize || '', range: val.range
+          });
+        });
+      };
+      if (src.tables8) pushMap(src.tables8);
+      else if (src.tables) pushMap(src.tables);
+      await FeltLabAPI.preflop.bulk(tablesArray);
+      await syncFromServer(true);
+      showToast('Estrategia 8-max importada ✓', 'success');
+    } else if (pendingImport.type === 'range') {
+      state.range = pendingImport.range;
+      if (pendingImport.meta) {
+        if (pendingImport.meta.hero && POS_ORDER.includes(pendingImport.meta.hero)) state.hero = pendingImport.meta.hero;
+        if (pendingImport.meta.vs !== undefined) state.vs = pendingImport.meta.vs;
+        if (pendingImport.meta.stack) state.stack = pendingImport.meta.stack;
+        if (pendingImport.meta.situation) state.situation = pendingImport.meta.situation;
+        ensureValidVs();
+      }
+      state.selected.clear();
+      syncUIFromState(); renderGrid(); pushHistory(); updateSituationDots();
+      showToast('Rango importado ✓', 'success');
+    } else {
+      state.range = pendingImport.parsed.range;
+      state.selected.clear();
+      renderGrid(); pushHistory(); updateSituationDots();
+      showToast(`Importadas ${pendingImport.parsed.parsed} manos ✓`, 'success');
+    }
+    closeImportModal();
+  } catch (e) {
+    showToast('Error: ' + (e.message || 'desconocido'), 'error');
+  } finally {
+    setLoading(false);
+  }
+};
+
+/* ═══════════════════════════════════════════════════════
+   EXPORT
+   ═══════════════════════════════════════════════════════ */
+function exportStrategy() {
+  saveCurrentTableToStrategy();
+  const tables8 = {};
+  Object.entries(state.tables).forEach(([key, val]) => {
+    const pk = parseTableKey(key);
+    const innerKey = `${pk.hero}|${pk.vs == null ? '-' : pk.vs}|${pk.stack}|${pk.situation}`;
+    tables8[innerKey] = { range: val.range, sequence: val.sequence || '', raiseSize: val.raiseSize || '' };
+  });
+  const data = {
+    version: 'preflop-strategy-v4-8max',
+    exported_at: new Date().toISOString(),
+    user: currentUser ? currentUser.username : null,
+    tableSize: TABLE_SIZE,
+    hero: state.hero, vs: state.vs || '', stack: state.stack, situation: state.situation,
+    tables8
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `preflop_strategy_8max_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Estrategia 8-max exportada ✓', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════
+   FIX: openStatsModal - cerrar drawer, esperar, forzar visibilidad
+   ═══════════════════════════════════════════════════════ */
+async function openStatsModal() {
+  closeSheets();
+  await new Promise(r => setTimeout(r, 260));
+
+  const modal = document.getElementById('statsModal');
+  modal.classList.add('visible');
+  modal.style.display = 'flex';
+  modal.style.zIndex = '9500';
+
+  const content = document.getElementById('statsContent');
+  content.innerHTML = '<div style="padding:20px;text-align:center;">Cargando…</div>';
+
+  try {
+    const list = await FeltLabAPI.preflop.list();
+    const list8 = (list || []).filter(t => (t.table_size || TABLE_SIZE) === TABLE_SIZE);
+    if (!list8.length) {
+      content.innerHTML = '<p style="text-align:center;padding:20px;">No tienes tablas 8-max guardadas aún.</p>';
+      return;
+    }
+    content.innerHTML = `
+      <p style="margin-bottom:12px;"><strong style="color:var(--accent);">${list8.length}</strong> tablas 8-max guardadas</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${list8.map(t => {
+          const vsTxt = t.vs ? `vs ${t.vs}` : '(OR)';
+          const dateStr = t.updated_at ? new Date(String(t.updated_at).replace(' ', 'T')).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit' }) : '';
+          return `
+            <div style="padding:10px;background:var(--bg-2);border-radius:8px;font-size:0.82rem;display:flex;justify-content:space-between;gap:10px;align-items:center;">
+              <div>
+                <div style="font-weight:700;color:var(--accent);">${escapeHtml(t.hero)} ${escapeHtml(vsTxt)} · ${t.stack}bb</div>
+                <div style="color:var(--text-3);font-size:0.72rem;margin-top:2px;">${escapeHtml(t.situation)}</div>
+              </div>
+              <div style="text-align:right;color:var(--text-3);font-size:0.7rem;white-space:nowrap;">${dateStr}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } catch (e) {
+    content.innerHTML = '<p style="color:var(--red);">Error cargando tablas: ' + escapeHtml(e.message || String(e)) + '</p>';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SHEETS
+   ═══════════════════════════════════════════════════════ */
+const overlay = document.getElementById('sheetOverlay');
+function openSheet(id) {
+  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
+  const sheet = document.getElementById('sheet-' + id);
+  if (!sheet) return;
+  if (id === 'config') {
+    try { syncUIFromState(); } catch (_) {}
+  }
+  sheet.classList.add('open');
+  if (overlay) overlay.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheets() {
+  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
+  if (overlay) overlay.classList.remove('visible');
+  document.body.style.overflow = '';
+}
+overlay.addEventListener('click', closeSheets);
+document.querySelectorAll('[data-close-sheet]').forEach(b => b.addEventListener('click', closeSheets));
+document.querySelectorAll('[data-open-sheet]').forEach(b => b.addEventListener('click', () => openSheet(b.dataset.openSheet)));
+document.getElementById('bbFreq').addEventListener('click', () => openSheet('freq'));
+document.getElementById('bbSave').addEventListener('click', saveCurrentContext);
+
+document.getElementById('btnMenu').addEventListener('click', () => openSheet('actions'));
+const btnContextBarEl = document.getElementById('btnContextBar');
+if (btnContextBarEl) btnContextBarEl.addEventListener('click', () => openSheet('config'));
+
+/* ═══════════════════════════════════════════════════════
+   UI BINDINGS
+   ═══════════════════════════════════════════════════════ */
+document.querySelectorAll('.js-hero-btn').forEach(b => b.addEventListener('click', () => {
+  if (b.disabled) return;
+  switchContext(b.dataset.pos, state.vs, state.stack, state.situation);
+}));
+document.querySelectorAll('.js-vs-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    if (b.disabled || isOpenRaise(state.situation)) return;
+    const allowed = validVsPositions(state.hero);
+    if (!allowed.includes(b.dataset.pos)) return;
+    switchContext(state.hero, b.dataset.pos, state.stack, state.situation);
+  });
+});
+document.querySelectorAll('.js-stack-btn').forEach(b => b.addEventListener('click', () => switchContext(state.hero, state.vs, parseInt(b.dataset.stack, 10), state.situation)));
+document.querySelectorAll('.js-custom-stack').forEach(el => el.addEventListener('change', e => { const v = parseInt(e.target.value, 10); if (v > 0) switchContext(state.hero, state.vs, v, state.situation); }));
+document.querySelectorAll('.js-sit-btn').forEach(b => b.addEventListener('click', () => switchContext(state.hero, state.vs, state.stack, b.dataset.sit)));
+document.querySelectorAll('.js-sequence').forEach(el => el.addEventListener('input', e => { state.sequence = e.target.value; document.querySelectorAll('.js-sequence').forEach(o => { if (o !== e.target) o.value = e.target.value; }); updateTitle(); }));
+document.querySelectorAll('.js-raise-size').forEach(el => el.addEventListener('input', e => {
+  state.raiseSize = e.target.value;
+  document.querySelectorAll('.js-raise-size').forEach(o => { if (o !== e.target) o.value = e.target.value; });
+  updateTitle();
+}));
+
+function setMode(m) { state.mode = m; if (m !== 'select') state.selected.clear(); updateModeUI(); renderGrid(); }
+document.getElementById('modePaint').addEventListener('click', () => setMode('paint'));
+document.getElementById('modeSelect').addEventListener('click', () => setMode('select'));
+document.getElementById('bbMode').addEventListener('click', () => setMode(state.mode === 'paint' ? 'select' : 'paint'));
+
+document.querySelectorAll('#bbQuick100 .q100-btn, #desktopQuick100 .q100-btn, .q100-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const parts = btn.dataset.mix.split(',').map(Number);
+    const freq = { limp: parts[0] || 0, call: parts[1] || 0, fold: parts[2] || 0, raise: parts[3] || 0, allin: parts[4] || 0 };
+    const targets = state.selected.size ? Array.from(state.selected) : null;
+    state.mix = { ...freq };
+    setMixSliders(freq);
+    updateBottomBarFreq();
+    if (targets && targets.length) {
+      pushHistory();
+      targets.forEach(h => { state.range[h] = { ...freq }; });
+      dirtyTables.add(currentKey());
+      saveCurrentTableToStrategy();
+      renderGrid();
+      showToast('100% aplicado a ' + targets.length + ' manos', 'success');
+    }
+  });
+});
+
+let rangeClipboard = null;
+
+function updatePasteButton() {
+  const btnMobile = document.getElementById('btnPasteGrid');
+  const btnDesktop = document.getElementById('btnPasteGridDesktop');
+  if (btnMobile) btnMobile.disabled = !rangeClipboard;
+  if (btnDesktop) btnDesktop.disabled = !rangeClipboard;
+}
+
+['btnCopyGrid', 'btnCopyGridDesktop'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', () => {
+    rangeClipboard = {
+      range: JSON.parse(JSON.stringify(state.range)),
+      sequence: state.sequence || '',
+      raiseSize: state.raiseSize || ''
+    };
+    updatePasteButton();
+    const n = Object.values(rangeClipboard.range).filter(f => f && !isEmpty(f) && !isPureFold(f)).length;
+    showToast(n ? `Rango copiado (${n} manos)` : 'Tabla copiada (vacía / solo Fold)', 'success');
+  });
+});
+
+['btnPasteGrid', 'btnPasteGridDesktop'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', () => {
+    if (!rangeClipboard) {
+      showToast('No hay nada copiado', 'error');
+      return;
+    }
+    pushHistory();
+    state.range = normalizeRange(rangeClipboard.range);
+    state.sequence = rangeClipboard.sequence || '';
+    state.raiseSize = rangeClipboard.raiseSize || '';
+    document.querySelectorAll('.js-sequence').forEach(el => el.value = state.sequence);
+    document.querySelectorAll('.js-raise-size').forEach(el => el.value = state.raiseSize);
+    state.selected.clear();
+    saveCurrentTableToStrategy();
+    renderGrid();
+    updateSituationDots();
+    updateTitle();
+    showToast('Rango pegado ✓', 'success');
+  });
+});
+
+updatePasteButton();
+
+['btnClearGrid', 'btnClearGridDesktop'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', () => {
+    pushHistory();
+    state.range = makeEmptyRange();
+    state.selected.clear();
+    saveCurrentTableToStrategy();
+    renderGrid();
+    updateSituationDots();
+    showToast('Tabla limpiada → 100% Fold', 'success');
+  });
+});
+
+document.getElementById('btnUndo').addEventListener('click', undo);
+
+async function clearCurrentTable() {
+  if (!confirm('¿Limpiar solo la tabla actual?')) return;
+  setLoading(true);
+  try {
+    await deleteTableFromServer(state.hero, isOpenRaise(state.situation) ? null : state.vs, state.stack, state.situation);
+    const key = currentKey();
+    delete state.tables[key];
+    state.range = makeEmptyRange();
+    state.selected.clear();
+    state.sequence = '';
+    state.raiseSize = '';
+    document.querySelectorAll('.js-sequence, .js-raise-size').forEach(el => el.value = '');
+    renderGrid(); pushHistory(); updateSituationDots();
+    showToast('Tabla limpiada ✓', 'success');
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+document.getElementById('btnClearM').addEventListener('click', () => { clearCurrentTable(); closeSheets(); });
+document.getElementById('btnSaveCurrent').addEventListener('click', () => { saveCurrentContext(); closeSheets(); });
+document.getElementById('btnStatsM').addEventListener('click', () => { openStatsModal(); });
+document.getElementById('btnSyncM').addEventListener('click', () => { closeSheets(); syncFromServer(); });
+document.getElementById('btnHelpM').addEventListener('click', () => { closeSheets(); setTimeout(openHelpModal, 200); });
+document.getElementById('btnCreditsM').addEventListener('click', () => { closeSheets(); setTimeout(openCreditsModal, 200); });
+document.getElementById('btnLogoutM').addEventListener('click', () => { closeSheets(); logout(); });
+
+async function newStrategy() {
+  if (!confirm('¿Eliminar TODAS las tablas guardadas en el servidor?')) return;
+  setLoading(true);
+  try {
+    await FeltLabAPI.preflop.bulk([]);
+    state.tables = {};
+    state.hero = 'UTG';
+    state.vs = null;
+    state.stack = 60;
+    state.situation = 'OR';
+    state.range = makeEmptyRange();
+    state.sequence = '';
+    state.raiseSize = '';
+    state.selected.clear();
+    document.querySelectorAll('.js-sequence, .js-raise-size').forEach(el => el.value = '');
+    ensureValidVs();
+    loadTableFromStrategy(currentKey());
+    syncUIFromState();
+    renderGrid();
+    updateSituationDots();
+    updateTitle();
+    showToast('Estrategia vaciada · UTG Open Raise 60bb', 'success');
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+document.getElementById('btnNewM').addEventListener('click', () => { newStrategy(); closeSheets(); });
+document.getElementById('btnExportM').addEventListener('click', () => { exportStrategy(); closeSheets(); });
+document.getElementById('btnImportM').addEventListener('click', () => { closeSheets(); setTimeout(openImportModal, 200); });
+document.getElementById('btnEditorM').addEventListener('click', () => { closeSheets(); setAppMode('editor'); });
+document.getElementById('btnTrainerM').addEventListener('click', () => { closeSheets(); setAppMode('trainer'); });
+document.querySelectorAll('[data-app-mode]').forEach(b => b.addEventListener('click', () => setAppMode(b.dataset.appMode)));
+
+document.getElementById('btnCorrect').addEventListener('click', showTrainerResult);
+document.getElementById('btnReview').addEventListener('click', () => {
+  document.getElementById('trainerOverlay').classList.remove('visible');
+  if (state.solutionRange) {
+    state.range = JSON.parse(JSON.stringify(state.solutionRange));
+    renderGrid();
+  }
+});
+document.getElementById('btnRetry').addEventListener('click', () => {
+  document.getElementById('trainerOverlay').classList.remove('visible');
+  state.range = makeEmptyRange();
+  state.selected.clear();
+  state.trainerResult = null;
+  renderGrid();
+});
+document.getElementById('btnExitTrainer').addEventListener('click', () => {
+  document.getElementById('trainerOverlay').classList.remove('visible');
+  setAppMode('editor');
+});
+
+async function logout() {
+  if (!confirm('¿Cerrar sesión?')) return;
+  saveCurrentTableToStrategy();
+  const bulkPayload = Object.entries(state.tables).map(([k, v]) => {
+    const pk = parseTableKey(k);
+    return {
+      hero: pk.hero,
+      vs: pk.vs,
+      stack: pk.stack,
+      situation: pk.situation,
+      table_size: TABLE_SIZE,
+      sequence: v.sequence || '',
+      raise_size: v.raiseSize || '',
+      range: v.range
+    };
+  });
+  if (bulkPayload.length) {
+    try { await FeltLabAPI.preflop.bulk(bulkPayload); } catch {}
+  }
+  try { await FeltLabAPI.auth.logout(); } catch {}
+  window.location.href = '/login';
+}
+
+/* ═══════════════════════════════════════════════════════
+   TECLADO
+   ═══════════════════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const key = e.key.toLowerCase();
+
+  if (e.key === 'Escape') {
+    if (document.querySelector('.sheet.open')) { closeSheets(); return; }
+    if (document.getElementById('importModal').classList.contains('visible')) { closeImportModal(); return; }
+    if (document.getElementById('trainerOverlay').classList.contains('visible')) { document.getElementById('trainerOverlay').classList.remove('visible'); return; }
+    if (document.getElementById('statsModal').classList.contains('visible')) { closeInfoModal('statsModal'); return; }
+    if (document.getElementById('helpModal').classList.contains('visible')) { closeInfoModal('helpModal'); return; }
+    if (document.getElementById('creditsModal').classList.contains('visible')) { closeInfoModal('creditsModal'); return; }
+    return;
+  }
+
+  if (e.metaKey || e.ctrlKey) {
+    if (key === 'z') { e.preventDefault(); undo(); }
+    if (key === 's') { e.preventDefault(); saveCurrentContext(); }
+    return;
+  }
+  const map = { l: 'limp', c: 'call', f: 'fold', r: 'raise', a: 'allin' };
+  if (map[key]) { const pureFreq = emptyFreq(); pureFreq[map[key]] = 100; setMixSliders(pureFreq); }
+  if (key === 'x') setMixSliders(emptyFreq());
+});
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════ */
+async function init() {
+  const ok = await loadUser();
+  if (!ok) return;
+
+  buildGrid();
+
+  const syncOk = await syncFromServer(true);
+
+  if (syncOk && Object.keys(state.tables).length === 0) {
+    loadDemoRange();
+    const key = currentKey();
+    if (state.tables[key]) {
+      try {
+        const pk = parseTableKey(key);
+        await saveTableToServer(pk.hero, pk.vs, pk.stack, pk.situation, state.tables[key]);
+      } catch (e) {
+        console.warn('No se pudo guardar la demo:', e);
+      }
+    }
+  }
+
+  ensureValidVs();
+  loadTableFromStrategy(currentKey());
+  renderGrid();
+  updateSituationDots();
+  updateTitle();
+  initFreqSliders();
+  syncUIFromState();
+  updateModeUI();
+  pushHistory();
+
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+    if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+    setTimeout(() => {
+      const s = document.getElementById('splash');
+      if (s) s.remove();
+    }, 700);
+  }, 1200);
+
+  setMode('select');
+  setConnStatus('online', 'Online');
+}
+
+/* ═══════════════════════════════════════════════════════
+   DEMO (8-max)
+   ═══════════════════════════════════════════════════════ */
+function loadDemoRange() {
+  const range = makeEmptyRange();
+  const set = (hands, action) => hands.forEach(h => { if (range[h] !== undefined) range[h] = pure(action); });
+  const setMix = (hands, freq) => hands.forEach(h => { if (range[h] !== undefined) range[h] = { ...freq }; });
+  Object.keys(range).forEach(h => { range[h] = pure('fold'); });
+  set(['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33'], 'allin');
+  set(['AKs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A2s',
+       'KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s',
+       'QJs','QTs','Q9s','Q8s','Q7s','Q6s','Q5s',
+       'JTs','J9s','J8s','J7s','J6s','J5s',
+       'T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','76s','75s','65s','64s','54s','53s','43s','42s','22'], 'call');
+  set(['AQs','AKo','KQo','ATo','KTo','QTo','JTo','A9o','A8o','A7o','A5o','A4o','A3o','A2o'], 'raise');
+  set(['AQo','AJo','A3s'], 'allin');
+  setMix(['AQs'], { call: 40, fold: 0, raise: 60, allin: 0 });
+  setMix(['AKo'], { call: 30, fold: 0, raise: 70, allin: 0 });
+  setMix(['KQo'], { call: 50, fold: 0, raise: 50, allin: 0 });
+  setMix(['AJo'], { call: 0, fold: 0, raise: 40, allin: 60 });
+  setMix(['QJo'], { call: 70, fold: 0, raise: 30, allin: 0 });
+  setMix(['JTs'], { call: 80, fold: 0, raise: 20, allin: 0 });
+  setMix(['T9s'], { call: 60, fold: 20, raise: 20, allin: 0 });
+  setMix(['98s'], { call: 50, fold: 50, raise: 0, allin: 0 });
+  setMix(['76s'], { call: 40, fold: 60, raise: 0, allin: 0 });
+  setMix(['55'], { call: 30, fold: 0, raise: 0, allin: 70 });
+  setMix(['44'], { call: 20, fold: 0, raise: 0, allin: 80 });
+  state.range = range;
+  state.sequence = 'Vs 3B 7.5BB · Jam 40BB';
+  state.raiseSize = '15.75bb';
+  saveCurrentTableToStrategy();
+}
+
+/* ═══════════════════════════════════════════════════════
+   ONLINE/OFFLINE
+   ═══════════════════════════════════════════════════════ */
+window.addEventListener('offline', () => setConnStatus('offline', 'Offline'));
+window.addEventListener('online', () => setConnStatus('online', 'Online'));
+
+init();
+</script>
+
+<script>
+(function(){
+  function boot(){
+    if(!window.RangeLabI18n){ setTimeout(boot,40); return; }
+    RangeLabI18n.applyDom();
+    RangeLabI18n.wireLangButtons();
+    if(window.RangeLabProfile){
+      RangeLabProfile.ensureStyles();
+      var chip = document.querySelector('.user-chip');
+      if(chip) RangeLabProfile.wireUserChip(chip, null);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+})();
+</script>
+
+
+<script>
+(function(){
+  function applySite(s){
+    if(!s) return;
+    document.querySelectorAll('.rl-site-footer').forEach(function(el){ el.textContent = s.footer_text || el.textContent; });
+    document.querySelectorAll('.rl-site-footer-brand').forEach(function(el){ el.textContent = 'Creado por ' + (s.brand_name || 'RangeSoft'); });
+    document.querySelectorAll('.rl-site-brand-name').forEach(function(el){ el.textContent = 'Acerca de ' + (s.brand_name || 'RangeSoft'); });
+  }
+  if(window.__RL_SITE) applySite(window.__RL_SITE);
+  else RangeLabAPI.site().then(function(s){ window.__RL_SITE=s; applySite(s); }).catch(function(){});
+})();
+</script>
+<script>
+(function(){
+  if (window.RangeLabSkeleton) RangeLabSkeleton.registerSW('/sw.js');
+  else if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>

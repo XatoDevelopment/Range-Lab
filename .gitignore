@@ -1,0 +1,18 @@
+# Datos locales: NUNCA subir a GitHub
+data/
+logs/
+*.db
+*.db-journal
+.secret_key
+.env
+backups/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Sistema
+.DS_Store
+Thumbs.db

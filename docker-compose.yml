@@ -1,0 +1,29 @@
+services:
+  rangelab:
+    build: .
+    image: rangelab:1.1.0
+    container_name: rangelab
+    restart: unless-stopped
+    ports:
+      - "${RANGELAB_PORT:-5000}:5000"
+    environment:
+      RANGELAB_HOST: "0.0.0.0"
+      RANGELAB_PORT: "5000"
+      # Pon 1 si hay HTTPS delante (Caddy / nginx / Cloudflare)
+      RANGELAB_HTTPS: "${RANGELAB_HTTPS:-0}"
+      RANGELAB_DB_PATH: "/data/rangelab.db"
+      # Opcional: fija la clave de sesión (recomendado en multi-réplica)
+      # RANGELAB_SECRET_KEY: "cambia-esto-por-un-hex-largo"
+    volumes:
+      - rangelab_data:/data
+      - rangelab_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:5000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  rangelab_data:
+  rangelab_logs:

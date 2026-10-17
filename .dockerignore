@@ -1,0 +1,17 @@
+.git
+.gitignore
+*.db
+*.db-*
+.secret_key
+logs/
+__pycache__/
+*.pyc
+Python_Embedded/
+*.zip
+*.md
+!README.md
+.env
+.venv/
+venv/
+data/
+ranglab_server.pid

@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Equity Lab — RangeLab</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/profile.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   EQUITY LAB — TOP BAR + DRAWER (scope: body.tool-equity)
+   Todo el CSS nuevo va aquí, con prefijo eq-* para no chocar
+   con rangelab.css. No se modifica ninguna regla global.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Contenedor principal: header fijo + padding-top para no tapar contenido */
+body.tool-equity {
+  padding: 0 12px calc(120px + var(--safe-bottom));
+  padding-top: calc(64px + var(--safe-top));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOP BAR (header full-width FIXED)
+   ═══════════════════════════════════════════════════════════════ */
+body.tool-equity .eq-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 12px 16px;
+  padding-top: calc(12px + var(--safe-top));
+  background: var(--glass-bg, color-mix(in srgb, var(--bg) 82%, transparent));
+  
+  
+  border-bottom: 1px solid var(--glass-border, var(--border-soft));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  box-sizing: border-box;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--border-soft) 50%, transparent);
+}
+@media (max-width: 420px) {
+  body.tool-equity .eq-header { padding: 10px 12px; padding-top: calc(10px + var(--safe-top)); gap: 8px; }
+  body.tool-equity .eq-brand-mark { width: 36px; height: 36px; font-size: 18px; border-radius: 11px; }
+  body.tool-equity .eq-brand-title { font-size: 15px; }
+  body.tool-equity .eq-brand-sub { display: none; }
+  body.tool-equity .eq-icon-btn { width: 40px; height: 40px; }
+}
+body.tool-equity .eq-header-left {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  flex: 1;
+}
+body.tool-equity .eq-hamburger {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  transition: all 0.18s;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+body.tool-equity .eq-hamburger:hover { color: var(--gold); border-color: var(--gold); }
+body.tool-equity .eq-hamburger:active { transform: scale(0.94); }
+body.tool-equity .eq-hamburger svg { width: 20px; height: 20px; }
+
+body.tool-equity .eq-brand-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #07090f;
+  box-shadow: 0 0 24px rgba(240, 193, 75, 0.4);
+  flex-shrink: 0;
+}
+body.tool-equity .eq-brand-text { min-width: 0; flex: 1; }
+body.tool-equity .eq-brand-title {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: linear-gradient(90deg, var(--gold), var(--accent-h));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+body.tool-equity .eq-brand-sub {
+  font-size: 10px;
+  color: var(--text-3);
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.tool-equity .eq-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+}
+body.tool-equity .eq-icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  font-size: 18px;
+  transition: all 0.18s;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+body.tool-equity .eq-icon-btn:hover { color: var(--gold); border-color: var(--gold); }
+body.tool-equity .eq-icon-btn:active { transform: scale(0.94); }
+body.tool-equity .eq-icon-btn.primary {
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border-color: transparent;
+  color: #fff;
+}
+body.tool-equity .eq-icon-btn.primary:hover { filter: brightness(1.1); color: #fff; }
+
+/* user-chip dentro del header: reutiliza estilo existente pero
+   compacto para el top */
+body.tool-equity .eq-header-actions .user-chip {
+  padding: 8px 12px;
+  max-width: 130px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DRAWER (menú lateral izquierda → derecha)
+   Reutilizo los estilos base pero con prefijo eq-*
+   ═══════════════════════════════════════════════════════════════ */
+body.tool-equity .eq-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 9, 15, 0.75);
+  
+  
+  z-index: 500;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s;
+}
+body.tool-equity .eq-drawer-overlay.show { opacity: 1; visibility: visible; }
+
+body.tool-equity .eq-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 88%;
+  max-width: 360px;
+  background: var(--bg-1);
+  border-right: 1px solid var(--border);
+  z-index: 501;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  box-shadow: 6px 0 30px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+}
+body.tool-equity .eq-drawer.show { transform: translateX(0); }
+
+/* Equity: drawer → bottom sheet on mobile (native app) */
+@media (max-width: 767px) {
+  body.tool-equity .eq-hamburger { display: none !important; }
+  body.tool-equity .eq-drawer {
+    top: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: min(88vh, 640px) !important;
+    border-radius: 20px 20px 0 0 !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border) !important;
+    transform: translateY(105%) !important;
+    box-shadow: 0 -12px 48px rgba(0,0,0,0.5) !important;
+  }
+  body.tool-equity .eq-drawer.show {
+    transform: translateY(0) !important;
+  }
+  body.tool-equity .eq-drawer-header::before {
+    content: '';
+    display: block;
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 10px;
+  }
+}
+
+
+body.tool-equity .eq-drawer-header {
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+body.tool-equity .eq-drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: -0.01em;
+}
+body.tool-equity .eq-drawer-title .eq-drawer-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #07090f;
+  box-shadow: 0 0 18px rgba(240, 193, 75, 0.35);
+  flex-shrink: 0;
+}
+body.tool-equity .eq-drawer-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+body.tool-equity .eq-drawer-close:hover { color: var(--red); border-color: var(--red); }
+body.tool-equity .eq-drawer-close:active { transform: scale(0.94); }
+
+body.tool-equity .eq-drawer-body {
+  flex: 1;
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+body.tool-equity .eq-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 12px;
+  color: var(--text-2);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: left;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+body.tool-equity .eq-drawer-item:hover {
+  background: var(--bg-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+body.tool-equity .eq-drawer-item:active { transform: scale(0.98); }
+body.tool-equity .eq-drawer-item.danger { color: var(--red); }
+body.tool-equity .eq-drawer-item.danger:hover {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.3);
+  color: var(--red);
+}
+body.tool-equity .eq-drawer-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--bg-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-soft);
+}
+body.tool-equity .eq-drawer-text { min-width: 0; flex: 1; }
+body.tool-equity .eq-drawer-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: inherit;
+  line-height: 1.2;
+}
+body.tool-equity .eq-drawer-desc {
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+body.tool-equity .eq-drawer-item.danger .eq-drawer-desc { color: rgba(248, 113, 113, 0.75); }
+
+body.tool-equity .eq-drawer-divider {
+  height: 1px;
+  background: var(--border-soft);
+  margin: 8px 4px;
+}
+
+body.tool-equity .eq-drawer-footer {
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--border-soft);
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--text-3);
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+body.tool-equity .eq-drawer-footer strong { color: var(--gold); font-weight: 800; }
+
+/* Responsive: en pantallas pequeñas, no mostrar subtítulo brand */
+@media (max-width: 420px) {
+  body.tool-equity .eq-brand-sub { display: none; }
+  body.tool-equity .eq-brand-title { font-size: 16px; }
+  body.tool-equity .eq-hamburger { width: 40px; height: 40px; }
+  body.tool-equity .eq-brand-mark { width: 40px; height: 40px; font-size: 20px; }
+  body.tool-equity .eq-icon-btn { width: 40px; height: 40px; font-size: 17px; }
+}
+@media (max-width: 380px) {
+  body.tool-equity .eq-header-actions .user-chip { max-width: 100px; }
+}
+
+/* Toast de "capturando" mientras se genera el JPG */
+body.tool-equity .eq-capture-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 16px 22px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+body.tool-equity .eq-capture-toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+body.tool-equity .eq-capture-toast .eq-spin {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(240, 193, 75, 0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: eqSpin 0.7s linear infinite;
+}
+@keyframes eqSpin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   FIX ESCRITORIO: aprovechar todo el ancho en PC
+   (solo aplica desde 768px, no toca la vista móvil)
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  body.tool-equity {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* El contenedor principal ocupa todo el ancho disponible
+     y le damos padding interno para que nada pegue a los bordes */
+  body.tool-equity .container {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 18px 28px 28px;
+    box-sizing: border-box;
+    border-radius: 18px;
+  }
+
+  /* Header fijo: padding lateral alineado con el container */
+  body.tool-equity .eq-header {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  /* ─── Tabla de jugadores en PC ─────────────────────────────
+     Rejilla cómoda: check · nombre · cartas · rango · ganadas
+     Reparte el espacio y centra cada columna. */
+  body.tool-equity .table-header,
+  body.tool-equity .player-row {
+    display: grid !important;
+    grid-template-columns: 56px minmax(160px, 1.2fr) minmax(140px, 1fr) 110px 110px;
+    align-items: center;
+    column-gap: 18px;
+    width: 100%;
+  }
+
+  /* Encabezados alineados con sus columnas */
+  body.tool-equity .table-header > div {
+    text-align: center;
+    padding: 6px 0;
+    font-size: 11px;
+    letter-spacing: 1.4px;
+  }
+  body.tool-equity .table-header > div:nth-child(2) {
+    text-align: left;
+    padding-left: 4px;
+  }
+
+  /* Filas con más aire */
+  body.tool-equity .player-row {
+    padding: 14px 8px;
+  }
+
+  /* El nombre alineado a la izquierda de su celda */
+  body.tool-equity .player-row .player-name {
+    text-align: left;
+  }
+
+  /* Las cartas y los valores, centrados en su columna */
+  body.tool-equity .player-row .cards,
+  body.tool-equity .player-row .range-badge {
+    justify-self: center;
+  }
+  body.tool-equity .player-row .range,
+  body.tool-equity .player-row .equity {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Board y botones: aire y centrado ───────────────────── */
+  body.tool-equity .board-section {
+    padding-top: 22px;
+  }
+  body.tool-equity .board {
+    justify-content: center;
+    gap: 12px;
+    margin: 8px 0 14px;
+  }
+  body.tool-equity .phase-label {
+    text-align: center;
+  }
+  body.tool-equity .actions {
+    justify-content: center;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  body.tool-equity .sim-options {
+    justify-content: center;
+    gap: 10px;
+  }
+  body.tool-equity .btn-primary {
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+  body.tool-equity .status {
+    text-align: center;
+  }
+
+  /* Modal un poco más ancho en PC */
+  body.tool-equity .modal {
+    max-width: 560px;
+  }
+
+  /* Drawer un poco más ancho en PC para que respire */
+  body.tool-equity .eq-drawer {
+    max-width: 380px;
+  }
+}
+
+/* En pantallas muy grandes, centrar con un ancho máximo cómodo */
+@media (min-width: 1400px) {
+  body.tool-equity .container {
+    max-width: 1180px;
+  }
+}
+</style>
+
+<link rel="stylesheet" href="/static/css/rangelab-menus.css">
+</head>
+<body class="rl-loading tool-equity">
+
+<!-- ═══════════════════════ SPLASH ═══════════════════════ -->
+<div id="splash">
+  <div class="splash-logo">🎯</div>
+  <div class="splash-title">Equity <span>Lab</span></div>
+  <div class="splash-sub">RangeLab Suite · Equity · Rangos</div>
+  <div class="splash-credits">Cargando herramienta…</div>
+  <div class="splash-loader"></div>
+</div>
+
+<!-- ═══════════════════════ LOADING OVERLAY ═══════════════════════ -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- ═══════════════════════ TOP BAR ═══════════════════════ -->
+<header class="eq-header">
+  <div class="eq-header-left">
+    <button class="eq-hamburger" onclick="eqOpenDrawer()" title="Menú" data-i18n-title="nav.menu" data-i18n-aria="nav.menu" aria-label="Menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="eq-brand-mark">🎯</div>
+    <div class="eq-brand-text">
+      <div class="eq-brand-title">Equity Lab</div>
+      <div class="eq-brand-sub">RangeLab Suite · Equity Calculator</div>
+    </div>
+  </div>
+  <div class="eq-header-actions">
+      <button class="theme-toggle" type="button" title="Tema claro/oscuro" data-i18n-title="common.theme" data-i18n-aria="common.theme" aria-label="Cambiar tema claro/oscuro">
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    <div class="conn-indicator" id="connIndicator" title="Estado del servidor" data-i18n-title="nav.serverStatus">
+      <span class="dot"></span>
+      <span class="ctext">—</span>
+    </div>
+    <div class="user-chip" title="Sesión actual" data-i18n-title="nav.session">
+      <span class="udot"></span>
+      <span class="uname" id="userName">—</span>
+    </div>
+    <button class="eq-icon-btn" onclick="openPotOddsModal()" title="Pot Odds Reference">🃏</button>
+    <button class="eq-icon-btn primary" onclick="exportAsJPG()" title="Guardar como JPG" data-i18n-title="eq.saveJpg">📸</button>
+  </div>
+</header>
+
+<!-- ═══════════════════════ DRAWER ═══════════════════════ -->
+<div class="eq-drawer-overlay" id="eqDrawerOverlay" onclick="eqCloseDrawer()"></div>
+<aside class="eq-drawer" id="eqDrawer">
+  <div class="rl-sheet-handle" aria-hidden="true" style="width:36px;height:4px;background:var(--border,#2a3348);border-radius:2px;margin:10px auto 4px;flex-shrink:0;"></div>
+  <div class="eq-drawer-header">
+    <div class="eq-drawer-title">
+      <div class="eq-drawer-logo">🎯</div>
+      <span>Equity Lab</span>
+    </div>
+    <button class="eq-drawer-close" onclick="eqCloseDrawer()" aria-label="Cerrar menú" data-i18n-aria="nav.closeMenu">✕</button>
+  </div>
+
+  <div class="eq-drawer-body">
+    <button class="eq-drawer-item" onclick="eqDrawerGo('/')">
+      <div class="eq-drawer-icon">🏠</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="nav.backPortal">Volver al portal</div>
+        <div class="eq-drawer-desc" data-i18n="nav.backPortalDesc">RangeLab Suite</div>
+      </div>
+    </button>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('newSession')">
+      <div class="eq-drawer-icon">✨</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="eq.newSession">Nueva sesión</div>
+        <div class="eq-drawer-desc" data-i18n="eq.newSessionDesc">Empezar desde cero</div>
+      </div>
+    </button>
+
+    <div class="eq-drawer-divider"></div>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('saveSession')">
+      <div class="eq-drawer-icon">💾</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="eq.saveSession">Guardar sesión</div>
+        <div class="eq-drawer-desc" data-i18n="eq.saveSessionDesc">Guardar en el servidor</div>
+      </div>
+    </button>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('openSessions')">
+      <div class="eq-drawer-icon">📂</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="eq.mySessions">Mis sesiones</div>
+        <div class="eq-drawer-desc" data-i18n="eq.mySessionsDesc">Cargar / gestionar guardadas</div>
+      </div>
+    </button>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('exportJSON')">
+      <div class="eq-drawer-icon">📤</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="common.exportJson">Exportar JSON</div>
+        <div class="eq-drawer-desc" data-i18n="common.exportJsonDesc">Descargar archivo</div>
+      </div>
+    </button>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('importJSON')">
+      <div class="eq-drawer-icon">📥</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="common.importJson">Importar JSON</div>
+        <div class="eq-drawer-desc" data-i18n="common.importJsonDesc">Cargar desde archivo</div>
+      </div>
+    </button>
+
+    <div class="eq-drawer-divider"></div>
+
+    <div class="lang-menu-row">
+      <span class="lmr-label">
+        <span class="lmr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span data-i18n="common.language">Idioma</span>
+      </span>
+      <div class="rl-lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang-set="es" title="Español">ES</button>
+        <button type="button" data-lang-set="en" title="English">EN</button>
+      </div>
+    </div>
+
+    <div class="eq-drawer-divider"></div>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('potOdds')">
+      <div class="eq-drawer-icon">🃏</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="eq.potOdds">Pot Odds</div>
+        <div class="eq-drawer-desc" data-i18n="eq.potOddsDesc">Tabla de referencia rápida</div>
+      </div>
+    </button>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('help')">
+      <div class="eq-drawer-icon">❓</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="nav.help">Ayuda</div>
+        <div class="eq-drawer-desc" data-i18n="nav.helpDesc">Cómo funciona</div>
+      </div>
+    </button>
+
+    <button class="eq-drawer-item" onclick="eqDrawerAction('credits')">
+      <div class="eq-drawer-icon">💡</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="nav.credits">Créditos</div>
+        <div class="eq-drawer-desc" data-i18n="nav.creditsDesc">Autores del proyecto</div>
+      </div>
+    </button>
+
+    <div class="eq-drawer-divider"></div>
+
+    <button class="eq-drawer-item danger" onclick="eqDrawerAction('logout')">
+      <div class="eq-drawer-icon">🚪</div>
+      <div class="eq-drawer-text">
+        <div class="eq-drawer-name" data-i18n="nav.logout">Cerrar sesión</div>
+        <div class="eq-drawer-desc" data-i18n="nav.logoutDesc">Salir de tu cuenta</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="eq-drawer-footer">
+    Equity Lab<br>
+    <span class="rl-site-footer">Creado por RangeSoft® · © 2026</span>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN CONTAINER ═══════════════════════ -->
+<div class="container">
+  <div class="table-header">
+    <div></div>
+    <div>PLAYER</div>
+    <div style="text-align:center">CARTAS</div>
+    <div style="text-align:center">RANGO</div>
+    <div style="text-align:center">GANADAS</div>
+  </div>
+  <div id="players"></div>
+  <div class="actions player-actions">
+    <button class="btn btn-secondary" onclick="addPlayer()">Añadir jugador</button>
+    <button class="btn btn-secondary" onclick="removePlayer()">Eliminar jugador</button>
+  </div>
+
+  <div class="board-section">
+    <div class="board" id="board"></div>
+    <div class="phase-label" id="phaseLabel">Preflop</div>
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="randomBoardPhase()" id="btnRandomBoard">Random</button>
+      <button class="btn btn-secondary" onclick="clearBoard()">Clear board</button>
+    </div>
+    <div class="sim-options">
+      <button class="btn btn-sim" id="btnFast" onclick="setIters(30000)">Rápida</button>
+      <button class="btn btn-sim active" id="btnBalanced" onclick="setIters(50000)">Balanceada</button>
+    </div>
+    <button class="btn btn-primary" id="mainSimBtn" onclick="toggleSimulation()" data-i18n="eq.start">Iniciar</button>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ TOAST ═══════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════ POT ODDS MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="potOddsModal">
+  <div class="modal">
+    <div class="pot-odds-content">
+      <h3>🃏 POT ODDS</h3>
+      <div class="pot-odds-section">
+        <h4>APUESTA → EQUITY</h4>
+        <table class="pot-odds-table">
+          <tr><td>¼ POT</td><td>17%</td></tr>
+          <tr><td>⅓ POT</td><td>20%</td></tr>
+          <tr><td>½ POT</td><td>25%</td></tr>
+          <tr><td>⅔ POT</td><td>29%</td></tr>
+          <tr><td>¾ POT</td><td>30%</td></tr>
+          <tr><td>1× POT</td><td>33%</td></tr>
+          <tr><td>1.5× POT</td><td>38%</td></tr>
+          <tr><td>2× POT</td><td>40%</td></tr>
+          <tr><td>3× POT</td><td>43%</td></tr>
+        </table>
+      </div>
+      <div class="rule-box">
+        REGLA
+        <span>FLOP: outs × 4 · TURN: outs × 2</span>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn btn-secondary" style="width:100%" onclick="closePotOddsModal()" data-i18n="common.close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SESSIONS MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="sessionsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📂 Mis sesiones guardadas</h3>
+      <button class="modal-close-btn" onclick="closeSessionsModal()">✕</button>
+    </div>
+    <div id="sessionsList"></div>
+    <div style="margin-top:14px">
+      <button class="btn btn-secondary" style="width:100%" onclick="closeSessionsModal()" data-i18n="common.close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SAVE SESSION MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="saveModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>💾 Guardar sesión</h3>
+      <button class="modal-close-btn" onclick="closeSaveModal()">✕</button>
+    </div>
+    <div style="padding: 4px 0 8px;">
+      <label style="display:block;font-size:12px;color:var(--text-2);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Nombre de la sesión</label>
+      <input type="text" id="saveSessionName" placeholder="Ej: AK vs QQ preflop" style="width:100%;padding:12px;background:var(--bg-1);border:1px solid var(--border-2);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border-2)'">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeSaveModal()">Cancelar</button>
+      <button class="btn btn-primary" style="margin-top:0" onclick="confirmSaveSession()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ HELP MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>❓ Ayuda</h3>
+      <button class="modal-close-btn" onclick="closeModal('helpModal')">✕</button>
+    </div>
+    <div style="font-size:13px;line-height:1.7;color:var(--text-2);">
+      <p style="margin-bottom:12px;"><strong style="color:var(--gold);">🎯 ¿Qué es?</strong><br>Calculadora de equity de póker. Simula millones de boards y calcula tu probabilidad de ganar.</p>
+      <p style="margin-bottom:12px;"><strong style="color:var(--gold);">👥 Jugadores</strong><br>Añade 2+ jugadores. Asigna a cada uno cartas exactas (tocando las casillas) o un rango completo.</p>
+      <p style="margin-bottom:12px;"><strong style="color:var(--gold);">🃏 Board</strong><br>Toca las casillas del board para elegir las cartas comunitarias. Puedes simular flop, turn o river completo.</p>
+      <p style="margin-bottom:12px;"><strong style="color:var(--gold);">⚡ Simulación</strong><br>"Rápida" usa 30k manos, "Balanceada" 50k. Si el board está completo, el cálculo es exacto.</p>
+      <p style="margin-bottom:12px;"><strong style="color:var(--gold);">💾 Sesiones</strong><br>Guarda tus configuraciones favoritas en el servidor y cárgalas desde cualquier dispositivo.</p>
+      <p style="margin-bottom:12px;"><strong style="color:var(--gold);">📸 Guardar JPG</strong><br>El botón del top exporta una imagen con la tabla, el board y los resultados actuales.</p>
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn btn-secondary" style="width:100%" onclick="closeModal('helpModal')" data-i18n="common.close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CREDITS MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="creditsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>💡 Créditos</h3>
+      <button class="modal-close-btn" onclick="closeModal('creditsModal')">✕</button>
+    </div>
+    <div style="text-align:center;padding:8px 0;">
+      <div style="font-size:40px;margin-bottom:12px;">♠ ♥ ♦ ♣</div>
+      <div style="font-size:18px;font-weight:900;background:linear-gradient(90deg,var(--gold),var(--accent-h));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px;">EQUITY CALCULATOR</div>
+      <div style="font-size:11px;color:var(--text-2);margin-top:4px;letter-spacing:1px;">RangeLab · Equity Lab</div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border-2),transparent);margin:16px 0;"></div>
+      <div style="font-size:14px;font-weight:700;">Creado por <span style="color:var(--gold)">RangeSoft®</span></div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,var(--border-2),transparent);margin:16px 0;"></div>
+      <div style="font-size:10px;color:var(--text-3);"><span class="rl-site-footer">© RangeSoft®. Código abierto · uso no comercial (ver LICENSE).</span></div>
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn btn-secondary" style="width:100%" onclick="closeModal('creditsModal')" data-i18n="common.close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ UNIFIED PLAYER MODAL ═══════════════════════ -->
+<div class="modal-overlay" id="playerModal">
+  <div class="modal">
+    <div class="range-header">
+      <h3 id="modalPlayerName">Hero</h3>
+      <div class="range-stats" id="modalStats">R: 0.0% · C: 0</div>
+    </div>
+    <div class="mode-tabs">
+      <div class="mode-tab active" id="tabRange" onclick="setMode('range')">Rango</div>
+      <div class="mode-tab" id="tabSpecific" onclick="setMode('specific')">Cartas exactas</div>
+    </div>
+
+    <div id="rangeMode">
+      <div class="range-slider-row">
+        <label>Top %</label>
+        <input type="range" id="rangeSlider" min="0" max="100" value="0" step="1" oninput="onRangeSlider(this.value)">
+        <span class="pct-val" id="sliderPct">0%</span>
+      </div>
+      <textarea class="range-text" id="rangeText" placeholder="Ej: AA, KK, AKs, AQs+, 22+, A2s-A5s, KQo" spellcheck="false" onchange="onRangeTextEdit()" onblur="onRangeTextEdit()"></textarea>
+      <div class="suit-legend">
+        <span class="black">♠ = s</span>
+        <span class="red">♥ = h</span>
+        <span class="red">♦ = d</span>
+        <span class="black">♣ = c</span>
+        <span>suited = s · offsuit = o</span>
+      </div>
+      <div class="matrix" id="matrix"></div>
+      <div class="modal-actions">
+        <button class="btn btn-green" onclick="saveRange()">Guardar rango</button>
+        <button class="btn btn-red" onclick="clearRange()">Eliminar rango</button>
+      </div>
+    </div>
+
+    <div id="specificMode" style="display:none">
+      <div id="cardSelector"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="clearSpecific()">Clear</button>
+        <button class="btn btn-green" onclick="saveSpecific()">Guardar cartas</button>
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <button class="btn btn-secondary" style="width:100%" onclick="closePlayerModal()" data-i18n="common.close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ BOARD CARD PICKER ═══════════════════════ -->
+<div class="modal-overlay" id="boardModal">
+  <div class="modal">
+    <div class="range-header">
+      <h3 id="boardPhaseTitle">Flop</h3>
+      <div class="range-stats" id="boardPhaseHint">Selecciona 3 cartas</div>
+    </div>
+    <div class="board-picks" id="boardPicks"></div>
+    <div id="boardSelector"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="randomBoardInModal()">Random</button>
+      <button class="btn btn-secondary" onclick="clearBoardPhase()">Clear</button>
+      <button class="btn btn-green" onclick="closeBoardModal()">Listo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Capture overlay (JPG) -->
+<div class="eq-capture-toast" id="eqCaptureToast">
+  <div class="eq-spin"></div>
+  <span id="eqCaptureText">Generando imagen…</span>
+</div>
+
+<!-- Hidden file input for import -->
+<input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(event)">
+
+<script src="/static/js/api-client.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   CONSTANTES
+   ═══════════════════════════════════════════════════════════════ */
+const RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+const RANK_VAL = {A:14,K:13,Q:12,J:11,T:10,'9':9,'8':8,'7':7,'6':6,'5':5,'4':4,'3':3,'2':2};
+const HAND_ORDER = (() => {
+  const ranked = [
+    'AA','KK','QQ','JJ','AKs','TT','AQs','AJs','KQs','AKo',
+    '99','ATs','KJs','QJs','KTs','AQo','88','A9s','AJo','KQo',
+    'QTs','A8s','KJo','K9s','A7s','A5s','A6s','A4s','A3s','A2s',
+    'QJo','77','KTo','Q9s','JTs','ATo','K8s','K7s','K6s','K5s',
+    'K4s','K3s','K2s','QTo','J9s','T9s','A9o','66','Q8s','JTo',
+    'K9o','A8o','Q7s','T8s','J8s','A7o','55','98s','Q9o','A5o',
+    'A6o','A4o','A3o','A2o','J7s','K8o','T7s','97s','87s','Q6s',
+    'Q5s','Q4s','Q3s','Q2s','44','J9o','T9o','A9s','K7o','Q8o',
+    'J6s','T6s','96s','86s','76s','K6o','J8o','T8o','98o','33',
+    'K5o','Q7o','J5s','T5s','95s','85s','75s','65s','K4o','Q6o',
+    'J7o','T7o','97o','87o','22','K3o','Q5o','J4s','T4s','94s',
+    '84s','74s','64s','54s','K2o','Q4o','J6o','T6o','96o','86o',
+    '76o','Q3o','J3s','T3s','93s','83s','73s','63s','53s','43s',
+    'Q2o','J5o','T5o','95o','85o','75o','65o','J2s','T2s','92s',
+    '82s','72s','62s','52s','42s','32s','J4o','T4o','94o','84o',
+    '74o','64o','54o','J3o','T3o','93o','83o','73o','63o','53o',
+    '43o','J2o','T2o','92o','82o','72o','62o','52o','42o','32o'
+  ];
+  const seen = new Set(ranked);
+  for (let i = 0; i < 13; i++) {
+    for (let j = 0; j < 13; j++) {
+      let lab;
+      if (i === j) lab = RANKS[i] + RANKS[j];
+      else if (i < j) lab = RANKS[i] + RANKS[j] + 's';
+      else lab = RANKS[j] + RANKS[i] + 'o';
+      if (!seen.has(lab)) { seen.add(lab); ranked.push(lab); }
+    }
+  }
+  return ranked;
+})();
+const SUITS = [
+  {s:'♠', c:'black', id:0},
+  {s:'♣', c:'black', id:1},
+  {s:'♦', c:'red', id:2},
+  {s:'♥', c:'red', id:3}
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   ESTADO
+   ═══════════════════════════════════════════════════════════════ */
+let players = [
+  { name: 'Hero', cards: [null, null], range: null, equity: 0, rangePct: 0, active: true, isHero: true },
+  { name: 'Villano 1', cards: [null, null], range: null, equity: 0, rangePct: 0, active: true, isHero: false }
+];
+let board = [null, null, null, null, null];
+let currentPlayerIndex = 0;
+let currentMode = 'range';
+let tempRange = new Set();
+let tempCards = [null, null];
+let selectingBoardIndex = -1;
+let usedCards = new Set();
+let currentUser = null;
+let currentSessionId = null;
+let currentSessionName = null;
+
+function cardKey(rank, suitId) { return rank + suitId; }
+
+function updateUsed() {
+  usedCards.clear();
+  players.forEach(p => {
+    if (p.cards[0] && p.cards[1]) {
+      p.cards.forEach(c => { if (c) usedCards.add(cardKey(c.rank, c.suit)); });
+    }
+  });
+  board.forEach(c => { if (c) usedCards.add(cardKey(c.rank, c.suit)); });
+}
+
+function getHandLabel(i, j) {
+  if (i === j) return RANKS[i] + RANKS[j];
+  if (i < j) return RANKS[i] + RANKS[j] + 's';
+  return RANKS[j] + RANKS[i] + 'o';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════════════════════════════ */
+function renderPlayers() {
+  const el = document.getElementById('players');
+  el.innerHTML = players.map((p, i) => {
+    let cardsHtml;
+    if (p.range && p.range.size > 0) {
+      const pct = p.rangePct.toFixed(1);
+      cardsHtml = `<div class="range-badge" onclick="openPlayerModal(${i})">Rango<br>${pct}%</div>`;
+    } else if (p.cards[0] && p.cards[1]) {
+      cardsHtml = `<div class="cards">
+        ${[0,1].map(ci => renderCard(p.cards[ci], `openPlayerModal(${i})`)).join('')}
+      </div>`;
+    } else {
+      cardsHtml = `<div class="cards">
+        <div class="card empty" onclick="openPlayerModal(${i})"></div>
+        <div class="card empty" onclick="openPlayerModal(${i})"></div>
+      </div>`;
+    }
+    return `
+    <div class="player-row">
+      <input type="checkbox" class="check" ${p.active?'checked':''} onchange="togglePlayer(${i})">
+      <div class="player-name ${p.isHero?'hero':''}">${escapeHtml(p.name)}</div>
+      ${cardsHtml}
+      <div class="range">${p.rangePct.toFixed(1)}%</div>
+      <div class="equity">${p.equity.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderCard(c, onclick) {
+  if (!c) return `<div class="card empty" onclick="${onclick}"></div>`;
+  const suit = SUITS[c.suit];
+  return `<div class="card ${suit.c}" onclick="${onclick}"><span class="rank">${c.rank}</span><span class="suit">${suit.s}</span></div>`;
+}
+
+function renderBoard() {
+  document.getElementById('board').innerHTML = board.map((c, i) => renderCard(c, `openBoardModal(${i})`)).join('');
+  updatePhaseLabel();
+}
+
+function togglePlayer(i) { players[i].active = !players[i].active; renderPlayers(); }
+
+function addPlayer() {
+  const n = players.length;
+  players.push({ name: `Villain ${n}`, cards: [null,null], range: null, equity:0, rangePct:0, active:true, isHero:false });
+  renderPlayers();
+  resetEquities();
+}
+
+function removePlayer() {
+  if (players.length <= 2) {
+    document.getElementById('status').textContent = 'Mínimo 2 jugadores';
+    return;
+  }
+  players.pop();
+  updateUsed();
+  renderPlayers();
+  resetEquities();
+}
+
+function clearBoard() {
+  board = [null,null,null,null,null];
+  updateUsed();
+  renderBoard();
+  resetEquities();
+}
+
+function resetEquities() {
+  players.forEach(p => { p.equity = 0; });
+  renderPlayers();
+  document.getElementById('status').textContent = '';
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UI HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function setLoading(on) {
+  document.getElementById('loadingOverlay').classList.toggle('show', on);
+  if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(on);
+  else document.body.classList.toggle('rl-loading', !!on);
+}
+
+function updateSessionLabel() {
+  // (Mantenido por compatibilidad; ya no hay label visible en el top)
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DRAWER (nuevo)
+   ═══════════════════════════════════════════════════════════════ */
+function eqOpenDrawer() {
+  document.getElementById('eqDrawer').classList.add('show');
+  document.getElementById('eqDrawerOverlay').classList.add('show');
+}
+function eqCloseDrawer() {
+  document.getElementById('eqDrawer').classList.remove('show');
+  document.getElementById('eqDrawerOverlay').classList.remove('show');
+}
+function eqDrawerGo(url) {
+  eqCloseDrawer();
+  window.location.href = url;
+}
+function eqDrawerAction(action) {
+  eqCloseDrawer();
+  switch (action) {
+    case 'newSession':     newSession(); break;
+    case 'saveSession':    saveSessionDialog(); break;
+    case 'openSessions':   openSessionsModal(); break;
+    case 'exportJSON':     exportCurrent(); break;
+    case 'importJSON':     openImportDialog(); break;
+    case 'potOdds':        openPotOddsModal(); break;
+    case 'help':           openHelpModal(); break;
+    case 'credits':        openCreditsModal(); break;
+    case 'logout':         logout(); break;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODALES BÁSICOS
+   ═══════════════════════════════════════════════════════════════ */
+function openPotOddsModal() { document.getElementById('potOddsModal').classList.add('active'); }
+function closePotOddsModal() { document.getElementById('potOddsModal').classList.remove('active'); }
+function openHelpModal() { document.getElementById('helpModal').classList.add('active'); }
+function openCreditsModal() { document.getElementById('creditsModal').classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// Cerrar modales al hacer click en overlay
+['potOddsModal','helpModal','creditsModal','sessionsModal','saveModal'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('click', e => {
+    if (e.target.id === id) closeModal(id);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   SERVIDOR
+   ═══════════════════════════════════════════════════════════════ */
+function setConnStatus(status, text) {
+  const el = document.getElementById('connIndicator');
+  if (el) {
+    el.classList.remove('online', 'offline');
+    if (status) el.classList.add(status);
+    const t = el.querySelector('.ctext');
+    if (t && text) t.textContent = text;
+  }
+  const udot = document.querySelector('.user-chip .udot');
+  if (udot) {
+    udot.style.background = status === 'online' ? 'var(--green)' : (status === 'offline' ? 'var(--red)' : 'var(--text-3)');
+    udot.style.boxShadow = status === 'online' ? '0 0 8px var(--green)' : 'none';
+  }
+  const chip = document.querySelector('.user-chip');
+  if (chip) {
+    chip.classList.remove('online', 'offline');
+    if (status) chip.classList.add(status);
+    chip.title = status === 'online' ? 'Conectado · Sesión actual' : (status === 'offline' ? 'Sesión actual' : 'Sesión actual');
+  }
+}
+
+async function loadUser() {
+  try {
+    const me = await FeltLabAPI.auth.me();
+    if (!me.authenticated) {
+      window.location.href = '/login';
+      return false;
+    }
+    currentUser = me.user;
+    const un = document.getElementById('userName');
+    if (un) un.textContent = me.user.display_name || me.user.username;
+    setConnStatus('online', 'Online');
+    return true;
+  } catch (e) {
+    console.error('Error cargando usuario:', e);
+    setConnStatus('offline', 'Offline');
+    return false;
+  }
+}
+
+function serializeCurrentState() {
+  return {
+    players: players.map(p => ({
+      name: p.name,
+      cards: p.cards.map(c => c ? { rank: c.rank, suit: c.suit } : null),
+      range: p.range ? Array.from(p.range) : null,
+      rangePct: p.rangePct,
+      active: p.active,
+      isHero: p.isHero
+    })),
+    board: board.map(c => c ? { rank: c.rank, suit: c.suit } : null),
+    result: players.map(p => ({ name: p.name, equity: p.equity }))
+  };
+}
+
+function applySerializedState(data) {
+  if (!data) return;
+
+  if (Array.isArray(data.players) && data.players.length >= 2) {
+    players = data.players.map(p => ({
+      name: p.name || 'Player',
+      cards: Array.isArray(p.cards) ? p.cards.map(c => c ? { rank: c.rank, suit: c.suit } : null) : [null, null],
+      range: Array.isArray(p.range) && p.range.length ? new Set(p.range) : null,
+      rangePct: p.rangePct || 0,
+      equity: 0,
+      active: p.active !== false,
+      isHero: !!p.isHero
+    }));
+  }
+
+  if (Array.isArray(data.board)) {
+    board = [0,1,2,3,4].map(i => {
+      const c = data.board[i];
+      return c ? { rank: c.rank, suit: c.suit } : null;
+    });
+  } else {
+    board = [null, null, null, null, null];
+  }
+
+  updateUsed();
+  renderPlayers();
+  renderBoard();
+  resetEquities();
+}
+
+async function saveSessionDialog() {
+  const hasData = players.some(p => (p.cards && p.cards[0]) || p.range) || board.some(c => c);
+  if (!hasData) {
+    showToast('Nada que guardar (sin cartas ni rangos)', 'error');
+    return;
+  }
+  const input = document.getElementById('saveSessionName');
+  input.value = currentSessionName || 'Sesión ' + new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  document.getElementById('saveModal').classList.add('active');
+  setTimeout(() => input.focus(), 200);
+}
+
+function closeSaveModal() {
+  document.getElementById('saveModal').classList.remove('active');
+}
+
+async function confirmSaveSession() {
+  const name = document.getElementById('saveSessionName').value.trim();
+  if (!name) {
+    showToast('Escribe un nombre', 'error');
+    return;
+  }
+
+  const payload = {
+    name: name,
+    ...serializeCurrentState()
+  };
+
+  setLoading(true);
+  try {
+    if (currentSessionId) {
+      await FeltLabAPI.equity.update(currentSessionId, payload);
+      showToast('Sesión actualizada ✓', 'success');
+    } else {
+      const r = await FeltLabAPI.equity.create(payload);
+      currentSessionId = r.id;
+      showToast('Sesión guardada ✓', 'success');
+    }
+    currentSessionName = name;
+    updateSessionLabel();
+    closeSaveModal();
+  } catch (e) {
+    showToast('Error: ' + (e.message || 'desconocido'), 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function openSessionsModal() {
+  document.getElementById('sessionsModal').classList.add('active');
+  const list = document.getElementById('sessionsList');
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-2);font-size:13px;">Cargando…</div>';
+
+  try {
+    const sessions = await FeltLabAPI.equity.list();
+    renderSessionsList(sessions);
+  } catch (e) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><div class="es-text">Error de conexión</div><div class="es-sub">' + escapeHtml(e.message) + '</div></div>';
+  }
+}
+
+function closeSessionsModal() {
+  document.getElementById('sessionsModal').classList.remove('active');
+}
+
+function renderSessionsList(sessions) {
+  const list = document.getElementById('sessionsList');
+  if (!sessions || !sessions.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="es-icon">📭</div>
+        <div class="es-text">No tienes sesiones guardadas</div>
+        <div class="es-sub">Guarda tu primera sesión desde el menú</div>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  sessions.forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'session-item';
+    const dateStr = s.updated_at ? formatDate(s.updated_at) : '';
+    item.innerHTML = `
+      <div class="si-icon">🎯</div>
+      <div class="si-main">
+        <div class="si-name">${escapeHtml(s.name)}</div>
+        <div class="si-meta">
+          <span>📅 ${dateStr}</span>
+        </div>
+      </div>
+      <button class="si-del" title="Eliminar">🗑️</button>
+    `;
+
+    item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('si-del')) return;
+      loadSession(s.id, s.name);
+    });
+
+    item.querySelector('.si-del').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm(`¿Eliminar la sesión "${s.name}"?`)) return;
+      try {
+        await FeltLabAPI.equity.remove(s.id);
+        if (currentSessionId === s.id) {
+          currentSessionId = null;
+          currentSessionName = null;
+          updateSessionLabel();
+        }
+        showToast('Sesión eliminada', 'success');
+        openSessionsModal();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    });
+
+    list.appendChild(item);
+  });
+}
+
+async function loadSession(id, name) {
+  setLoading(true);
+  try {
+    const session = await FeltLabAPI.equity.get(id);
+    applySerializedState(session);
+    currentSessionId = id;
+    currentSessionName = name || session.name;
+    updateSessionLabel();
+    closeSessionsModal();
+    showToast('Sesión cargada ✓', 'success');
+  } catch (e) {
+    showToast('Error: ' + (e.message || 'desconocido'), 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+function formatDate(iso) {
+  try {
+    const d = new Date(iso.replace(' ', 'T'));
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
+  } catch { return iso; }
+}
+
+function newSession() {
+  if (!confirm('¿Empezar una sesión nueva? Los cambios no guardados se perderán.')) return;
+  players = [
+    { name: 'Hero', cards: [null, null], range: null, equity: 0, rangePct: 0, active: true, isHero: true },
+    { name: 'Villano 1', cards: [null, null], range: null, equity: 0, rangePct: 0, active: true, isHero: false }
+  ];
+  board = [null, null, null, null, null];
+  currentSessionId = null;
+  currentSessionName = null;
+  updateUsed();
+  renderPlayers();
+  renderBoard();
+  resetEquities();
+  updateSessionLabel();
+  showToast('Sesión nueva ✓', 'success');
+}
+
+function exportCurrent() {
+  const data = {
+    version: 'equity-session-v1',
+    exported_at: new Date().toISOString(),
+    app: 'Equity Lab',
+    user: currentUser ? currentUser.username : null,
+    name: currentSessionName || 'Sin nombre',
+    ...serializeCurrentState()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `equity_${(currentSessionName || 'session').replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Sesión exportada ✓', 'success');
+}
+
+function openImportDialog() {
+  document.getElementById('importFileInput').click();
+}
+
+function handleImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.players) throw new Error('Formato inválido');
+      applySerializedState(data);
+      currentSessionId = null;
+      currentSessionName = data.name || 'Importada';
+      updateSessionLabel();
+      showToast('Sesión importada ✓', 'success');
+    } catch (err) {
+      showToast('Error al importar: ' + err.message, 'error');
+    } finally {
+      event.target.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function logout() {
+  if (!confirm((window.RangeLabI18n&&RangeLabI18n.t('common.confirmLogout'))||'¿Cerrar sesión?')) return;
+  try { await FeltLabAPI.auth.logout(); } catch {}
+  window.location.href = '/login';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPORTAR COMO JPG (html2canvas desde CDN, cargado on-demand)
+   ═══════════════════════════════════════════════════════════════ */
+function eqShowCaptureToast(text) {
+  const t = document.getElementById('eqCaptureToast');
+  document.getElementById('eqCaptureText').textContent = text || 'Generando imagen…';
+  t.classList.add('show');
+}
+function eqHideCaptureToast() {
+  document.getElementById('eqCaptureToast').classList.remove('show');
+}
+
+function eqLoadHtml2Canvas() {
+  return new Promise((resolve, reject) => {
+    if (window.html2canvas) return resolve(window.html2canvas);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = () => window.html2canvas ? resolve(window.html2canvas) : reject(new Error('html2canvas no disponible'));
+    s.onerror = () => reject(new Error('No se pudo cargar html2canvas (revisa tu conexión)'));
+    document.head.appendChild(s);
+  });
+}
+
+async function exportAsJPG() {
+  const container = document.querySelector('.container');
+  if (!container) return;
+
+  eqShowCaptureToast('Preparando captura…');
+  try {
+    const html2canvas = await eqLoadHtml2Canvas();
+
+    // Fondo sólido porque el container puede tener bordes redondeados
+    const bg = getComputedStyle(document.body).backgroundColor || '#07090f';
+
+    const canvas = await html2canvas(container, {
+      backgroundColor: bg,
+      scale: Math.min(window.devicePixelRatio || 1, 2),
+      useCORS: true,
+      logging: false,
+      allowTaint: false
+    });
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+    a.href = dataUrl;
+    a.download = `equity_${(currentSessionName || 'captura').replace(/\s+/g, '_')}_${stamp}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    eqHideCaptureToast();
+    showToast('Imagen JPG descargada ✓', 'success');
+  } catch (e) {
+    console.error(e);
+    eqHideCaptureToast();
+    showToast('Error al capturar: ' + (e.message || e), 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PLAYER MODAL
+   ═══════════════════════════════════════════════════════════════ */
+function openPlayerModal(idx) {
+  currentPlayerIndex = idx;
+  const p = players[idx];
+  document.getElementById('modalPlayerName').textContent = p.name;
+
+  if (p.range && p.range.size > 0) {
+    tempRange = new Set(p.range);
+    tempCards = [null, null];
+    setMode('range');
+  } else if (p.cards[0] && p.cards[1]) {
+    tempRange = new Set();
+    tempCards = [{...p.cards[0]}, {...p.cards[1]}];
+    setMode('specific');
+  } else {
+    tempRange = new Set();
+    tempCards = [null, null];
+    setMode('range');
+  }
+  renderMatrix();
+  renderCardSelector();
+  updateRangeStats();
+  document.getElementById('playerModal').classList.add('active');
+}
+
+function closePlayerModal() {
+  document.getElementById('playerModal').classList.remove('active');
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('tabRange').classList.toggle('active', mode === 'range');
+  document.getElementById('tabSpecific').classList.toggle('active', mode === 'specific');
+  document.getElementById('rangeMode').style.display = mode === 'range' ? 'block' : 'none';
+  document.getElementById('specificMode').style.display = mode === 'specific' ? 'block' : 'none';
+  if (mode === 'range') { renderMatrix(); updateRangeStats(); }
+  else renderCardSelector();
+}
+
+function renderMatrix() {
+  const el = document.getElementById('matrix');
+  let html = '';
+  for (let i = 0; i < 13; i++) {
+    for (let j = 0; j < 13; j++) {
+      const label = getHandLabel(i, j);
+      const sel = tempRange.has(label) ? 'selected' : '';
+      const pair = i === j ? 'pair' : '';
+      html += `<div class="matrix-cell ${sel} ${pair}" onclick="toggleHand('${label}')">${label}</div>`;
+    }
+  }
+  el.innerHTML = html;
+}
+
+function toggleHand(label) {
+  if (tempRange.has(label)) tempRange.delete(label);
+  else tempRange.add(label);
+  renderMatrix();
+  updateRangeStats();
+}
+
+function rangeComboCount(set) {
+  let combos = 0;
+  set.forEach(h => {
+    if (h.length === 2) combos += 6;
+    else if (h.endsWith('s')) combos += 4;
+    else combos += 12;
+  });
+  return combos;
+}
+
+function updateRangeStats() {
+  const combos = rangeComboCount(tempRange);
+  const pct = (combos / 1326 * 100).toFixed(1);
+  document.getElementById('modalStats').textContent = `R: ${pct}% · C: ${combos}`;
+  const slider = document.getElementById('rangeSlider');
+  if (slider && document.activeElement !== slider) {
+    slider.value = Math.round(combos / 1326 * 100);
+    document.getElementById('sliderPct').textContent = slider.value + '%';
+  }
+}
+
+function onRangeSlider(val) {
+  const pct = Math.max(0, Math.min(100, parseInt(val, 10) || 0));
+  document.getElementById('sliderPct').textContent = pct + '%';
+  tempRange.clear();
+  if (pct <= 0) { renderMatrix(); updateRangeStats(); return; }
+  if (pct >= 100) {
+    for (const h of HAND_ORDER) tempRange.add(h);
+  } else {
+    let combos = 0;
+    const target = Math.round(1326 * pct / 100);
+    for (const h of HAND_ORDER) {
+      const w = h.length === 2 ? 6 : (h.endsWith('s') ? 4 : 12);
+      tempRange.add(h);
+      combos += w;
+      if (combos >= target) break;
+    }
+  }
+  renderMatrix();
+  updateRangeStats();
+}
+
+function parseRangeText(text) {
+  const result = new Set();
+  if (!text || !text.trim()) return result;
+  const rankSet = new Set(RANKS);
+  const tokens = text.toUpperCase().replace(/\s+/g, ' ').split(/[,\s]+/).filter(Boolean);
+
+  function addHand(h) { if (h) result.add(h); }
+
+  function ranksBetween(hi, lo) {
+    const ia = RANKS.indexOf(hi);
+    const ib = RANKS.indexOf(lo);
+    if (ia < 0 || ib < 0) return [];
+    const a = Math.min(ia, ib), b = Math.max(ia, ib);
+    return RANKS.slice(a, b + 1);
+  }
+
+  for (let raw of tokens) {
+    raw = raw.replace(/[^A-Z0-9+\-]/g, '');
+    if (!raw) continue;
+
+    if (raw.includes('-')) {
+      const [left, right] = raw.split('-');
+      if (!left || !right) continue;
+      if (left.length === 2 && right.length === 2 && left[0] === left[1] && right[0] === right[1]) {
+        const list = ranksBetween(left[0], right[0]);
+        list.forEach(r => addHand(r + r));
+        continue;
+      }
+      const ls = left.slice(-1), rs = right.slice(-1);
+      if ((ls === 'S' || ls === 'O') && ls === rs && left.length === 3 && right.length === 3 && left[0] === right[0]) {
+        const high = left[0];
+        const a = left[1], b = right[1];
+        const suf = ls.toLowerCase();
+        ranksBetween(a, b).forEach(r => {
+          if (r !== high) addHand(high + r + suf);
+        });
+        continue;
+      }
+      parseRangeText(left).forEach(h => result.add(h));
+      parseRangeText(right).forEach(h => result.add(h));
+      continue;
+    }
+
+    if (raw.endsWith('+')) {
+      const base = raw.slice(0, -1);
+      if (base.length === 2 && base[0] === base[1] && rankSet.has(base[0])) {
+        const start = RANKS.indexOf(base[0]);
+        for (let i = start; i >= 0; i--) addHand(RANKS[i] + RANKS[i]);
+        continue;
+      }
+      if (base.length === 3 && (base[2] === 'S' || base[2] === 'O') && rankSet.has(base[0]) && rankSet.has(base[1])) {
+        const H = base[0], L = base[1], suf = base[2].toLowerCase();
+        const hi = RANKS.indexOf(H), lo = RANKS.indexOf(L);
+        if (hi < lo) {
+          for (let i = lo; i > hi; i--) addHand(H + RANKS[i] + suf);
+        }
+        continue;
+      }
+    }
+
+    if (raw.length === 2 && raw[0] === raw[1] && rankSet.has(raw[0])) {
+      addHand(raw[0] + raw[1]);
+      continue;
+    }
+    if (raw.length === 3 && rankSet.has(raw[0]) && rankSet.has(raw[1]) && (raw[2] === 'S' || raw[2] === 'O')) {
+      const r1 = raw[0], r2 = raw[1], suf = raw[2].toLowerCase();
+      const i1 = RANKS.indexOf(r1), i2 = RANKS.indexOf(r2);
+      if (i1 === i2) continue;
+      const H = i1 < i2 ? r1 : r2;
+      const L = i1 < i2 ? r2 : r1;
+      addHand(H + L + suf);
+      continue;
+    }
+    if (raw.length === 2 && rankSet.has(raw[0]) && rankSet.has(raw[1]) && raw[0] !== raw[1]) {
+      const i1 = RANKS.indexOf(raw[0]), i2 = RANKS.indexOf(raw[1]);
+      const H = i1 < i2 ? raw[0] : raw[1];
+      const L = i1 < i2 ? raw[1] : raw[0];
+      addHand(H + L + 's');
+      addHand(H + L + 'o');
+      continue;
+    }
+  }
+  return result;
+}
+
+function onRangeTextEdit() {
+  const el = document.getElementById('rangeText');
+  if (!el) return;
+  const parsed = parseRangeText(el.value);
+  tempRange = parsed;
+  renderMatrix();
+  const combos = rangeComboCount(tempRange);
+  document.getElementById('modalStats').textContent = `R: ${(combos / 1326 * 100).toFixed(1)}% · C: ${combos}`;
+  const slider = document.getElementById('rangeSlider');
+  if (slider) {
+    slider.value = Math.round(combos / 1326 * 100);
+    document.getElementById('sliderPct').textContent = slider.value + '%';
+  }
+}
+
+function saveRange() {
+  const p = players[currentPlayerIndex];
+  p.range = new Set(tempRange);
+  p.cards = [null, null];
+  let combos = 0;
+  p.range.forEach(h => {
+    if (h.length === 2) combos += 6;
+    else if (h.endsWith('s')) combos += 4;
+    else combos += 12;
+  });
+  p.rangePct = combos / 1326 * 100;
+  updateUsed();
+  renderPlayers();
+  resetEquities();
+  closePlayerModal();
+  showToast('Rango guardado ✓', 'success');
+}
+
+function clearRange() {
+  tempRange.clear();
+  const slider = document.getElementById('rangeSlider');
+  if (slider) { slider.value = 0; document.getElementById('sliderPct').textContent = '0%'; }
+  const ta = document.getElementById('rangeText');
+  if (ta) ta.value = '';
+  renderMatrix();
+  updateRangeStats();
+  const p = players[currentPlayerIndex];
+  p.range = null;
+  p.rangePct = 0;
+  renderPlayers();
+}
+
+function renderCardSelector() {
+  updateUsed();
+  const sel = document.getElementById('cardSelector');
+  const p = players[currentPlayerIndex];
+  const ignore = new Set();
+  if (p.cards[0]) ignore.add(cardKey(p.cards[0].rank, p.cards[0].suit));
+  if (p.cards[1]) ignore.add(cardKey(p.cards[1].rank, p.cards[1].suit));
+  if (tempCards[0]) ignore.add(cardKey(tempCards[0].rank, tempCards[0].suit));
+  if (tempCards[1]) ignore.add(cardKey(tempCards[1].rank, tempCards[1].suit));
+
+  sel.innerHTML = SUITS.map(suit => {
+    return `<div class="suit-row">${RANKS.map(r => {
+      const key = cardKey(r, suit.id);
+      const isUsed = usedCards.has(key) && !ignore.has(key);
+      const isSelected = (tempCards[0] && tempCards[0].rank===r && tempCards[0].suit===suit.id) ||
+                         (tempCards[1] && tempCards[1].rank===r && tempCards[1].suit===suit.id);
+      let cls = `sel-card ${suit.c}`;
+      if (isUsed) cls += ' disabled';
+      if (isSelected) cls += ' selected';
+      return `<div class="${cls}" onclick="pickSpecific('${r}',${suit.id})">${r}<br>${suit.s}</div>`;
+    }).join('')}</div>`;
+  }).join('');
+}
+
+function pickSpecific(rank, suitId) {
+  const key = cardKey(rank, suitId);
+  if (tempCards[0] && tempCards[0].rank===rank && tempCards[0].suit===suitId) {
+    tempCards[0] = null;
+  } else if (tempCards[1] && tempCards[1].rank===rank && tempCards[1].suit===suitId) {
+    tempCards[1] = null;
+  } else {
+    if (!tempCards[0]) tempCards[0] = {rank, suit: suitId};
+    else if (!tempCards[1]) tempCards[1] = {rank, suit: suitId};
+    else {
+      tempCards[1] = {rank, suit: suitId};
+    }
+  }
+  renderCardSelector();
+}
+
+function clearSpecific() {
+  tempCards = [null, null];
+  renderCardSelector();
+}
+
+function saveSpecific() {
+  if (!tempCards[0] || !tempCards[1]) {
+    showToast('Selecciona 2 cartas', 'error');
+    return;
+  }
+  const p = players[currentPlayerIndex];
+  p.cards = [{...tempCards[0]}, {...tempCards[1]}];
+  p.range = null;
+  p.rangePct = 0;
+  updateUsed();
+  renderPlayers();
+  resetEquities();
+  closePlayerModal();
+  showToast('Cartas guardadas ✓', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BOARD
+   ═══════════════════════════════════════════════════════════════ */
+let boardPhase = 'flop';
+let boardPhaseSlots = [0, 1, 2];
+
+function getBoardPhaseInfo() {
+  const has0 = !!board[0], has1 = !!board[1], has2 = !!board[2];
+  const has3 = !!board[3], has4 = !!board[4];
+  if (!has0 || !has1 || !has2) return { phase: 'flop', slots: [0, 1, 2], label: 'Flop', need: 3 };
+  if (!has3) return { phase: 'turn', slots: [3], label: 'Turn', need: 1 };
+  if (!has4) return { phase: 'river', slots: [4], label: 'River', need: 1 };
+  return { phase: 'river', slots: [4], label: 'River', need: 1 };
+}
+
+function updatePhaseLabel() {
+  const info = getBoardPhaseInfo();
+  const el = document.getElementById('phaseLabel');
+  if (!el) return;
+  const filled = board.filter(Boolean).length;
+  if (filled === 0) el.textContent = 'Preflop';
+  else if (filled < 3) el.textContent = `Flop (${filled}/3)`;
+  else if (filled === 3) el.textContent = 'Flop completo · Turn';
+  else if (filled === 4) el.textContent = 'Turn · River';
+  else el.textContent = 'River completo';
+}
+
+function openBoardModal(idx) {
+  if (idx <= 2) {
+    boardPhase = 'flop';
+    boardPhaseSlots = [0, 1, 2];
+  } else if (idx === 3) {
+    boardPhase = 'turn';
+    boardPhaseSlots = [3];
+  } else {
+    boardPhase = 'river';
+    boardPhaseSlots = [4];
+  }
+  renderBoardModal();
+  document.getElementById('boardModal').classList.add('active');
+}
+
+function renderBoardModal() {
+  updateUsed();
+  const title = boardPhase === 'flop' ? 'Flop' : (boardPhase === 'turn' ? 'Turn' : 'River');
+  const need = boardPhaseSlots.length;
+  document.getElementById('boardPhaseTitle').textContent = title;
+  document.getElementById('boardPhaseHint').textContent =
+    need === 3 ? 'Selecciona 3 cartas' : 'Selecciona 1 carta';
+
+  const picks = document.getElementById('boardPicks');
+  picks.innerHTML = boardPhaseSlots.map(si => {
+    const c = board[si];
+    if (!c) return `<div class="card empty"></div>`;
+    const suit = SUITS[c.suit];
+    return `<div class="card ${suit.c}"><span class="rank">${c.rank}</span><span class="suit">${suit.s}</span></div>`;
+  }).join('');
+
+  const phaseKeys = new Set();
+  boardPhaseSlots.forEach(si => {
+    const c = board[si];
+    if (c) phaseKeys.add(cardKey(c.rank, c.suit));
+  });
+
+  const sel = document.getElementById('boardSelector');
+  sel.innerHTML = SUITS.map(suit => {
+    return `<div class="suit-row">${RANKS.map(r => {
+      const key = cardKey(r, suit.id);
+      const inPhase = phaseKeys.has(key);
+      const isUsedElsewhere = usedCards.has(key) && !inPhase;
+      let cls = `sel-card ${suit.c}`;
+      if (isUsedElsewhere) cls += ' disabled';
+      if (inPhase) cls += ' selected';
+      return `<div class="${cls}" onclick="pickBoardPhaseCard('${r}',${suit.id})">${r}<br>${suit.s}</div>`;
+    }).join('')}</div>`;
+  }).join('');
+}
+
+function pickBoardPhaseCard(rank, suitId) {
+  const key = cardKey(rank, suitId);
+  for (const si of boardPhaseSlots) {
+    const c = board[si];
+    if (c && c.rank === rank && c.suit === suitId) {
+      board[si] = null;
+      if (boardPhase === 'flop') compactFlop();
+      updateUsed();
+      renderBoard();
+      renderBoardModal();
+      resetEquities();
+      updatePhaseLabel();
+      return;
+    }
+  }
+  let slot = -1;
+  for (const si of boardPhaseSlots) {
+    if (!board[si]) { slot = si; break; }
+  }
+  if (slot < 0) {
+    slot = boardPhaseSlots[boardPhaseSlots.length - 1];
+  }
+  updateUsed();
+  const phaseKeys = new Set();
+  boardPhaseSlots.forEach(si => {
+    const c = board[si];
+    if (c) phaseKeys.add(cardKey(c.rank, c.suit));
+  });
+  if (usedCards.has(key) && !phaseKeys.has(key)) return;
+
+  board[slot] = { rank, suit: suitId };
+  updateUsed();
+  renderBoard();
+  renderBoardModal();
+  resetEquities();
+  updatePhaseLabel();
+}
+
+function compactFlop() {
+  const cards = [board[0], board[1], board[2]].filter(Boolean);
+  board[0] = cards[0] || null;
+  board[1] = cards[1] || null;
+  board[2] = cards[2] || null;
+}
+
+function clearBoardPhase() {
+  boardPhaseSlots.forEach(si => { board[si] = null; });
+  updateUsed();
+  renderBoard();
+  renderBoardModal();
+  resetEquities();
+  updatePhaseLabel();
+}
+
+function closeBoardModal() {
+  document.getElementById('boardModal').classList.remove('active');
+  updatePhaseLabel();
+}
+
+function randomCardsForSlots(slots) {
+  updateUsed();
+  slots.forEach(si => { board[si] = null; });
+  updateUsed();
+  const available = [];
+  for (let s = 0; s < 4; s++) {
+    for (const r of RANKS) {
+      const key = cardKey(r, s);
+      if (!usedCards.has(key)) available.push({ rank: r, suit: s });
+    }
+  }
+  for (let i = available.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    const t = available[i]; available[i] = available[j]; available[j] = t;
+  }
+  for (let i = 0; i < slots.length && i < available.length; i++) {
+    board[slots[i]] = available[i];
+  }
+  updateUsed();
+  renderBoard();
+  resetEquities();
+  updatePhaseLabel();
+}
+
+function randomBoardInModal() {
+  randomCardsForSlots(boardPhaseSlots);
+  renderBoardModal();
+}
+
+function randomBoardPhase() {
+  if (!board[0] || !board[1] || !board[2]) {
+    randomCardsForSlots([0, 1, 2]);
+  } else if (!board[3]) {
+    randomCardsForSlots([3]);
+  } else if (!board[4]) {
+    randomCardsForSlots([4]);
+  } else {
+    randomCardsForSlots([4]);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EVALUADOR
+   ═══════════════════════════════════════════════════════════════ */
+function cardToId(c) { return (RANK_VAL[c.rank] - 2) * 4 + c.suit; }
+function idRank(id) { return (id >> 2) + 2; }
+function idSuit(id) { return id & 3; }
+
+const _rc = new Uint8Array(15);
+const _sc = new Uint8Array(4);
+const _fr = new Uint8Array(7);
+
+function evaluateIds(ids, n) {
+  _rc.fill(0);
+  _sc.fill(0);
+  let rankBits = 0;
+  for (let i = 0; i < n; i++) {
+    const id = ids[i];
+    const r = (id >> 2) + 2;
+    const s = id & 3;
+    _rc[r]++;
+    _sc[s]++;
+    rankBits |= (1 << (r - 2));
+  }
+
+  let flushSuit = -1;
+  if (_sc[0] >= 5) flushSuit = 0;
+  else if (_sc[1] >= 5) flushSuit = 1;
+  else if (_sc[2] >= 5) flushSuit = 2;
+  else if (_sc[3] >= 5) flushSuit = 3;
+
+  let straightHigh = 0;
+  for (let high = 12; high >= 4; high--) {
+    const mask = 0x1F << (high - 4);
+    if ((rankBits & mask) === mask) { straightHigh = high + 2; break; }
+  }
+  if (!straightHigh && (rankBits & 0x100F) === 0x100F) straightHigh = 5;
+
+  let sfHigh = 0;
+  if (flushSuit >= 0) {
+    let fb = 0;
+    for (let i = 0; i < n; i++) {
+      const id = ids[i];
+      if ((id & 3) === flushSuit) fb |= (1 << (id >> 2));
+    }
+    for (let high = 12; high >= 4; high--) {
+      const mask = 0x1F << (high - 4);
+      if ((fb & mask) === mask) { sfHigh = high + 2; break; }
+    }
+    if (!sfHigh && (fb & 0x100F) === 0x100F) sfHigh = 5;
+  }
+
+  let quads = 0, trips1 = 0, trips2 = 0, pair1 = 0, pair2 = 0;
+  for (let r = 14; r >= 2; r--) {
+    const c = _rc[r];
+    if (c === 4) quads = r;
+    else if (c === 3) { if (!trips1) trips1 = r; else trips2 = r; }
+    else if (c === 2) { if (!pair1) pair1 = r; else if (!pair2) pair2 = r; }
+  }
+
+  let cat = 0, k1 = 0, k2 = 0, k3 = 0, k4 = 0, k5 = 0;
+
+  if (sfHigh) {
+    cat = 8; k1 = sfHigh;
+  } else if (quads) {
+    cat = 7; k1 = quads;
+    for (let r = 14; r >= 2; r--) if (_rc[r] && r !== quads) { k2 = r; break; }
+  } else if (trips1 && (pair1 || trips2)) {
+    cat = 6; k1 = trips1; k2 = pair1 || trips2;
+  } else if (flushSuit >= 0) {
+    cat = 5;
+    let fn = 0;
+    for (let i = 0; i < n; i++) {
+      const id = ids[i];
+      if ((id & 3) === flushSuit) _fr[fn++] = (id >> 2) + 2;
+    }
+    for (let a = 0; a < 5 && a < fn; a++) {
+      let best = a;
+      for (let b = a + 1; b < fn; b++) if (_fr[b] > _fr[best]) best = b;
+      const tmp = _fr[a]; _fr[a] = _fr[best]; _fr[best] = tmp;
+    }
+    k1 = _fr[0]; k2 = _fr[1]; k3 = _fr[2]; k4 = _fr[3]; k5 = _fr[4];
+  } else if (straightHigh) {
+    cat = 4; k1 = straightHigh;
+  } else if (trips1) {
+    cat = 3; k1 = trips1;
+    let f = 0;
+    for (let r = 14; r >= 2 && f < 2; r--) if (_rc[r] && r !== trips1) {
+      if (f === 0) k2 = r; else k3 = r;
+      f++;
+    }
+  } else if (pair1 && pair2) {
+    cat = 2; k1 = pair1; k2 = pair2;
+    for (let r = 14; r >= 2; r--) if (_rc[r] === 1) { k3 = r; break; }
+  } else if (pair1) {
+    cat = 1; k1 = pair1;
+    let f = 0;
+    for (let r = 14; r >= 2 && f < 3; r--) if (_rc[r] === 1) {
+      if (f === 0) k2 = r; else if (f === 1) k3 = r; else k4 = r;
+      f++;
+    }
+  } else {
+    cat = 0;
+    let f = 0;
+    for (let r = 14; r >= 2 && f < 5; r--) if (_rc[r]) {
+      if (f === 0) k1 = r; else if (f === 1) k2 = r; else if (f === 2) k3 = r;
+      else if (f === 3) k4 = r; else k5 = r;
+      f++;
+    }
+  }
+
+  return cat * 1e12 + k1 * 1e10 + k2 * 1e8 + k3 * 1e6 + k4 * 1e4 + k5 * 100;
+}
+
+function evaluate(cards) {
+  const ids = new Array(cards.length);
+  for (let i = 0; i < cards.length; i++) ids[i] = cardToId(cards[i]);
+  return evaluateIds(ids, cards.length);
+}
+
+function expandRange(rangeSet, deadKeys) {
+  const combos = [];
+  const dead = new Set(deadKeys);
+
+  rangeSet.forEach(label => {
+    const r1 = label[0], r2 = label[1];
+    const suited = label.endsWith('s');
+    const offsuit = label.endsWith('o');
+    const isPair = label.length === 2;
+
+    if (isPair) {
+      for (let s1=0; s1<4; s1++) {
+        for (let s2=s1+1; s2<4; s2++) {
+          const k1 = cardKey(r1, s1), k2 = cardKey(r1, s2);
+          if (!dead.has(k1) && !dead.has(k2)) {
+            combos.push([{rank:r1,suit:s1}, {rank:r1,suit:s2}]);
+          }
+        }
+      }
+    } else if (suited) {
+      for (let s=0; s<4; s++) {
+        const k1 = cardKey(r1, s), k2 = cardKey(r2, s);
+        if (!dead.has(k1) && !dead.has(k2)) {
+          combos.push([{rank:r1,suit:s}, {rank:r2,suit:s}]);
+        }
+      }
+    } else {
+      for (let s1=0; s1<4; s1++) {
+        for (let s2=0; s2<4; s2++) {
+          if (s1 === s2) continue;
+          const k1 = cardKey(r1, s1), k2 = cardKey(r2, s2);
+          if (!dead.has(k1) && !dead.has(k2)) {
+            combos.push([{rank:r1,suit:s1}, {rank:r2,suit:s2}]);
+          }
+        }
+      }
+    }
+  });
+  return combos;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIMULACIÓN
+   ═══════════════════════════════════════════════════════════════ */
+let currentIter = 50000;
+let stopFlag = false;
+let isRunning = false;
+let simStartTime = 0;
+
+function formatElapsed(ms) {
+  if (ms < 1000) return ms + ' ms';
+  return (ms / 1000).toFixed(1) + ' s';
+}
+
+function setIters(iters) {
+  if (isRunning) return;
+  currentIter = iters;
+  document.getElementById('btnFast').classList.toggle('active', iters === 30000);
+  document.getElementById('btnBalanced').classList.toggle('active', iters === 50000);
+}
+
+function toggleSimulation() {
+  if (isRunning) {
+    stopFlag = true;
+    document.getElementById('status').textContent = 'Deteniendo...';
+    return;
+  }
+  runSimulation();
+}
+
+function setRunningUI(running) {
+  isRunning = running;
+  const btn = document.getElementById('mainSimBtn');
+  if (running) {
+    btn.textContent = (window.RangeLabI18n&&RangeLabI18n.t('eq.stop'))||'Detener';
+    btn.classList.add('running');
+    document.querySelectorAll('.btn-sim').forEach(b => b.disabled = true);
+  } else {
+    btn.textContent = (window.RangeLabI18n&&RangeLabI18n.t('eq.start'))||'Iniciar';
+    btn.classList.remove('running');
+    document.querySelectorAll('.btn-sim').forEach(b => b.disabled = false);
+  }
+}
+
+function finishSim() {
+  stopFlag = false;
+  setRunningUI(false);
+}
+
+function combCount(n, k) {
+  if (k < 0 || k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  if (k > n - k) k = n - k;
+  let c = 1;
+  for (let i = 0; i < k; i++) c = c * (n - i) / (i + 1);
+  return Math.round(c);
+}
+
+async function runSimulation() {
+  const active = players.filter(p => p.active);
+  if (active.length < 2) {
+    document.getElementById('status').textContent = 'Se necesitan al menos 2 jugadores activos';
+    return;
+  }
+
+  let anyRange = false;
+  for (const p of active) {
+    const hasRange = p.range && p.range.size > 0;
+    const hasCards = p.cards[0] && p.cards[1];
+    if (!hasRange && !hasCards) {
+      document.getElementById('status').textContent = `${p.name} necesita cartas o un rango`;
+      return;
+    }
+    if (hasRange) anyRange = true;
+  }
+
+  stopFlag = false;
+  setRunningUI(true);
+  simStartTime = performance.now();
+
+  const knownBoard = board.filter(c => c);
+  const boardKeys = new Set(knownBoard.map(c => cardKey(c.rank, c.suit)));
+
+  const deadKeys = new Set(boardKeys);
+  active.forEach(p => {
+    if (!(p.range && p.range.size > 0) && p.cards[0] && p.cards[1]) {
+      deadKeys.add(cardKey(p.cards[0].rank, p.cards[0].suit));
+      deadKeys.add(cardKey(p.cards[1].rank, p.cards[1].suit));
+    }
+  });
+
+  const remainingDeck = [];
+  for (let s = 0; s < 4; s++) {
+    for (const r of RANKS) {
+      const k = cardKey(r, s);
+      if (!deadKeys.has(k)) remainingDeck.push({rank: r, suit: s, key: k});
+    }
+  }
+
+  const needBoard = 5 - knownBoard.length;
+
+  if (!anyRange) {
+    document.getElementById('status').textContent = 'Calculando exacto...';
+
+    const fixedHands = active.map(p => [p.cards[0], p.cards[1]]);
+
+    const handKeys = new Set();
+    for (const h of fixedHands) {
+      const k1 = cardKey(h[0].rank, h[0].suit);
+      const k2 = cardKey(h[1].rank, h[1].suit);
+      if (handKeys.has(k1) || handKeys.has(k2) || boardKeys.has(k1) || boardKeys.has(k2)) {
+        document.getElementById('status').textContent = 'Cartas duplicadas detectadas';
+        finishSim();
+        return;
+      }
+      handKeys.add(k1); handKeys.add(k2);
+    }
+
+    if (needBoard === 0) {
+      const scores = fixedHands.map(h => evaluate(h.concat(knownBoard)));
+      let maxScore = Math.max(...scores);
+      const winners = scores.map((s,i) => s === maxScore ? i : -1).filter(i => i >= 0);
+      let idx = 0;
+      players.forEach(p => {
+        if (p.active) {
+          p.equity = winners.includes(idx) ? (100 / winners.length) : 0;
+          idx++;
+        } else p.equity = 0;
+      });
+      renderPlayers();
+      const elapsed = formatElapsed(performance.now() - simStartTime);
+      document.getElementById('status').textContent = `Exacto (board completo) · ${elapsed}`;
+      finishSim();
+      return;
+    }
+
+    const total = combCount(remainingDeck.length, needBoard);
+    if (total === 0) {
+      document.getElementById('status').textContent = 'No hay runouts posibles';
+      finishSim();
+      return;
+    }
+
+    const wins = new Array(active.length).fill(0);
+    const ties = new Array(active.length).fill(0);
+    let done = 0;
+    let stopped = false;
+    const numPlayers = fixedHands.length;
+
+    const knownBoardIds = knownBoard.map(cardToId);
+    const holeIds = fixedHands.map(h => [cardToId(h[0]), cardToId(h[1])]);
+    const deckIds = remainingDeck.map(cardToId);
+    const nb = knownBoardIds.length;
+    const totalCards = nb + needBoard;
+    const evalBuf = new Uint8Array(7);
+    const scores = new Float64Array(numPlayers);
+
+    await new Promise((resolve) => {
+      const n = deckIds.length;
+      const k = needBoard;
+      const cidx = new Int16Array(k);
+      for (let i = 0; i < k; i++) cidx[i] = i;
+      let hasMore = true;
+      const batchLimit = k >= 5 ? 15000 : (k === 4 ? 30000 : 50000);
+
+      function processBatch() {
+        if (stopFlag) { stopped = true; resolve(); return; }
+        let batch = 0;
+        while (hasMore && batch < batchLimit) {
+          for (let i = 0; i < nb; i++) evalBuf[2 + i] = knownBoardIds[i];
+          for (let i = 0; i < k; i++) evalBuf[2 + nb + i] = deckIds[cidx[i]];
+
+          let maxScore = -1;
+          let bestCount = 0;
+          let bestP = 0;
+          for (let p = 0; p < numPlayers; p++) {
+            evalBuf[0] = holeIds[p][0];
+            evalBuf[1] = holeIds[p][1];
+            const sc = evaluateIds(evalBuf, 2 + totalCards);
+            scores[p] = sc;
+            if (sc > maxScore) { maxScore = sc; bestCount = 1; bestP = p; }
+            else if (sc === maxScore) bestCount++;
+          }
+          if (bestCount === 1) {
+            wins[bestP]++;
+          } else {
+            const share = 1 / bestCount;
+            for (let p = 0; p < numPlayers; p++) if (scores[p] === maxScore) ties[p] += share;
+          }
+          done++;
+          batch++;
+
+          let i = k - 1;
+          while (i >= 0 && cidx[i] === n - k + i) i--;
+          if (i < 0) { hasMore = false; break; }
+          cidx[i]++;
+          for (let j = i + 1; j < k; j++) cidx[j] = cidx[j - 1] + 1;
+        }
+
+        let pidx = 0;
+        players.forEach(p => {
+          if (p.active) {
+            p.equity = done > 0 ? ((wins[pidx] + ties[pidx]) / done) * 100 : 0;
+            pidx++;
+          }
+        });
+        renderPlayers();
+        const pct = Math.min(100, Math.round(done / total * 100));
+        document.getElementById('status').textContent =
+          `Exacto... ${pct}% (${done.toLocaleString()}/${total.toLocaleString()})`;
+
+        if (hasMore && !stopFlag) setTimeout(processBatch, 0);
+        else { if (stopFlag) stopped = true; resolve(); }
+      }
+      processBatch();
+    });
+
+    let idx = 0;
+    players.forEach(p => {
+      if (p.active) {
+        p.equity = done > 0 ? ((wins[idx] + ties[idx]) / done) * 100 : 0;
+        idx++;
+      } else p.equity = 0;
+    });
+    renderPlayers();
+    const elapsed = formatElapsed(performance.now() - simStartTime);
+    if (stopped || stopFlag) {
+      document.getElementById('status').textContent =
+        `Detenido · exacto parcial ${done.toLocaleString()} runouts · ${elapsed}`;
+    } else {
+      document.getElementById('status').textContent =
+        `Exacto · ${total.toLocaleString()} runouts · ${elapsed}`;
+    }
+    finishSim();
+    return;
+  }
+
+  document.getElementById('status').textContent = 'Monte Carlo... 0%';
+
+  const playerCombos = active.map(p => {
+    if (p.range && p.range.size > 0) {
+      return expandRange(p.range, Array.from(boardKeys));
+    } else {
+      return [[p.cards[0], p.cards[1]]];
+    }
+  });
+
+  if (playerCombos.some(c => c.length === 0)) {
+    document.getElementById('status').textContent = 'Rango/cartas incompatibles con el board';
+    finishSim();
+    return;
+  }
+
+  const comboIds = playerCombos.map(combos =>
+    combos.map(c => [cardToId(c[0]), cardToId(c[1])])
+  );
+  const knownBoardIds = knownBoard.map(cardToId);
+  const boardIdSet = new Set(knownBoardIds);
+
+  const deckIds = [];
+  for (let id = 0; id < 52; id++) if (!boardIdSet.has(id)) deckIds.push(id);
+
+  const ITER = currentIter;
+  const wins = new Array(active.length).fill(0);
+  const ties = new Array(active.length).fill(0);
+  let completed = 0;
+  const CHUNK = 4000;
+  const numP = active.length;
+  const evalBuf = new Uint8Array(7);
+  const scores = new Float64Array(numP);
+  const usedBits = new Uint8Array(52);
+  const nb = knownBoardIds.length;
+
+  while (completed < ITER && !stopFlag) {
+    const batch = Math.min(CHUNK, ITER - completed);
+    for (let it = 0; it < batch; it++) {
+      usedBits.fill(0);
+      for (let i = 0; i < nb; i++) usedBits[knownBoardIds[i]] = 1;
+
+      const order = new Array(numP);
+      for (let i = 0; i < numP; i++) order[i] = i;
+      for (let i = numP - 1; i > 0; i--) {
+        const j = (Math.random() * (i + 1)) | 0;
+        const t = order[i]; order[i] = order[j]; order[j] = t;
+      }
+
+      const chosen = new Array(numP);
+      let valid = true;
+      for (let oi = 0; oi < numP; oi++) {
+        const pi = order[oi];
+        const list = comboIds[pi];
+        let pick = null;
+        const len = list.length;
+        for (let tries = 0; tries < 12; tries++) {
+          const c = list[(Math.random() * len) | 0];
+          if (!usedBits[c[0]] && !usedBits[c[1]]) { pick = c; break; }
+        }
+        if (!pick) {
+          for (let ci = 0; ci < len; ci++) {
+            const c = list[ci];
+            if (!usedBits[c[0]] && !usedBits[c[1]]) { pick = c; break; }
+          }
+        }
+        if (!pick) { valid = false; break; }
+        chosen[pi] = pick;
+        usedBits[pick[0]] = 1;
+        usedBits[pick[1]] = 1;
+      }
+      if (!valid) continue;
+
+      const rem = [];
+      for (let i = 0; i < deckIds.length; i++) if (!usedBits[deckIds[i]]) rem.push(deckIds[i]);
+      if (rem.length < needBoard) continue;
+
+      for (let i = 0; i < needBoard; i++) {
+        const j = i + ((Math.random() * (rem.length - i)) | 0);
+        const t = rem[i]; rem[i] = rem[j]; rem[j] = t;
+      }
+
+      let maxScore = -1, bestCount = 0, bestP = 0;
+      for (let p = 0; p < numP; p++) {
+        evalBuf[0] = chosen[p][0];
+        evalBuf[1] = chosen[p][1];
+        for (let i = 0; i < nb; i++) evalBuf[2 + i] = knownBoardIds[i];
+        for (let i = 0; i < needBoard; i++) evalBuf[2 + nb + i] = rem[i];
+        const sc = evaluateIds(evalBuf, 2 + nb + needBoard);
+        scores[p] = sc;
+        if (sc > maxScore) { maxScore = sc; bestCount = 1; bestP = p; }
+        else if (sc === maxScore) bestCount++;
+      }
+      if (bestCount === 1) wins[bestP]++;
+      else {
+        const share = 1 / bestCount;
+        for (let p = 0; p < numP; p++) if (scores[p] === maxScore) ties[p] += share;
+      }
+    }
+    completed += batch;
+
+    let idx = 0;
+    players.forEach(p => {
+      if (p.active) {
+        p.equity = ((wins[idx] + ties[idx]) / completed) * 100;
+        idx++;
+      }
+    });
+    renderPlayers();
+    const pct = Math.round(completed / ITER * 100);
+    document.getElementById('status').textContent =
+      `Monte Carlo... ${pct}% (${completed.toLocaleString()}/${ITER.toLocaleString()})`;
+
+    if (completed >= 25000 && completed % 5000 === 0) {
+      let allTight = true;
+      for (let i = 0; i < numP; i++) {
+        const p = (wins[i] + ties[i]) / completed;
+        const se = Math.sqrt(Math.max(p * (1 - p), 1e-6) / completed);
+        if (1.96 * se * 100 > 0.35) { allTight = false; break; }
+      }
+      if (allTight) {
+        const elapsed = formatElapsed(performance.now() - simStartTime);
+        document.getElementById('status').textContent =
+          `MC convergido · ${completed.toLocaleString()} manos (CI < 0.35%) · ${elapsed}`;
+        break;
+      }
+    }
+
+    await new Promise(r => setTimeout(r, 0));
+  }
+
+  let idx = 0;
+  players.forEach(p => {
+    if (p.active) {
+      p.equity = completed > 0 ? ((wins[idx] + ties[idx]) / completed) * 100 : 0;
+      idx++;
+    } else p.equity = 0;
+  });
+  renderPlayers();
+
+  const elapsed = formatElapsed(performance.now() - simStartTime);
+  if (stopFlag) {
+    document.getElementById('status').textContent = `Detenido · MC ${completed.toLocaleString()} manos · ${elapsed}`;
+  } else if (completed >= ITER) {
+    document.getElementById('status').textContent = `Monte Carlo · ${completed.toLocaleString()} manos · ${elapsed}`;
+  }
+  finishSim();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INICIALIZACIÓN
+   ═══════════════════════════════════════════════════════════════ */
+function hideSplash() {
+  const s = document.getElementById('splash');
+  if (!s) return;
+  s.classList.add('hide');
+  if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+  else document.body.classList.remove('rl-loading');
+  setTimeout(() => { try { s.remove(); } catch (_) {} }, 700);
+}
+
+async function init() {
+  try {
+    const ok = await loadUser();
+    if (!ok) {
+      hideSplash();
+      return;
+    }
+    updateUsed();
+    renderPlayers();
+    renderBoard();
+    updateSessionLabel();
+  } catch (e) {
+    console.error('Equity Lab init:', e);
+    if (typeof showToast === 'function') showToast('Error al iniciar: ' + (e.message || e), 'error');
+  } finally {
+    setTimeout(hideSplash, 500);
+  }
+}
+
+init();
+
+// Cerrar drawer con Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const d = document.getElementById('eqDrawer');
+    if (d && d.classList.contains('show')) eqCloseDrawer();
+  }
+});
+</script>
+
+<script>
+(function(){
+  function boot(){
+    if(!window.RangeLabI18n){ setTimeout(boot,40); return; }
+    RangeLabI18n.applyDom();
+    RangeLabI18n.wireLangButtons();
+    if(window.RangeLabProfile){
+      RangeLabProfile.ensureStyles();
+      var chip = document.querySelector('.user-chip');
+      if(chip) RangeLabProfile.wireUserChip(chip, null);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+})();
+</script>
+
+
+<script>
+(function(){
+  function applySite(s){
+    if(!s) return;
+    document.querySelectorAll('.rl-site-footer').forEach(function(el){ el.textContent = s.footer_text || el.textContent; });
+    document.querySelectorAll('.rl-site-footer-brand').forEach(function(el){ el.textContent = 'Creado por ' + (s.brand_name || 'RangeSoft'); });
+    document.querySelectorAll('.rl-site-brand-name').forEach(function(el){ el.textContent = 'Acerca de ' + (s.brand_name || 'RangeSoft'); });
+  }
+  if(window.__RL_SITE) applySite(window.__RL_SITE);
+  else RangeLabAPI.site().then(function(s){ window.__RL_SITE=s; applySite(s); }).catch(function(){});
+})();
+</script>
+<script>
+(function(){
+  if (window.RangeLabSkeleton) RangeLabSkeleton.registerSW('/sw.js');
+  else if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+
+<nav class="rl-bottom-nav" aria-label="Navegación Equity Lab">
+  <a href="/" class="rl-nav-item">
+    <span class="rl-nav-ico">🏠</span>
+    <span class="rl-nav-label">Portal</span>
+  </a>
+  <button type="button" class="rl-nav-item active" onclick="eqCloseDrawer()">
+    <span class="rl-nav-ico">🎯</span>
+    <span class="rl-nav-label">Equity</span>
+  </button>
+  <button type="button" class="rl-nav-item" onclick="eqOpenDrawer()">
+    <span class="rl-nav-ico">☰</span>
+    <span class="rl-nav-label">Menú</span>
+  </button>
+  <button type="button" class="rl-nav-item" onclick="openPotOddsModal()">
+    <span class="rl-nav-ico">🃏</span>
+    <span class="rl-nav-label">Odds</span>
+  </button>
+  <a href="/profile" class="rl-nav-item">
+    <span class="rl-nav-ico">👤</span>
+    <span class="rl-nav-label">Perfil</span>
+  </a>
+</nav>
+
+</body>
+</html>

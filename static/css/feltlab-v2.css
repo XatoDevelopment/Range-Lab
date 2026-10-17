@@ -1,0 +1,611 @@
+/* ═══════════════════════════════════════════════════════════════
+   Hand Lab v2 — "Mesa de noche"
+   Rediseño visual de FeltLab. Se carga DESPUÉS de los estilos
+   inline de feltlab.html. Solo presentación: no toca posiciones
+   (top/left/transform del tablero, pot y jugadores) ni lógica.
+
+   Dirección: tinta azul profunda, felt esmeralda con borde oscuro
+   y filete dorado, y un único acento champán para lo interactivo.
+   Glass sutil solo en cabeceras, pot, badges y paneles flotantes.
+   ═══════════════════════════════════════════════════════════════ */
+
+body.tool-feltlab {
+  --hl2-gold: #e7c26a;
+  --hl2-gold-hi: #f2d98f;
+  --hl2-gold-deep: #c99a45;
+  --hl2-gold-soft: rgba(231, 194, 106, 0.12);
+  --hl2-gold-line: rgba(231, 194, 106, 0.30);
+  --hl2-line: rgba(255, 255, 255, 0.07);
+  --hl2-surface: rgba(255, 255, 255, 0.03);
+  --hl2-surface-hi: rgba(255, 255, 255, 0.06);
+  --hl2-radius: 16px;
+  --hl2-radius-sm: 12px;
+}
+
+/* ── Fondo: tinta con un halo esmeralda arriba ── */
+html:not([data-theme="light"]) body.tool-feltlab {
+  background:
+    radial-gradient(1100px 620px at 50% -12%, rgba(23, 117, 107, 0.18), transparent 62%),
+    radial-gradient(760px 480px at 108% 112%, rgba(124, 58, 237, 0.07), transparent 60%),
+    #070a12;
+}
+html[data-theme="light"] body.tool-feltlab {
+  background:
+    radial-gradient(1100px 620px at 50% -12%, rgba(23, 117, 107, 0.10), transparent 62%),
+    #f4f1e8;
+}
+
+/* ── Cabecera ── */
+body.tool-feltlab .app-header {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+body.tool-feltlab .brand-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #1c2a3d, #0b1220);
+  box-shadow: inset 0 0 0 1px var(--hl2-gold-line), 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+body.tool-feltlab .brand-name {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+body.tool-feltlab .brand-name span {
+  color: var(--hl2-gold);
+}
+body.tool-feltlab .user-chip,
+body.tool-feltlab .conn-indicator {
+  border-radius: 999px;
+  border: 1px solid var(--glass-edge);
+}
+
+/* ── Mesa: felt esmeralda con rail de madera oscura ── */
+body.tool-feltlab .poker-table {
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0%, transparent 42%),
+    radial-gradient(ellipse at 50% 38%, var(--hl2-felt-1, #17756b) 0%, var(--hl2-felt-2, #0f5249) 54%, var(--hl2-felt-3, #09372f) 100%) !important;
+  border: 10px solid #141a27 !important;
+  box-shadow:
+    inset 0 0 0 1px var(--hl2-gold-line),
+    inset 0 0 72px rgba(0, 0, 0, 0.55),
+    0 0 0 1px #05070d,
+    0 0 0 4px #1c2435,
+    0 28px 60px rgba(0, 0, 0, 0.55) !important;
+  animation: hl2-felt-in 0.7s var(--ease-out) backwards;
+}
+body.tool-feltlab .poker-table::before {
+  border: 1px solid rgba(231, 194, 106, 0.10) !important;
+}
+
+/* Pot: píldora de cristal con cifra dorada */
+body.tool-feltlab .pot {
+  background: var(--glass-bg);
+  border: 1px solid var(--hl2-gold-line);
+  border-radius: 999px;
+  color: #f6e7bd;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+body.tool-feltlab .session-badge {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+body.tool-feltlab .table-info-banner {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--hl2-radius-sm);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* Jugadores */
+body.tool-feltlab .player .name-badge {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-edge) !important;
+  border-radius: 999px;
+}
+body.tool-feltlab .player .stack-badge {
+  color: var(--hl2-gold);
+  font-variant-numeric: tabular-nums;
+}
+body.tool-feltlab .player .avatar {
+  box-shadow: 0 0 0 2px rgba(231, 194, 106, 0.22), 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Controles de reproducción ── */
+body.tool-feltlab .video-controls button {
+  background: var(--hl2-surface-hi);
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s var(--ease-out);
+}
+body.tool-feltlab .video-controls button:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: var(--hl2-gold-line);
+}
+body.tool-feltlab .video-controls button:active {
+  transform: scale(0.94);
+}
+body.tool-feltlab .video-controls button.main-play {
+  background: linear-gradient(180deg, var(--hl2-gold-hi), var(--hl2-gold-deep)) !important;
+  color: #1a1305 !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 22px rgba(231, 194, 106, 0.28);
+}
+body.tool-feltlab .progress-bar {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+body.tool-feltlab .progress-fill {
+  background: linear-gradient(90deg, var(--hl2-gold-deep), var(--hl2-gold-hi));
+  border-radius: inherit;
+}
+
+/* ── Panel lateral: segmentado de cristal ── */
+body.tool-feltlab .col-side {
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+  border: 1px solid var(--glass-edge);
+  border-radius: 20px;
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+}
+body.tool-feltlab .side-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--hl2-surface);
+  border: 1px solid var(--hl2-line);
+}
+body.tool-feltlab .side-tab {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  border-radius: 10px;
+  font-weight: 700;
+  transition: background 0.25s var(--ease-out), color 0.25s, box-shadow 0.25s;
+}
+body.tool-feltlab .side-tab:hover {
+  color: var(--text);
+}
+body.tool-feltlab .side-tab.active {
+  background: var(--hl2-gold-soft);
+  color: var(--hl2-gold);
+  box-shadow: inset 0 0 0 1px var(--hl2-gold-line);
+}
+
+/* Buscador y botón de filtros */
+body.tool-feltlab .filter-search,
+body.tool-feltlab .hl-hist-search {
+  background: var(--hl2-surface) !important;
+  border: 1px solid var(--hl2-line) !important;
+  border-radius: var(--hl2-radius-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+body.tool-feltlab .filter-search:focus,
+body.tool-feltlab .hl-hist-search:focus {
+  outline: none;
+  border-color: var(--hl2-gold-line) !important;
+  box-shadow: 0 0 0 3px var(--hl2-gold-soft);
+}
+body.tool-feltlab .hl-filter-open-btn {
+  border-radius: var(--hl2-radius-sm);
+  background: var(--hl2-surface);
+  border: 1px solid var(--hl2-line);
+  transition: border-color 0.2s, background 0.2s;
+}
+body.tool-feltlab .hl-filter-open-btn:hover {
+  border-color: var(--hl2-gold-line);
+}
+
+/* Manos del historial */
+body.tool-feltlab .hand-item {
+  background: var(--hl2-surface) !important;
+  border: 1px solid var(--hl2-line) !important;
+  border-radius: var(--hl2-radius-sm) !important;
+  transition: border-color 0.2s var(--ease-out), background 0.2s var(--ease-out);
+}
+body.tool-feltlab .hand-item:hover {
+  background: var(--hl2-surface-hi) !important;
+  border-color: var(--border-2) !important;
+}
+body.tool-feltlab .hand-item.current {
+  background: var(--hl2-gold-soft) !important;
+  border-color: var(--hl2-gold-line) !important;
+  box-shadow: inset 3px 0 0 var(--hl2-gold);
+}
+/* Cada panel del lateral entra al mostrarse */
+body.tool-feltlab .col-historial,
+body.tool-feltlab .col-stats,
+body.tool-feltlab .col-notes {
+  animation: rl-fade 0.28s var(--ease-out);
+}
+
+/* Estadísticas y notas */
+body.tool-feltlab .stat-block,
+body.tool-feltlab .note-card,
+body.tool-feltlab .note-editor {
+  background: var(--hl2-surface) !important;
+  border: 1px solid var(--hl2-line) !important;
+  border-radius: var(--hl2-radius) !important;
+}
+body.tool-feltlab .stat-block .value,
+body.tool-feltlab .stat-block .count {
+  font-variant-numeric: tabular-nums;
+}
+body.tool-feltlab #noteText {
+  border-radius: var(--hl2-radius-sm);
+}
+body.tool-feltlab .tag-chip {
+  border-radius: 999px;
+  transition: transform 0.15s var(--ease-out), background 0.2s, color 0.2s, border-color 0.2s;
+}
+body.tool-feltlab .tag-chip:hover {
+  border-color: var(--hl2-gold-line);
+}
+body.tool-feltlab .tag-chip:active {
+  transform: scale(0.94);
+}
+body.tool-feltlab .tag-chip.active {
+  background: var(--hl2-gold-soft);
+  color: var(--hl2-gold);
+  border-color: var(--hl2-gold-line);
+}
+
+/* ── Botones ── */
+body.tool-feltlab .btn-primary {
+  background: linear-gradient(180deg, var(--hl2-gold-hi), var(--hl2-gold-deep)) !important;
+  color: #1a1305 !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 6px 18px rgba(231, 194, 106, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  font-weight: 800;
+}
+body.tool-feltlab .btn-primary:hover {
+  filter: brightness(1.06);
+}
+body.tool-feltlab .btn-secondary {
+  background: var(--hl2-surface-hi) !important;
+  border: 1px solid var(--glass-edge) !important;
+  color: var(--text) !important;
+}
+body.tool-feltlab .chip.active {
+  background: var(--hl2-gold-soft);
+  border-color: var(--hl2-gold-line);
+  color: var(--hl2-gold);
+}
+
+/* ── Menú lateral → sheet: entradas con cascada (ver rangelab.css) ── */
+body.tool-feltlab .side-menu-header .title span,
+body.tool-feltlab .side-menu-header .title {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+body.tool-feltlab .menu-item {
+  border-radius: 14px;
+  transition: background 0.2s var(--ease-out);
+}
+body.tool-feltlab .menu-item:hover {
+  background: var(--hl2-surface-hi);
+}
+body.tool-feltlab .tool-mini-card {
+  border-radius: var(--hl2-radius);
+  background: var(--hl2-surface);
+  border: 1px solid var(--glass-edge);
+  transition: border-color 0.25s var(--ease-out), background 0.25s var(--ease-out);
+}
+body.tool-feltlab .tool-mini-card:hover {
+  border-color: var(--tool-c, var(--hl2-gold-line));
+  background: var(--hl2-surface-hi);
+}
+
+/* Modales de FeltLab */
+body.tool-feltlab .modal-header h3 {
+  color: var(--hl2-gold);
+  letter-spacing: -0.01em;
+}
+
+/* ── Barra inferior móvil de cristal ── */
+body.tool-feltlab .hl-unav-item {
+  border-radius: 14px;
+  transition: color 0.25s var(--ease-out), background 0.25s var(--ease-out);
+}
+body.tool-feltlab .hl-unav-item.active {
+  color: var(--hl2-gold);
+  background: var(--hl2-gold-soft);
+}
+body.tool-feltlab .hl-unav-item.active .hl-unav-ico {
+  animation: hl2-pop 0.42s var(--ease-spring);
+}
+@keyframes hl2-pop {
+  0%   { transform: scale(0.8); }
+  60%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* ── Luz clara: el felt se mantiene, el resto respira ── */
+html[data-theme="light"] body.tool-feltlab .hand-item.current {
+  background: rgba(184, 112, 26, 0.10) !important;
+  border-color: rgba(184, 112, 26, 0.35) !important;
+}
+html[data-theme="light"] body.tool-feltlab .side-tab.active {
+  color: #8a5410;
+  background: rgba(184, 112, 26, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(184, 112, 26, 0.35);
+}
+html[data-theme="light"] body.tool-feltlab .btn-primary {
+  color: #1a1305 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Hand Lab v2 · Móvil — reorganización de la pantalla
+   Orden de arriba abajo: banner de mano · mesa · reproducción ·
+   registro. Cada bloque comparte radio, borde y separación.
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  body.tool-feltlab[data-tab="mesa"] .col-mesa {
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* 1 · Banner de la mano: una tarjeta, dos líneas claras */
+  body.tool-feltlab .table-info-banner {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+    background: var(--hl2-surface) !important;
+    border: 1px solid var(--hl2-line) !important;
+  }
+  body.tool-feltlab .tib-title {
+    flex: 1 1 60%;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  body.tool-feltlab .tib-id {
+    color: var(--text-3);
+    font-weight: 600;
+    margin-left: 4px;
+  }
+  body.tool-feltlab .tib-blinds {
+    color: var(--hl2-gold);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  body.tool-feltlab .tib-badge {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 2 · Mesa: más alta y con más felt para que quepan los asientos */
+  body.tool-feltlab .table-scene {
+    aspect-ratio: 1 / 1.1 !important;
+    max-height: min(470px, 60vh) !important;
+  }
+  body.tool-feltlab .poker-table {
+    width: 88% !important;
+    height: 76% !important;
+  }
+
+  /* Asientos compactos: avatar pequeño, chips de una línea */
+  body.tool-feltlab .player {
+    width: 74px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2px;
+  }
+  body.tool-feltlab .player .avatar {
+    width: calc(26px * var(--hl-player-font-scale, 1)) !important;
+    height: calc(26px * var(--hl-player-font-scale, 1)) !important;
+    font-size: calc(9px * var(--hl-player-font-scale, 1)) !important;
+  }
+  body.tool-feltlab .player .stack-badge {
+    font-size: calc(10px * var(--hl-player-font-scale, 1)) !important;
+    padding: 1px 6px !important;
+  }
+  body.tool-feltlab .player .name-badge {
+    font-size: calc(10px * var(--hl-name-scale, 1)) !important;
+    max-width: 74px;
+    padding: 1px 6px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.tool-feltlab .player .cards {
+    min-height: 0 !important;
+    margin: 1px 0;
+  }
+  body.tool-feltlab .player .card {
+    width: calc(22px * var(--hl-card-scale, 1)) !important;
+    height: calc(31px * var(--hl-card-scale, 1)) !important;
+  }
+  /* Board compacto: deja sitio a los asientos laterales */
+  body.tool-feltlab .board { gap: 3px !important; }
+  body.tool-feltlab .board .card {
+    width: calc(31px * var(--hl-board-scale, 1)) !important;
+    height: calc(44px * var(--hl-board-scale, 1)) !important;
+  }
+  body.tool-feltlab .board .card .corner .r { font-size: calc(9px * var(--hl-board-scale, 1)) !important; }
+  body.tool-feltlab .board .card .center-suit { font-size: calc(15px * var(--hl-board-scale, 1)) !important; }
+  body.tool-feltlab .player.is-hero .card {
+    width: calc(22px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important;
+    height: calc(31px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important;
+  }
+  body.tool-feltlab .player.is-hero .card .corner .r { font-size: calc(7px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important; }
+  body.tool-feltlab .player.is-hero .card .center-suit { font-size: calc(10px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important; }
+  body.tool-feltlab .player .card .corner .r { font-size: calc(7px * var(--hl-card-scale, 1)) !important; }
+  body.tool-feltlab .player .card .center-suit { font-size: calc(10px * var(--hl-card-scale, 1)) !important; }
+
+  /* Las cartas de cada jugador salen hacia el centro de la mesa:
+     asientos de abajo → cartas arriba del asiento; el resto, debajo */
+  body.tool-feltlab .player.pos-bottom .action-tag { order: -3; }
+  body.tool-feltlab .player.pos-bottom .cards      { order: -2; }
+  body.tool-feltlab .player.pos-bottom .avatar-wrap { order: -1; }
+
+  body.tool-feltlab .session-badge {
+    font-size: 10px !important;
+    padding: 2px 8px !important;
+  }
+
+  /* 3 · Reproducción: una sola franja con el play al centro */
+  body.tool-feltlab .progress-bar {
+    height: 3px;
+    margin: 0 4px;
+  }
+  body.tool-feltlab .video-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 18px;
+    background: var(--hl2-surface);
+    border: 1px solid var(--hl2-line);
+  }
+  body.tool-feltlab .video-controls button {
+    width: 48px;
+    height: 46px;
+    font-size: 16px;
+  }
+  body.tool-feltlab .video-controls button.main-play {
+    width: 64px;
+    height: 52px;
+  }
+
+  /* 4 · Registro de acciones: tarjeta desplazable */
+  body.tool-feltlab #logAcciones {
+    border-radius: 16px;
+    padding: 4px 12px;
+    background: var(--hl2-surface);
+    border: 1px solid var(--hl2-line);
+    max-height: 132px;
+    overflow-y: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Apariencia personalizable (ajustes de Hand Lab)
+   Las variables --hl2-* y --hl-* las fija applyVisualVars() en JS.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Dorso de cartas según el tema elegido */
+body.tool-feltlab .card.back {
+  background: linear-gradient(145deg, var(--hl2-back-1, #1a3a6b) 0%, var(--hl2-back-2, #0d2244) 100%) !important;
+}
+
+/* Registro oculto si el usuario lo desactiva */
+body.tool-feltlab.hl-hide-log #logAcciones {
+  display: none !important;
+}
+
+/* Texto de registro, notas y lista de manos */
+body.tool-feltlab #logAcciones {
+  font-size: calc(11px * var(--hl-text-scale, 1)) !important;
+}
+body.tool-feltlab .note-card .nc-text,
+body.tool-feltlab .notes-list {
+  font-size: calc(12px * var(--hl-text-scale, 1));
+}
+body.tool-feltlab .hand-item {
+  font-size: calc(13px * var(--hl-text-scale, 1));
+}
+
+/* Segmentados de color: muestra un punto con el color de la opción */
+body.tool-feltlab .hl-seg-wrap {
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+body.tool-feltlab .hl-seg-wrap button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+body.tool-feltlab .hl-seg-wrap button::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sw);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+body.tool-feltlab .setting-row-col {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* Filas de ajustes: el texto tiene prioridad sobre el deslizador */
+body.tool-feltlab .setting-row > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+body.tool-feltlab .setting-row input[type="range"] {
+  flex: 0 1 120px;
+  min-width: 90px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Cartas del héroe · más grandes que las de los demás jugadores
+   (el multiplicador --hl-hero-scale lo fija el ajuste de Hand Lab)
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  body.tool-feltlab .player.is-hero .card {
+    width: calc(40px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important;
+    height: calc(56px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important;
+  }
+  body.tool-feltlab .player.is-hero .card .corner .r {
+    font-size: calc(12px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important;
+  }
+  body.tool-feltlab .player.is-hero .card .center-suit {
+    font-size: calc(18px * var(--hl-card-scale, 1) * var(--hl-hero-scale, 1)) !important;
+  }
+}
+
+/* Posición del bote (negativo sube, positivo baja) */
+body.tool-feltlab .pot {
+  margin-top: var(--hl-pot-offset, 0px) !important;
+}
+
+/* Texto de la lista de manos (historial) */
+body.tool-feltlab .hand-item .hand-idx,
+body.tool-feltlab .hand-item .hand-net {
+  font-size: calc(12px * var(--hl-text-scale, 1)) !important;
+}
+body.tool-feltlab .hand-item .badge {
+  font-size: calc(11px * var(--hl-text-scale, 1)) !important;
+}
+
+/* Menú en PC: botón visible en la cabecera (en móvil lo sustituye la barra inferior) */
+body.tool-feltlab #btnMenuDesk {
+  display: none;
+}
+@media (min-width: 960px) {
+  body.tool-feltlab #btnMenuDesk {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 18px;
+  }
+}

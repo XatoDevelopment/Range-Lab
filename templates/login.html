@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0e14">
+<title>Entrar — {{ site.site_name or 'RangeLab' }}</title>
+<link rel="icon" type="image/svg+xml" href="/static/icons/favicon.svg">
+<link rel="manifest" href="/manifest.webmanifest">
+<script>
+  // Tema y idioma antes de pintar (evita parpadeo)
+  (function () {
+    try {
+      var t = localStorage.getItem('rangelab-theme');
+      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+      var l = localStorage.getItem('rangelab-lang') || 'en';
+      document.documentElement.lang = l.slice(0, 2) === 'es' ? 'es' : 'en';
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root {
+    --bg: #0b0e14; --card: #131822; --line: #232b3b; --text: #eef1f7; --muted: #8a93a8;
+    --accent: #f2a83c; --accent-ink: #1a1206; --danger: #f87171; --focus: #33d2e3;
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f6f9; --card: #ffffff; --line: #dde2ec; --text: #161b26; --muted: #5b6478;
+    --accent: #d9891c; --accent-ink: #ffffff; --danger: #c43d3d; --focus: #0e7490;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100dvh; display: flex; flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .top { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -.01em; }
+  .brand img { width: 32px; height: 32px; border-radius: 9px; }
+  .brand .wm em { color: var(--accent); font-style: normal; }
+  .tools { display: flex; gap: 6px; }
+  .tools button {
+    height: 36px; min-width: 36px; padding: 0 10px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--card); color: var(--muted);
+    font: 600 13px system-ui, sans-serif; cursor: pointer;
+  }
+  .tools button[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
+
+  main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 16px 24px; }
+  .card {
+    width: 100%; max-width: 380px; background: var(--card);
+    border: 1px solid var(--line); border-radius: 18px; padding: 22px 20px 20px;
+    box-shadow: 0 18px 40px -20px rgba(0,0,0,.45);
+  }
+  h1 { margin: 0 0 4px; font-size: 22px; letter-spacing: -.02em; }
+  .sub { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+
+  .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+  .seg button {
+    height: 40px; border: 0; border-radius: 9px; background: transparent; color: var(--muted);
+    font: 700 15px system-ui, sans-serif; cursor: pointer;
+  }
+  .seg button[aria-selected="true"] { background: var(--card); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+
+  .field { margin-bottom: 14px; }
+  .field[hidden] { display: none; }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+  .input {
+    position: relative; display: flex; align-items: center;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%; height: 48px; padding: 0 14px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--text);
+    font-size: 16px; /* evita el zoom automático de iOS */
+    outline: none;
+  }
+  input:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  input.has-toggle { padding-right: 60px; }
+  .toggle-pw {
+    position: absolute; right: 6px; height: 36px; padding: 0 10px; border: 0; border-radius: 8px;
+    background: transparent; color: var(--muted); font: 600 13px system-ui, sans-serif; cursor: pointer;
+  }
+  .row { display: flex; align-items: center; gap: 8px; margin: 2px 0 16px; color: var(--muted); font-size: 14px; }
+  .row input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+  .error {
+    display: none; margin: 0 0 14px; padding: 10px 12px; border-radius: 10px;
+    background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.35); color: var(--danger); font-size: 14px;
+  }
+  .error.show { display: block; }
+
+  .submit {
+    width: 100%; height: 50px; border: 0; border-radius: 12px; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink); font: 800 16px system-ui, sans-serif;
+  }
+  .submit:disabled { opacity: .6; cursor: default; }
+
+  .help { margin: 16px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; text-align: center; }
+  .help a { color: var(--focus); font-weight: 700; }
+
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 12px 16px 18px; }
+
+  @media (min-width: 600px) { .card { padding: 28px 28px 24px; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .card { animation: rise .28s ease-out; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><img src="/static/icons/favicon.svg" alt="" width="32" height="32"><span class="wm">Range<em>Lab</em></span></div>
+  <div class="tools">
+    <button type="button" id="langBtn" aria-label="Idioma">EN</button>
+    <button type="button" id="themeBtn" aria-label="Tema claro u oscuro">☾</button>
+  </div>
+</header>
+
+<main>
+  <section class="card" aria-labelledby="title">
+    <h1 id="title">Entrar</h1>
+    <p class="sub" id="subtitle">Sign in to your private lab</p>
+
+    <div class="seg" role="tablist">
+      <button type="button" role="tab" id="tabLogin" aria-selected="true" aria-controls="form">Sign in</button>
+      <button type="button" role="tab" id="tabRegister" aria-selected="false" aria-controls="form">Create account</button>
+    </div>
+
+    <div class="error" id="errorBox" role="alert"></div>
+
+    <form id="form" autocomplete="on" novalidate>
+      <div class="field" id="fName" hidden>
+        <label for="display_name" id="lblName">Name (optional)</label>
+        <input id="display_name" name="display_name" type="text" autocomplete="nickname" maxlength="80">
+      </div>
+
+      <div class="field">
+        <label for="username" id="lblUser">Username</label>
+        <input id="username" name="username" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required minlength="3" enterkeyhint="next">
+      </div>
+
+      <div class="field">
+        <label for="password" id="lblPass">Password</label>
+        <div class="input">
+          <input id="password" class="has-toggle" name="password" type="password" autocomplete="current-password" required minlength="8" enterkeyhint="go">
+          <button type="button" class="toggle-pw" id="togglePw" aria-label="Show password">Show</button>
+        </div>
+      </div>
+
+
+      <label class="row" id="fRemember">
+        <input id="remember" type="checkbox" checked>
+        <span id="lblRemember">Remember this device</span>
+      </label>
+
+      <button class="submit" id="submit" type="submit">Sign in</button>
+    </form>
+
+    <p class="help" id="helpExisting">If the username already exists, use “Sign in”.</p>
+  </section>
+</main>
+
+<footer>{{ site.footer_text or '' }}<br>Developed by {{ developer.name }} · <a href="mailto:{{ developer.email }}" style="color:inherit">{{ developer.email }}</a></footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var STR = {
+    es: {
+      login: 'Sign in', register: 'Create account', titleLogin: 'Sign in', titleRegister: 'Create account',
+      subLogin: 'Sign in to your private lab', subRegister: 'Sign up on this server',
+      name: 'Name (optional)', user: 'Username', pass: 'Password',
+      remember: 'Remember this device', show: 'Show', hide: 'Hide',
+      helpExisting: 'If the username already exists, use “Sign in”.',
+      sending: '…', exists: 'That username already exists. Switch to “Sign in” and enter your password.',
+      bad: 'Incorrect username or password. Check for extra spaces or create a new account.',
+      needUser: 'The username must be at least 3 characters.', needPass: 'The password must be at least 8 characters.',
+      network: 'Could not reach the server. Check your connection and try again.',
+      generic: 'Something went wrong. Please try again.'
+    },
+    en: {
+      login: 'Sign in', register: 'Create account', titleLogin: 'Sign in', titleRegister: 'Create account',
+      subLogin: 'Access your private lab', subRegister: 'Register on this server',
+      name: 'Name (optional)', user: 'Username', pass: 'Password',
+      remember: 'Remember this device', show: 'Show', hide: 'Hide',
+      helpExisting: 'If the user already exists, use “Sign in”.',
+      sending: '…', exists: 'That user already exists. Switch to “Sign in” and enter your password.',
+      bad: 'Wrong username or password. Check for spaces or create a new account.',
+      needUser: 'Username must be at least 3 characters.', needPass: 'Password must be at least 8 characters.',
+      network: 'Could not reach the server. Check your connection and try again.',
+      generic: 'Something went wrong. Try again.'
+    }
+  };
+
+  var lang = (document.documentElement.lang === 'en') ? 'en' : 'es';
+  var T = STR[lang];
+  var mode = 'login';
+  var form = document.getElementById('form');
+  var $ = function (id) { return document.getElementById(id); };
+
+  function applyLang() {
+    $('langBtn').textContent = lang === 'es' ? 'EN' : 'ES';
+    $('lblName').textContent = T.name; $('lblUser').textContent = T.user; $('lblPass').textContent = T.pass;
+    $('lblRemember').textContent = T.remember;
+    $('helpExisting').textContent = T.helpExisting;
+    $('tabLogin').textContent = T.login; $('tabRegister').textContent = T.register;
+    $('togglePw').textContent = T.show;
+    setMode(mode);
+  }
+
+  function setMode(m) {
+    mode = m;
+    var reg = m === 'register';
+    $('tabLogin').setAttribute('aria-selected', String(!reg));
+    $('tabRegister').setAttribute('aria-selected', String(reg));
+    $('fName').hidden = !reg;
+    $('fRemember').hidden = reg;
+    $('title').textContent = reg ? T.titleRegister : T.titleLogin;
+    $('subtitle').textContent = reg ? T.subRegister : T.subLogin;
+    $('submit').textContent = reg ? T.register : T.login;
+    $('password').setAttribute('autocomplete', reg ? 'new-password' : 'current-password');
+    $('helpExisting').hidden = reg;
+    showError('');
+  }
+
+  function showError(msg) {
+    var box = $('errorBox');
+    box.textContent = msg || '';
+    box.classList.toggle('show', !!msg);
+  }
+
+  async function api(method, url, body) {
+    var opts = { method: method, headers: { 'Accept': 'application/json' }, credentials: 'same-origin' };
+    if (body !== undefined) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+    var res, text;
+    try { res = await fetch(url, opts); text = await res.text(); }
+    catch (e) { var ne = new Error(T.network); ne.status = 0; throw ne; }
+    var data = null;
+    if (text) { try { data = JSON.parse(text); } catch (e) { data = null; } }
+    if (!res.ok) {
+      var err = new Error((data && data.error) || T.generic);
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  $('tabLogin').onclick = function () { setMode('login'); };
+  $('tabRegister').onclick = function () { setMode('register'); };
+
+  $('togglePw').onclick = function () {
+    var pw = $('password');
+    var show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    this.textContent = show ? T.hide : T.show;
+    this.setAttribute('aria-label', show ? T.hide : T.show);
+  };
+
+  $('langBtn').onclick = function () {
+    lang = lang === 'es' ? 'en' : 'es';
+    T = STR[lang];
+    document.documentElement.lang = lang;
+    try { localStorage.setItem('rangelab-lang', lang); } catch (e) {}
+    applyLang();
+  };
+
+  $('themeBtn').onclick = function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    this.setAttribute('aria-pressed', String(next === 'light'));
+    try { localStorage.setItem('rangelab-theme', next); } catch (e) {}
+  };
+
+  try {
+    var saved = localStorage.getItem('rangelab-remember');
+    if (saved !== null) $('remember').checked = saved === '1';
+  } catch (e) {}
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    showError('');
+    var username = $('username').value.trim().toLowerCase();
+    var password = $('password').value;
+    if (username.length < 3) { showError(T.needUser); $('username').focus(); return; }
+    if (password.length < 8) { showError(T.needPass); $('password').focus(); return; }
+
+    var btn = $('submit');
+    var label = btn.textContent;
+    btn.disabled = true; btn.textContent = T.sending;
+    try {
+      if (mode === 'login') {
+        var remember = $('remember').checked;
+        try { localStorage.setItem('rangelab-remember', remember ? '1' : '0'); } catch (e) {}
+        await api('POST', '/api/auth/login', { username: username, password: password, remember: remember });
+      } else {
+        await api('POST', '/api/auth/register', {
+          username: username,
+          password: password,
+          display_name: $('display_name').value.trim()
+        });
+      }
+      window.location.replace('/');
+    } catch (err) {
+      var msg = err.message || T.generic;
+      if (mode === 'register' && err.status === 409) msg = T.exists;
+      if (mode === 'login' && err.status === 401) msg = T.bad;
+      showError(msg);
+      btn.disabled = false; btn.textContent = label;
+    }
+  });
+
+  // Si ya hay sesión, entrar directamente
+  api('GET', '/api/auth/me').then(function (r) {
+    if (r && r.authenticated) window.location.replace('/');
+  }).catch(function () {});
+
+  applyLang();
+  $('themeBtn').setAttribute('aria-pressed', String(document.documentElement.getAttribute('data-theme') === 'light'));
+  $('username').focus();
+})();
+</script>
+</body>
+</html>

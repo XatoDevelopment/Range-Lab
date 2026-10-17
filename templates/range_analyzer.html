@@ -1,0 +1,3069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Range Lab — RangeLab Suite</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/profile.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+<style>
+  /* FIX navegación de pestañas — solo Range Analyzer */
+  body.tool-range main.main .ra-panel { display: none; }
+  body.tool-range main.main .ra-panel.active { display: block; }
+  body.tool-range main.main #analysisContainer { display: block; }
+  body.tool-range main.main #analysisContainer.ra-hidden { display: none !important; }
+  body.tool-range main.main #uploadCard.ra-hidden { display: none !important; }
+  body.tool-range #raTabs.ra-hidden { display: none !important; }
+
+  /* Header compacto con hamburguesa */
+  body.tool-range .app-header .brand {
+    min-width: 0; flex: 1; gap: 8px;
+  }
+  body.tool-range .app-header .brand-text { min-width: 0; }
+  body.tool-range .app-header .brand-title {
+    font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  body.tool-range .app-header .brand-sub {
+    font-size: 9px; letter-spacing: 0.6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  body.tool-range .app-header .brand-mark { flex-shrink: 0; }
+
+  /* Header actions: conn-indicator + user-chip */
+  body.tool-range .app-header .header-actions {
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+  }
+  body.tool-range .ra-conn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 6px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  body.tool-range .ra-conn .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-3);
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  body.tool-range .ra-conn.online { color: var(--green); border-color: rgba(52,211,153,0.35); }
+  body.tool-range .ra-conn.online .dot { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  body.tool-range .ra-conn.offline { color: var(--red); border-color: rgba(248,113,113,0.35); }
+  body.tool-range .ra-conn.offline .dot { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+  body.tool-range .ra-user {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+  }
+  body.tool-range .ra-user .udot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-3, #888);
+    flex-shrink: 0;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  body.tool-range .ra-user.online .udot {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+  body.tool-range .ra-user.offline .udot {
+    background: var(--red);
+    box-shadow: none;
+  }
+  body.tool-range .ra-user .uname {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (max-width: 520px) {
+    body.tool-range .ra-conn { display: none !important; }
+    body.tool-range .ra-user { padding: 6px 10px; font-size: 11px; max-width: 130px; }
+    body.tool-range .ra-user .uname { display: inline !important; max-width: 90px; }
+  }
+
+  /* Drawer (mismo patrón que MTT Exploiter) */
+  body.tool-range .drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(7,9,15,0.75);
+    
+    
+    z-index: 500;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s;
+  }
+  body.tool-range .drawer-overlay.show { opacity: 1; visibility: visible; }
+  body.tool-range .drawer {
+    position: fixed; top: 0; bottom: 0; left: 0;
+    width: 88%; max-width: 360px;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    z-index: 501;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex; flex-direction: column;
+    padding-top: var(--safe-top, 0);
+    padding-bottom: var(--safe-bottom, 0);
+    overflow-y: auto;
+    box-shadow: 6px 0 30px rgba(0,0,0,0.5);
+  }
+  body.tool-range .drawer.show { transform: translateX(0); }
+  body.tool-range .drawer-header {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex; align-items: center; gap: 14px;
+  }
+  body.tool-range .drawer-logo {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(34,211,238,0.35);
+  }
+  body.tool-range .drawer-brand { min-width: 0; flex: 1; }
+  body.tool-range .drawer-brand-title {
+    font-size: 16px; font-weight: 900; line-height: 1.15;
+  }
+  body.tool-range .drawer-brand-title span {
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  body.tool-range .drawer-brand-sub {
+    font-size: 10px; color: var(--text-3); font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; margin-top: 3px;
+  }
+  body.tool-range .drawer-section { padding: 14px 14px 6px; }
+  body.tool-range .drawer-section-title {
+    font-size: 10px; color: var(--text-3); text-transform: uppercase;
+    letter-spacing: 1.2px; font-weight: 800; padding: 0 8px 8px;
+  }
+  body.tool-range .drawer-item {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    padding: 13px 14px; border-radius: 12px; color: var(--text-2);
+    font-size: 13.5px; font-weight: 700; text-align: left;
+    transition: all 0.15s; border: 1px solid transparent; margin-bottom: 4px;
+    background: transparent; cursor: pointer;
+  }
+  body.tool-range .drawer-item:hover {
+    background: var(--bg-2); color: var(--text); border-color: var(--border);
+  }
+  body.tool-range .drawer-item-icon {
+    width: 36px; height: 36px; border-radius: 10px; background: var(--bg-2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0; border: 1px solid var(--border-soft);
+  }
+  body.tool-range .drawer-item-text { min-width: 0; flex: 1; }
+  body.tool-range .drawer-item-title {
+    font-size: 13.5px; font-weight: 800; color: inherit; line-height: 1.2;
+  }
+  body.tool-range .drawer-item-desc {
+    font-size: 11px; color: var(--text-3); font-weight: 500; margin-top: 2px; line-height: 1.3;
+  }
+  body.tool-range .drawer-footer {
+    margin-top: auto; padding: 18px 20px 20px;
+    border-top: 1px solid var(--border-soft);
+    text-align: center; font-size: 11.5px; color: var(--text-3); line-height: 1.6;
+  }
+  body.tool-range .drawer-footer strong { color: var(--cyan); font-weight: 800; }
+  body.tool-range .drawer-status {
+    margin: 8px 14px 0; padding: 10px 12px; border-radius: 10px;
+    background: var(--bg-2); border: 1px solid var(--border-soft);
+    font-size: 11px; color: var(--text-3); line-height: 1.45;
+  }
+  body.tool-range .drawer-status b { color: var(--text); }
+
+  /* Botones de import (Hand Lab / Preflop Lab) */
+  body.tool-range .ra-import-btns {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+  }
+  body.tool-range .ra-import-btns .btn {
+    flex: 1 1 140px; justify-content: center; font-size: 12px; padding: 10px 12px;
+  }
+
+  /* Heatmap responsivo (override CSS global min-width:420px) */
+  body.tool-range .heatmap-wrap {
+    background: var(--bg-1) !important;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 6px 14px !important;
+    overflow: visible !important;
+  }
+  body.tool-range .heatmap-grid-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding: 4px 0 8px;
+    scrollbar-width: thin;
+  }
+  body.tool-range .heatmap-grid-wrap::-webkit-scrollbar {
+    height: 4px;
+  }
+  body.tool-range .heatmap-grid-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+  }
+  body.tool-range .heatmap-grid {
+    --ra-cell: 22px;
+    display: grid !important;
+    grid-template-columns: repeat(13, var(--ra-cell)) !important;
+    grid-template-rows: repeat(13, var(--ra-cell)) !important;
+    gap: 1px !important;
+    width: max-content !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+  }
+  body.tool-range .hm-cell {
+    width: var(--ra-cell) !important;
+    height: var(--ra-cell) !important;
+    min-width: var(--ra-cell) !important;
+    min-height: var(--ra-cell) !important;
+    border-radius: 3px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--ra-cell) * 0.30) !important;
+    font-weight: 700 !important;
+    font-family: ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace !important;
+    color: rgba(255,255,255,0.88);
+    border: 1.5px solid transparent !important;
+    cursor: default;
+    user-select: none;
+    line-height: 1 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+  }
+  body.tool-range .hm-cell:hover {
+    filter: brightness(1.15);
+    z-index: 2;
+  }
+  body.tool-range .hm-cell.pair { font-weight: 900 !important; }
+  body.tool-range .hm-cell.empty {
+    color: rgba(255,255,255,0.18);
+    background: var(--bg-3) !important;
+  }
+  body.tool-range .hm-cell.status-ok,
+  body.tool-range .hm-cell.status-under,
+  body.tool-range .hm-cell.status-error {
+    border-color: rgba(0,0,0,0.4) !important;
+    color: #0a0a0a !important;
+    font-weight: 800 !important;
+  }
+  body.tool-range .hm-cell.status-over {
+    border-color: rgba(0,0,0,0.4) !important;
+    color: #fff7ed !important;
+    font-weight: 800 !important;
+  }
+  body.tool-range .hm-cell.status-strat {
+    border-color: rgba(34,197,94,0.45) !important;
+  }
+  body.tool-range .heatmap-legend {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    font-size: 11px; color: var(--text-3); margin-top: 10px;
+  }
+  body.tool-range .heatmap-legend .lg-item {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  body.tool-range .heatmap-legend .lg-swatch {
+    width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+  }
+  body.tool-range #positionTabs,
+  body.tool-range .tab-buttons {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+    max-width: 100%;
+    padding-bottom: 4px;
+  }
+
+  /* Fila alineada: Stack (izq) + Posiciones (der) en heatmap */
+  body.tool-range .heatmap-filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    margin: 0 0 12px;
+    padding: 2px 0 6px;
+    width: 100%;
+  }
+  body.tool-range .heatmap-filters-row .bb-filter-row {
+    margin: 0;
+    padding: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  body.tool-range .heatmap-filters-row .tab-buttons,
+  body.tool-range .heatmap-filters-row #positionTabs {
+    flex: 0 1 auto;
+    margin: 0;
+    max-width: 100%;
+  }
+  /* Filtro por stack BB en heatmap */
+  body.tool-range .bb-filter-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 0 12px;
+    padding: 2px 0 6px;
+    max-width: 100%;
+  }
+  body.tool-range .bb-filter-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    flex-shrink: 0;
+    margin-right: 2px;
+  }
+  body.tool-range .bb-filter-btn {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  body.tool-range .bb-filter-btn:hover {
+    border-color: rgba(34,211,238,0.45);
+    color: var(--text);
+  }
+  body.tool-range .bb-filter-btn.active {
+    background: color-mix(in srgb, var(--cyan) 15%, transparent);
+    border-color: color-mix(in srgb, var(--cyan) 50%, transparent);
+    color: var(--cyan);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 20%, transparent);
+  }
+
+  
+@media (max-width: 767px) {
+  body.tool-range .drawer, body.tool-range #drawer, body.tool-range .side-drawer {
+    top: auto !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+    width: 100% !important; max-width: 100% !important; max-height: min(88vh, 640px) !important;
+    border-radius: 20px 20px 0 0 !important; border-right: none !important;
+    transform: translateY(105%) !important;
+  }
+  body.tool-range .drawer.show, body.tool-range #drawer.show, body.tool-range .side-drawer.show {
+    transform: translateY(0) !important;
+  }
+  body.tool-range #btnMenu { display: none !important; }
+}
+
+</style>
+<link rel="stylesheet" href="/static/css/rangelab-menus.css">
+</head>
+<body class="rl-loading tool-range">
+
+<div id="splash">
+  <div class="splash-logo">📊</div>
+  <div class="splash-title">Range <span>Lab</span></div>
+  <div class="splash-sub">RangeLab Suite · Leaks · Heatmaps · GTO</div>
+  <div class="splash-credits">Cargando herramienta…</div>
+  <div class="splash-bar"></div>
+  <div class="splash-credit">
+    <span class="rl-site-footer">Creado por RangeSoft® · © 2026</span>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="rl-sheet-handle" aria-hidden="true" style="width:36px;height:4px;background:var(--border,#2a3348);border-radius:2px;margin:10px auto 4px;flex-shrink:0;"></div>
+  <div class="drawer-header">
+    <div class="drawer-logo">📊</div>
+    <div class="drawer-brand">
+      <div class="drawer-brand-title">Range <span>Lab</span></div>
+      <div class="drawer-brand-sub">Leaks · Heatmaps · GTO</div>
+    </div>
+  </div>
+  <div class="drawer-status" id="drawerStatus" data-i18n="common.noData">Sin datos cargados</div>
+  <div class="drawer-section">
+    <div class="drawer-section-title" data-i18n="nav.navigation">Navegación</div>
+    <button class="drawer-item" id="drawerBackPortal" type="button" onclick="window.location.href='/'">
+      <div class="drawer-item-icon">🏠</div>
+      <div class="drawer-item-text">
+        <div class="drawer-item-title" data-i18n="nav.backPortal">Volver al portal</div>
+        <div class="drawer-item-desc" data-i18n="nav.backPortalDesc">RangeLab Suite</div>
+      </div>
+    </button>
+  </div>
+  <div class="drawer-section">
+    <div class="drawer-section-title" data-i18n="nav.data">Datos</div>
+    <button class="drawer-item" id="drawerImport" type="button">
+      <div class="drawer-item-icon">📥</div>
+      <div class="drawer-item-text">
+        <div class="drawer-item-title" data-i18n="rl.importLoad">Importar / Cargar</div>
+        <div class="drawer-item-desc" data-i18n="rl.importLoadDesc">Manos y tablas preflop</div>
+      </div>
+    </button>
+    <button class="drawer-item" id="drawerReplaceHands" type="button">
+      <div class="drawer-item-icon">🃏</div>
+      <div class="drawer-item-text">
+        <div class="drawer-item-title" data-i18n="rl.replaceHands">Reemplazar manos</div>
+        <div class="drawer-item-desc" data-i18n="rl.replaceHandsDesc">Mantiene las tablas</div>
+      </div>
+    </button>
+    <button class="drawer-item" id="drawerReplaceTables" type="button">
+      <div class="drawer-item-icon">📋</div>
+      <div class="drawer-item-text">
+        <div class="drawer-item-title">Reemplazar tablas</div>
+        <div class="drawer-item-desc">Mantiene las manos</div>
+      </div>
+    </button>
+    <button class="drawer-item" id="drawerClearAll" type="button">
+      <div class="drawer-item-icon">🗑️</div>
+      <div class="drawer-item-text">
+        <div class="drawer-item-title">Borrar todo</div>
+        <div class="drawer-item-desc">Manos, tablas y análisis</div>
+      </div>
+    </button>
+  </div>
+  <div class="drawer-section">
+    <div class="drawer-section-title">Análisis</div>
+    <button class="drawer-item" id="drawerGoLeaks" type="button">
+      <div class="drawer-item-icon">🚨</div>
+      <div class="drawer-item-text">
+        <div class="drawer-item-title">Ver leaks</div>
+        <div class="drawer-item-desc">Requiere análisis previo</div>
+      </div>
+    </button>
+  </div>
+  <div class="drawer-section">
+    <div class="drawer-section-title" data-i18n="common.language">Idioma</div>
+    <div class="lang-menu-row">
+      <span class="lmr-label">
+        <span class="lmr-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span data-i18n="common.language">Idioma</span>
+      </span>
+      <div class="rl-lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang-set="es" title="Español">ES</button>
+        <button type="button" data-lang-set="en" title="English">EN</button>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <div><span class="rl-site-footer">Creado por RangeSoft® · © 2026</span></div>
+  </div>
+</aside>
+
+<header class="app-header">
+  <div class="brand">
+    <button class="icon-btn" id="btnMenu" title="Menú" data-i18n-title="nav.menu" data-i18n-aria="nav.menu" style="margin-right:2px;flex-shrink:0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="brand-mark">📊</div>
+    <div class="brand-text">
+      <div class="brand-title">Range <span>Lab</span></div>
+      <div class="brand-sub">Manos + Tablas · RangeLab</div>
+    </div>
+  </div>
+  <div class="header-actions">
+      <button class="theme-toggle" type="button" title="Tema claro/oscuro" data-i18n-title="common.theme" data-i18n-aria="common.theme" aria-label="Cambiar tema claro/oscuro">
+        <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    <div class="ra-conn" id="raConn" title="Estado del servidor" data-i18n-title="nav.serverStatus">
+      <span class="dot"></span>
+      <span class="ctext">—</span>
+    </div>
+    <div class="ra-user" id="raUser" title="Sesión actual" data-i18n-title="nav.session">
+      <span class="udot"></span>
+      <span class="uname" id="raUserName">—</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="ra-tabs ra-hidden" id="raTabs">
+    <button type="button" class="ra-tab active" data-ra="stats">Stats</button>
+    <button type="button" class="ra-tab" data-ra="leaks">Leaks</button>
+    <button type="button" class="ra-tab" data-ra="heatmap">Heatmap</button>
+    <button type="button" class="ra-tab" data-ra="pos">Posiciones</button>
+  </div>
+
+  <div class="upload-card" id="uploadCard">
+    <div class="upload-title">📊 Analiza tu juego vs tu estrategia</div>
+    <div class="upload-sub">
+      <strong>Obligatorio:</strong> importa <em>manos</em> y <em>tablas preflop</em> (export JSON de Preflop Lab).
+      El análisis compara tu juego real con tus tablas. Si faltan spots en las tablas, se marcan como incompletos.
+      Los datos se guardan en este dispositivo hasta que los reemplaces.
+    </div>
+
+    <div id="raReadyBanner" style="display:none;margin-bottom:14px;padding:10px 12px;border-radius:10px;border:1px solid rgba(52,211,153,0.35);background:rgba(52,211,153,0.08);font-size:12px;line-height:1.45;">
+      <div id="raReadyText" style="color:var(--green);font-weight:700;"></div>
+      <div id="raReadyDetail" style="color:var(--muted);margin-top:4px;"></div>
+    </div>
+
+    <!-- PASO 1: MANOS -->
+    <div style="margin-bottom:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:800;">1. Manos</div>
+        <div id="handsStatusBadge" style="font-size:11px;font-weight:700;color:var(--muted);">Sin cargar</div>
+      </div>
+      <div class="format-badges">
+        <div class="fmt-badge" style="color: var(--cyan); border-color: rgba(34,211,238,0.3);">CoinPoker</div>
+        <div class="fmt-badge" style="color: var(--purple); border-color: rgba(167,139,250,0.3);">ACR / WPN</div>
+        <div class="fmt-badge" style="color: var(--red); border-color: rgba(248,113,113,0.3);">PokerStars</div>
+        <div class="fmt-badge" style="color: var(--green); border-color: rgba(52,211,153,0.3);">Genérico</div>
+        <div class="fmt-badge" style="color: var(--pink); border-color: rgba(219,97,162,0.3);">FeltLab JSON</div>
+      </div>
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon">📁</div>
+        <div class="dropzone-text">Arrastra o toca para cargar manos</div>
+        <div class="dropzone-sub">Logs .txt / .log · JSON de FeltLab · Múltiples archivos</div>
+        <input type="file" id="fileInput" accept=".json,.txt,.log" multiple>
+      </div>
+      <div class="dropzone-files" id="dropzoneFiles"></div>
+      <div class="ra-import-btns">
+        <button type="button" class="btn btn-secondary" id="btnLoadHandLab">🗄️ Mis manos (Hand Lab)</button>
+      </div>
+    </div>
+
+    <!-- PASO 2: TABLAS -->
+    <div style="margin-bottom:18px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+        <div style="font-size:13px;font-weight:800;">2. Tablas preflop</div>
+        <div id="tablesStatusBadge" style="font-size:11px;font-weight:700;color:var(--muted);">Sin cargar</div>
+      </div>
+      <div class="format-badges">
+        <div class="fmt-badge" style="color: var(--gold); border-color: rgba(240,193,75,0.35);">Preflop Lab JSON</div>
+        <div class="fmt-badge" style="color: var(--accent); border-color: rgba(99,102,241,0.35);">v4 8-max</div>
+      </div>
+      <div class="dropzone" id="dropzoneTables">
+        <div class="dropzone-icon">📋</div>
+        <div class="dropzone-text">Arrastra o toca el JSON de Preflop Lab</div>
+        <div class="dropzone-sub">Export JSON · o carga la salva guardada en Preflop Lab</div>
+        <input type="file" id="tablesFileInput" accept=".json">
+      </div>
+      <div class="dropzone-files" id="tablesFiles"></div>
+      <div class="ra-import-btns">
+        <button type="button" class="btn btn-secondary" id="btnLoadPreflopLab">♠ Cargar desde Preflop Lab</button>
+      </div>
+      <div id="tablesCoverage" style="display:none;margin-top:8px;font-size:11px;color:var(--muted);line-height:1.5;"></div>
+    </div>
+
+    <div class="parse-progress" id="parseProgress">
+      <div class="parse-progress-text">
+        <span id="parseProgressLabel">Procesando…</span>
+        <strong id="parseProgressPct">0%</strong>
+      </div>
+      <div class="parse-progress-bar">
+        <div class="parse-progress-fill" id="parseProgressFill"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="btnAnalyze" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      Analizar (manos + tablas)
+    </button>
+    <div id="analyzeHint" style="margin-top:8px;font-size:11px;color:var(--muted);text-align:center;">
+      Importa manos y tablas para habilitar el análisis
+    </div>
+
+    <button class="load-demo-btn" id="btnDemo" style="margin-top:10px;">
+      ✨ Demo: 200 manos + tablas RFI básicas
+    </button>
+  </div>
+
+  <div id="analysisContainer">
+    <div class="section" data-ra-section="stats">
+      <div class="table-size-badge" id="tableSizeBadge">
+        <span class="dot"></span>
+        <span id="tableSizeText">Mesa detectada: 8-max</span>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card" style="--card-color: var(--cyan);">
+          <div class="summary-label">Manos</div>
+          <div class="summary-value" id="sTotalHands">0</div>
+          <div class="summary-detail" id="sTotalDetail">analizadas</div>
+        </div>
+        <div class="summary-card" style="--card-color: var(--green);">
+          <div class="summary-label">Winrate</div>
+          <div class="summary-value" id="sWinrate">—</div>
+          <div class="summary-detail">bb/100</div>
+        </div>
+        <div class="summary-card" style="--card-color: var(--gold);">
+          <div class="summary-label">VPIP</div>
+          <div class="summary-value" id="sVpip">0%</div>
+          <div class="summary-detail" id="sVpipGto">GTO: 18-24%</div>
+        </div>
+        <div class="summary-card" style="--card-color: var(--purple);">
+          <div class="summary-label">PFR</div>
+          <div class="summary-value" id="sPfr">0%</div>
+          <div class="summary-detail" id="sPfrGto">GTO: 15-20%</div>
+        </div>
+        <div class="summary-card" style="--card-color: var(--pink);">
+          <div class="summary-label">Leaks</div>
+          <div class="summary-value" id="sLeaks">0</div>
+          <div class="summary-detail" id="sLeaksDetail">detectados</div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <div class="section-title">📊 Stats vs estrategia</div>
+          <div class="section-sub" id="gtoSubtitle">Comparado con tablas importadas</div>
+        </div>
+      </div>
+      <div class="stats-bars" id="statsBars"></div>
+    </div>
+
+    <div class="section" data-ra-section="leaks">
+      <div class="section-head">
+        <div>
+          <div class="section-title">🚨 Leaks detectados</div>
+          <div class="section-sub">Desviaciones respecto a tus tablas (spots sin tabla no cuentan como leak)</div>
+        </div>
+      </div>
+      <div class="leaks-list" id="leaksList"></div>
+    </div>
+
+    <div class="section" data-ra-section="heatmap">
+      <div class="section-head">
+        <div>
+          <div class="section-title">🔥 Tu rango vs tablas</div>
+          <div class="section-sub">Borde dorado = en tu estrategia. Rojo pulsante = desviación</div>
+        </div>
+      </div>
+      <div class="heatmap-filters-row">
+        <div class="bb-filter-row" id="bbFilterTabs">
+          <span class="bb-filter-label">Stack</span>
+          <button type="button" class="bb-filter-btn active" data-bb="">Todo</button>
+          <button type="button" class="bb-filter-btn" data-bb="60">60</button>
+          <button type="button" class="bb-filter-btn" data-bb="40">40</button>
+          <button type="button" class="bb-filter-btn" data-bb="20">20</button>
+          <button type="button" class="bb-filter-btn" data-bb="15">15</button>
+          <button type="button" class="bb-filter-btn" data-bb="5">5</button>
+        </div>
+        <div class="tab-buttons" id="positionTabs"></div>
+      </div>
+      <div class="heatmap-wrap">
+        <div class="compliance-banner" id="complianceBanner" style="display:none;">
+          <div class="compliance-circle" id="complianceCircle"><span id="compliancePct">0%</span></div>
+          <div class="compliance-body">
+            <div class="compliance-title" id="complianceTitle">Cumplimiento</div>
+            <div class="compliance-sub" id="complianceSub">—</div>
+          </div>
+        </div>
+        <div class="heatmap-grid-wrap"><div class="heatmap-grid" id="heatmapGrid"></div></div>
+        <div class="heatmap-legend">
+          <span class="lg-item"><span class="lg-swatch" style="background:#22c55e;border:1px solid #000;"></span>Verde: OK</span>
+          <span class="lg-item"><span class="lg-swatch" style="background:#fde047;border:1px solid #000;"></span>Amarillo: Underplay</span>
+          <span class="lg-item"><span class="lg-swatch" style="background:#ea580c;border:1px solid #000;"></span>Naranja: Overplay</span>
+          <span class="lg-item"><span class="lg-swatch" style="background:#f87171;border:1px solid #000;"></span>Rojo: Error</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" data-ra-section="pos">
+      <div class="section-head">
+        <div>
+          <div class="section-title">📍 Resultados por posición</div>
+          <div class="section-sub" id="posSubtitle">Winrate, stats y match vs tus tablas</div>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="pos-table" id="posTable">
+          <thead>
+            <tr>
+              <th>Posición</th>
+              <th>Manos</th>
+              <th>VPIP</th>
+              <th>PFR</th>
+              <th>Winrate</th>
+              <th>Match</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<script src="/static/js/api-client.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   TABLAS GTO 8-MAX TORNEO
+   ═══════════════════════════════════════════════════════════ */
+const RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+
+const GTO_RFI_8MAX = {
+  'UTG': { label:'UTG (14.5%)', pct:14.5, hands:['AA','KK','QQ','JJ','TT','99','88','77','66','55','AKs','AQs','AJs','ATs','A5s','A4s','KQs','KJs','KTs','QJs','QTs','JTs','T9s','98s','87s','AKo','AQo','AJo','KQo'] },
+  'UTG+1': { label:'UTG+1 (16.8%)', pct:16.8, hands:['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','AKs','AQs','AJs','ATs','A9s','A5s','A4s','A3s','KQs','KJs','KTs','K9s','QJs','QTs','JTs','T9s','98s','87s','76s','AKo','AQo','AJo','ATo','KQo'] },
+  'MP': { label:'MP (20.2%)', pct:20.2, hands:['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','AKs','AQs','AJs','ATs','A9s','A8s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','K9s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','87s','76s','65s','AKo','AQo','AJo','ATo','KQo','KJo','QJo'] },
+  'HJ': { label:'HJ (23.5%)', pct:23.5, hands:['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','K9s','K8s','QJs','QTs','Q9s','JTs','J9s','T9s','T8s','98s','87s','76s','65s','54s','AKo','AQo','AJo','ATo','KQo','KJo','QJo','JTo'] },
+  'CO': { label:'CO (28.7%)', pct:28.7, hands:['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','K9s','K8s','K7s','K6s','QJs','QTs','Q9s','Q8s','JTs','J9s','J8s','T9s','T8s','T7s','98s','97s','87s','86s','76s','75s','65s','64s','54s','53s','43s','AKo','AQo','AJo','ATo','A9o','KQo','KJo','KTo','QJo','QTo','JTo'] },
+  'BTN': { label:'BTN (45.2%)', pct:45.2, hands:['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QJs','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','JTs','J9s','J8s','J7s','J6s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','74s','65s','64s','63s','54s','53s','52s','43s','42s','32s','AKo','AQo','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KQo','KJo','KTo','K9o','K8o','QJo','QTo','Q9o','JTo','J9o','T9o','98o'] },
+  'SB': { label:'SB raise-or-fold (38.5%)', pct:38.5, hands:['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','QJs','QTs','Q9s','Q8s','Q7s','Q6s','JTs','J9s','J8s','J7s','T9s','T8s','T7s','98s','97s','96s','87s','86s','85s','76s','75s','65s','64s','54s','53s','AKo','AQo','AJo','ATo','A9o','A8o','A7o','A6o','A5o','KQo','KJo','KTo','K9o','QJo','QTo','Q9o','JTo','J9o','T9o'] }
+};
+
+const GTO_BB_DEF_VS_BTN = {
+  label: 'BB defiende vs BTN (55%)', pct: 55,
+  hands: ['AA','KK','QQ','JJ','TT','99','88','77','66','55','44','33','22','AKs','AQs','AJs','ATs','A9s','A8s','A7s','A6s','A5s','A4s','A3s','A2s','KQs','KJs','KTs','K9s','K8s','K7s','K6s','K5s','K4s','K3s','K2s','QJs','QTs','Q9s','Q8s','Q7s','Q6s','Q5s','Q4s','JTs','J9s','J8s','J7s','J6s','J5s','T9s','T8s','T7s','T6s','98s','97s','96s','87s','86s','85s','76s','75s','74s','65s','64s','63s','54s','53s','52s','43s','42s','32s','AKo','AQo','AJo','ATo','A9o','A8o','A7o','A6o','A5o','A4o','A3o','A2o','KQo','KJo','KTo','K9o','K8o','K7o','QJo','QTo','Q9o','Q8o','JTo','J9o','J8o','T9o','T8o','98o','87o']
+};
+
+const GTO_STATS_8MAX = {
+  vpip: { min: 18, max: 24, ideal: 21 },
+  pfr: { min: 15, max: 20, ideal: 17.5 },
+  threebet: { min: 4.5, max: 8, ideal: 6 },
+  cbet_flop: { min: 52, max: 72, ideal: 62 },
+  wtsd: { min: 24, max: 30, ideal: 27 }
+};
+
+const GTO_TABLE = {
+  2: { vpip:{min:60,max:80,ideal:70}, pfr:{min:50,max:70,ideal:60}, threebet:{min:10,max:18,ideal:14}, cbet_flop:{min:55,max:80,ideal:68}, wtsd:{min:28,max:38,ideal:33} },
+  3: { vpip:{min:35,max:45,ideal:40}, pfr:{min:28,max:38,ideal:33}, threebet:{min:8,max:14,ideal:11}, cbet_flop:{min:55,max:78,ideal:66}, wtsd:{min:26,max:35,ideal:30} },
+  4: { vpip:{min:28,max:36,ideal:32}, pfr:{min:23,max:30,ideal:26}, threebet:{min:7,max:12,ideal:9.5}, cbet_flop:{min:55,max:76,ideal:65}, wtsd:{min:25,max:34,ideal:29} },
+  5: { vpip:{min:24,max:31,ideal:27}, pfr:{min:20,max:26,ideal:23}, threebet:{min:6,max:11,ideal:8.5}, cbet_flop:{min:55,max:75,ideal:65}, wtsd:{min:25,max:33,ideal:28.5} },
+  6: { vpip:{min:22,max:28,ideal:25}, pfr:{min:18,max:24,ideal:21}, threebet:{min:6,max:10,ideal:8}, cbet_flop:{min:55,max:75,ideal:65}, wtsd:{min:25,max:32,ideal:28} },
+  7: { vpip:{min:20,max:26,ideal:23}, pfr:{min:16,max:22,ideal:19}, threebet:{min:5,max:9,ideal:7}, cbet_flop:{min:55,max:75,ideal:64}, wtsd:{min:24,max:31,ideal:27.5} },
+  8: GTO_STATS_8MAX,
+  9: { vpip:{min:16,max:22,ideal:19}, pfr:{min:13,max:18,ideal:15.5}, threebet:{min:4,max:7,ideal:5.5}, cbet_flop:{min:50,max:70,ideal:60}, wtsd:{min:23,max:29,ideal:26} }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   ESTADO
+   ═══════════════════════════════════════════════════════════ */
+const RA_LS_META = 'rangelab_ra_meta_v1';
+const RA_IDB_NAME = 'rangelab_range_analyzer';
+const RA_IDB_STORE = 'session';
+
+const state = {
+  hands: [],
+  handsMeta: { count: 0, sources: [], loadedAt: null },
+  tables: null,
+  tablesRaw: null,
+  tablesMeta: { count: 0, version: null, loadedAt: null, coverage: [] },
+  currentPosition: 'all',
+  currentBbFilter: null, // null = Todo (sin filtro de stack)
+  analyzed: false,
+  loading: false,
+  tableSize: 8,
+  availablePositions: ['UTG','MP','HJ','CO','BTN','SB','BB'],
+  showGtoOverlay: true,
+  analysis: null,
+  currentUser: null
+};
+
+const BB_STACK_BUCKETS = [60, 40, 20, 15, 5];
+
+/** Asigna el stack del héroe al bucket de BB más cercano (60/40/20/15/5). */
+function closestBbBucket(stackBb, buckets) {
+  const list = buckets || BB_STACK_BUCKETS;
+  if (stackBb == null || !isFinite(stackBb)) return list[0];
+  const target = Number(stackBb);
+  let best = list[0];
+  let bestDist = Math.abs(target - best);
+  for (let i = 1; i < list.length; i++) {
+    const d = Math.abs(target - list[i]);
+    if (d < bestDist || (d === bestDist && list[i] > best)) {
+      bestDist = d;
+      best = list[i];
+    }
+  }
+  return best;
+}
+
+/** Stack a usar para consultar tablas de estrategia según el filtro activo. */
+function strategyStackForFilter() {
+  return state.currentBbFilter != null ? state.currentBbFilter : 60;
+}
+
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(RA_IDB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(RA_IDB_STORE)) db.createObjectStore(RA_IDB_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function idbSet(key, value) {
+  return idbOpen().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(RA_IDB_STORE, 'readwrite');
+    tx.objectStore(RA_IDB_STORE).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+function idbGet(key) {
+  return idbOpen().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(RA_IDB_STORE, 'readonly');
+    const req = tx.objectStore(RA_IDB_STORE).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  }));
+}
+function idbDel(key) {
+  return idbOpen().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(RA_IDB_STORE, 'readwrite');
+    tx.objectStore(RA_IDB_STORE).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+function saveRaMeta() {
+  try {
+    localStorage.setItem(RA_LS_META, JSON.stringify({
+      handsMeta: state.handsMeta,
+      tablesMeta: state.tablesMeta,
+      tableSize: state.tableSize,
+      analyzed: state.analyzed
+    }));
+  } catch (e) { console.warn('saveRaMeta', e); }
+}
+async function persistSession() {
+  try {
+    if (state.hands && state.hands.length) await idbSet('hands', state.hands);
+    else await idbDel('hands');
+    if (state.tables) {
+      await idbSet('tables', { tables: state.tables, raw: state.tablesRaw, meta: state.tablesMeta });
+    } else await idbDel('tables');
+    if (state.analysis) await idbSet('analysis', state.analysis);
+    else await idbDel('analysis');
+    saveRaMeta();
+  } catch (e) {
+    console.warn('persistSession', e);
+    showToast('No se pudo guardar la sesión localmente (cuota)', 'error');
+  }
+}
+async function restoreSession() {
+  try {
+    const meta = JSON.parse(localStorage.getItem(RA_LS_META) || 'null');
+    if (!meta) return false;
+    const hands = await idbGet('hands');
+    const tablesPack = await idbGet('tables');
+    const analysis = await idbGet('analysis');
+    if (Array.isArray(hands) && hands.length) {
+      state.hands = hands;
+      state.handsMeta = meta.handsMeta || { count: hands.length, sources: [], loadedAt: null };
+    }
+    if (tablesPack && tablesPack.tables) {
+      const fixed = {};
+      for (const [k, v] of Object.entries(tablesPack.tables)) {
+        const range = (v && v.range) || (typeof extractRangeObject === 'function' ? extractRangeObject(v) : null);
+        if (!range) continue;
+        fixed[k] = { range, sequence: (v && v.sequence) || '', raiseSize: (v && v.raiseSize) || '' };
+      }
+      state.tables = Object.keys(fixed).length ? fixed : tablesPack.tables;
+      state.tablesRaw = tablesPack.raw || null;
+      state.tablesMeta = tablesPack.meta || meta.tablesMeta || { count: Object.keys(state.tables).length };
+    }
+    if (analysis) {
+      state.analysis = analysis;
+      state.analyzed = true;
+    }
+    state.tableSize = meta.tableSize || 8;
+    updateImportStatusUI();
+    if (state.analyzed && state.analysis) {
+      renderAnalysis(state.analysis);
+      if (typeof showAnalysisView === 'function') showAnalysisView('stats');
+    }
+    return !!(state.hands.length || state.tables);
+  } catch (e) {
+    console.warn('restoreSession', e);
+    return false;
+  }
+}
+async function clearPersisted(what) {
+  if (what === 'hands' || what === 'all') {
+    state.hands = [];
+    state.handsMeta = { count: 0, sources: [], loadedAt: null };
+    await idbDel('hands');
+  }
+  if (what === 'tables' || what === 'all') {
+    state.tables = null;
+    state.tablesRaw = null;
+    state.tablesMeta = { count: 0, version: null, loadedAt: null, coverage: [] };
+    await idbDel('tables');
+  }
+  state.analysis = null;
+  state.analyzed = false;
+  await idbDel('analysis');
+  saveRaMeta();
+  updateImportStatusUI();
+}
+
+function updateImportStatusUI() {
+  const hBadge = document.getElementById('handsStatusBadge');
+  const tBadge = document.getElementById('tablesStatusBadge');
+  const btn = document.getElementById('btnAnalyze');
+  const hint = document.getElementById('analyzeHint');
+  const ready = document.getElementById('raReadyBanner');
+  const readyText = document.getElementById('raReadyText');
+  const readyDetail = document.getElementById('raReadyDetail');
+  const cov = document.getElementById('tablesCoverage');
+
+  const hasH = state.hands && state.hands.length > 0;
+  const hasT = state.tables && Object.keys(state.tables).length > 0;
+
+  if (hBadge) {
+    if (hasH) { hBadge.textContent = `${state.hands.length.toLocaleString('es-ES')} manos`; hBadge.style.color = 'var(--green)'; }
+    else { hBadge.textContent = 'Sin cargar'; hBadge.style.color = 'var(--muted)'; }
+  }
+  if (tBadge) {
+    if (hasT) { tBadge.textContent = `${Object.keys(state.tables).length} tablas`; tBadge.style.color = 'var(--green)'; }
+    else { tBadge.textContent = 'Sin cargar'; tBadge.style.color = 'var(--muted)'; }
+  }
+  if (btn) btn.disabled = !(hasH && hasT);
+  if (hint) {
+    if (hasH && hasT) hint.textContent = 'Listo: pulsa Analizar';
+    else if (!hasH && !hasT) hint.textContent = 'Importa manos y tablas para habilitar el análisis';
+    else if (!hasH) hint.textContent = 'Faltan manos';
+    else hint.textContent = 'Faltan tablas preflop (export JSON de Preflop Lab)';
+  }
+  if (ready) {
+    if (hasH || hasT) {
+      ready.style.display = 'block';
+      readyText.textContent = (hasH && hasT)
+        ? '✓ Sesión guardada: manos + tablas listas'
+        : (hasH ? 'Manos cargadas — falta importar tablas' : 'Tablas cargadas — falta importar manos');
+      const parts = [];
+      if (hasH) parts.push(`${state.hands.length} manos` + (state.handsMeta.loadedAt ? ` · ${new Date(state.handsMeta.loadedAt).toLocaleString('es-ES')}` : ''));
+      if (hasT) {
+        let tPart = `${Object.keys(state.tables).length} tablas`;
+        if (state.tablesMeta.sourceName) tPart += ` · ${state.tablesMeta.sourceName}`;
+        else if (state.tablesMeta.version) tPart += ` · ${state.tablesMeta.version}`;
+        parts.push(tPart);
+      }
+      readyDetail.textContent = parts.join(' · ');
+    } else ready.style.display = 'none';
+  }
+  if (cov) {
+    if (hasT) {
+      cov.style.display = 'block';
+      let html = '';
+      if (state.tablesMeta.sourceName) {
+        html += `<div style="font-size:12px;margin-bottom:4px;"><strong style="color:var(--text);">Tabla:</strong> ${escapeHtml(state.tablesMeta.sourceName)}</div>`;
+      }
+      if (state.tablesMeta.coverage && state.tablesMeta.coverage.length) {
+        html += '<strong style="color:var(--text);">Cobertura:</strong> ' +
+          state.tablesMeta.coverage.slice(0, 24).map(c => escapeHtml(c)).join(', ') +
+          (state.tablesMeta.coverage.length > 24 ? '…' : '');
+      } else {
+        html += `${Object.keys(state.tables).length} spots importados`;
+      }
+      cov.innerHTML = html;
+    } else cov.style.display = 'none';
+  }
+}
+
+function extractRangeObject(val) {
+  if (!val || typeof val !== 'object') return null;
+  if (val.range && typeof val.range === 'object' && !Array.isArray(val.range)) {
+    const keys = Object.keys(val.range);
+    if (keys.length) {
+      const sample = val.range[keys[0]];
+      if (sample && typeof sample === 'object' && ('raise' in sample || 'fold' in sample || 'call' in sample || 'allin' in sample || 'limp' in sample)) {
+        return val.range;
+      }
+      if (val.range.range && typeof val.range.range === 'object') return val.range.range;
+      if (keys[0].length >= 2 && keys[0].length <= 3) return val.range;
+    }
+  }
+  const keys = Object.keys(val);
+  if (keys.some(k => /^[AKQJT98765432]{1,2}[so]?$/.test(k))) return val;
+  return null;
+}
+
+function parsePreflopExport(data) {
+  if (!data || typeof data !== 'object') throw new Error('JSON inválido');
+  let tablesSrc = data.tables8 || data.tables6 || data.tables || null;
+  if (!tablesSrc || typeof tablesSrc !== 'object') throw new Error('No se encontró tables8 / tables en el JSON');
+  const tables = {};
+  const coverage = [];
+  for (const [key, val] of Object.entries(tablesSrc)) {
+    const range = extractRangeObject(val);
+    if (!range) continue;
+    let norm = key;
+    const parts = String(key).split('|');
+    if (parts.length === 5) norm = `${parts[1]}|${parts[2]}|${parts[3]}|${parts[4]}`;
+    else if (parts.length !== 4) continue;
+    tables[norm] = { range, sequence: (val && val.sequence) || '', raiseSize: (val && val.raiseSize) || '' };
+    coverage.push(norm);
+  }
+  if (!Object.keys(tables).length) throw new Error('El JSON no contiene rangos válidos');
+  return {
+    tables,
+    meta: { count: Object.keys(tables).length, version: data.version || 'unknown', loadedAt: Date.now(), coverage: coverage.sort(), tableSize: data.tableSize || 8 },
+    raw: data
+  };
+}
+
+function dominantPlayFreq(freq) {
+  if (!freq || typeof freq !== 'object') return { play: 0, fold: 100 };
+  const raise = Number(freq.raise) || 0;
+  const call = Number(freq.call) || 0;
+  const limp = Number(freq.limp) || 0;
+  const allin = Number(freq.allin) || 0;
+  const fold = Number(freq.fold) || 0;
+  return { play: raise + call + limp + allin, fold, raise, call, limp, allin };
+}
+
+function isHandInStrategyRange(handKey, position, stackBb) {
+  const entry = findBestTable(position, stackBb, 'OR');
+  if (!entry || !entry.range) return null;
+  const freq = entry.range[handKey];
+  if (!freq) return false;
+  return dominantPlayFreq(freq).play >= 50;
+}
+
+function getStrategyRangeForPosition(position, stackBb) {
+  const entry = findBestTable(position, stackBb, 'OR');
+  if (!entry || !entry.range) return null;
+  const hands = [];
+  for (const [hk, freq] of Object.entries(entry.range)) {
+    if (dominantPlayFreq(freq).play >= 50) hands.push(hk);
+  }
+  const pct = Math.round((hands.length / 169) * 1000) / 10;
+  return { label: `${position} · ${entry.stack}bb OR (${pct}%)`, pct, hands, stack: entry.stack, key: entry.key, incomplete: false };
+}
+
+function findBestTable(heroPos, stackBb, situation) {
+  if (!state.tables || !heroPos) return null;
+  const sit = situation || 'OR';
+  const candidates = [];
+  for (const [key, val] of Object.entries(state.tables)) {
+    if (!val) continue;
+    const parts = String(key).split('|');
+    if (parts.length < 4) continue;
+    const [h, v, st, s] = parts;
+    if (h !== heroPos) continue;
+    if (sit === 'OR') {
+      if (s !== 'OR') continue;
+      if (v !== '-' && v !== '' && v != null) continue;
+    } else {
+      const sNorm = String(s || '').toLowerCase();
+      const want = String(sit).toLowerCase();
+      if (sNorm !== want && !sNorm.includes(want) && !want.includes(sNorm)) continue;
+    }
+    const range = val.range || extractRangeObject(val);
+    if (!range) continue;
+    candidates.push({ key, stack: parseInt(st, 10) || 0, value: val, range: range });
+  }
+  if (!candidates.length) return null;
+  const target = stackBb != null && isFinite(stackBb) ? Number(stackBb) : 60;
+  candidates.sort((a, b) => Math.abs(a.stack - target) - Math.abs(b.stack - target));
+  const best = candidates[0];
+  return { key: best.key, stack: best.stack, range: best.range, sequence: (best.value && best.value.sequence) || '' };
+}
+
+function getHeroStackBb(h) {
+  if (!h || !h.hero) return null;
+  const p = (h.players || []).find(x => x.name === h.hero);
+  if (!p) return null;
+  const bb = h.bb || 1;
+  if (!bb) return null;
+  return Math.round((Number(p.stack) || 0) / bb);
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let toastTimer = null;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function setProgress(show, label, pct) {
+  const el = document.getElementById('parseProgress');
+  el.classList.toggle('show', show);
+  if (show) {
+    document.getElementById('parseProgressLabel').textContent = label || 'Procesando…';
+    document.getElementById('parseProgressPct').textContent = (pct || 0) + '%';
+    document.getElementById('parseProgressFill').style.width = (pct || 0) + '%';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CONEXIÓN + USUARIO (top derecha)
+   ═══════════════════════════════════════════════════════════ */
+function setConnIndicator(status, text) {
+  const el = document.getElementById('raConn');
+  if (el) {
+    el.classList.remove('online', 'offline');
+    if (status) el.classList.add(status);
+    const t = el.querySelector('.ctext');
+    if (t) t.textContent = text || '—';
+  }
+  const udot = document.querySelector('.ra-user .udot');
+  if (udot) {
+    udot.style.background = status === 'online' ? 'var(--green)' : (status === 'offline' ? 'var(--red)' : 'var(--text-3)');
+    udot.style.boxShadow = status === 'online' ? '0 0 8px var(--green)' : 'none';
+  }
+  const chip = document.querySelector('.ra-user');
+  if (chip) {
+    chip.classList.remove('online', 'offline');
+    if (status) chip.classList.add(status);
+    chip.title = status === 'online' ? 'Conectado · Sesión actual' : (status === 'offline' ? 'Sesión actual' : 'Sesión actual');
+  }
+}
+
+async function loadUserAndConn() {
+  if (typeof FeltLabAPI === 'undefined' || !FeltLabAPI.auth) {
+    setConnIndicator('offline', 'Offline');
+    const un = document.getElementById('raUserName');
+    if (un) un.textContent = '@guest';
+    return;
+  }
+  try {
+    const me = await FeltLabAPI.auth.me();
+    if (!me || !me.authenticated) {
+      setConnIndicator('offline', 'Offline');
+      const un = document.getElementById('raUserName');
+      if (un) un.textContent = '@invitado';
+      return;
+    }
+    state.currentUser = me.user;
+    const un = document.getElementById('raUserName');
+    if (un) un.textContent = '@' + (me.user.username || me.user.display_name || 'user');
+    setConnIndicator('online', 'Online');
+  } catch (e) {
+    console.warn('loadUserAndConn', e);
+    setConnIndicator('offline', 'Offline');
+  }
+}
+
+window.addEventListener('offline', () => setConnIndicator('offline', 'Offline'));
+window.addEventListener('online', () => {
+  if (state.currentUser) setConnIndicator('online', 'Online');
+});
+
+/* ═══════════════════════════════════════════════════════════
+   DETECCIÓN DE SITIO
+   ═══════════════════════════════════════════════════════════ */
+function detectarSitio(text) {
+  if (/CoinPoker Hand #/i.test(text)) return 'coinpoker';
+  if (/PokerStars Hand #/i.test(text)) return 'pokerstars';
+  if (/^\s*HH\d{8}\s+SCHEDULEDID-/i.test(text)) return 'acr';
+  if (/Winning Poker Network/i.test(text)) return 'acr';
+  if (/Americas Cardroom/i.test(text)) return 'acr';
+  if (/BlackChipPoker|BlackChip Poker/i.test(text)) return 'acr';
+  if (/\bACR\b/i.test(text)) return 'acr';
+  if (/Game Hand #\d+\s*-\s*Tournament #\d+\s*-\s*Holdem \(No Limit\)\s*-\s*Level \d+/i.test(text)) return 'acr';
+  if (/^\s*Game Hand #\d+ - Tournament #\d+/im.test(text)) return 'generic';
+  if (/#Game No :/i.test(text)) return 'generic';
+  return 'unknown';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PARSERS
+   ═══════════════════════════════════════════════════════════ */
+function parseCoinPokerLog(text) {
+  const hands = [];
+  const bloques = text.split(/\n(?=CoinPoker Hand #)/);
+  for (const b of bloques) { const h = parseCoinPokerHand(b); if (h) hands.push(h); }
+  return hands;
+}
+function parseCoinPokerHand(bloque) {
+  const lines = bloque.split('\n').map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return null;
+  const hand = { id:null, site:'coinpoker', tournament:null, tournamentName:null, level:null, blinds:null, ante:0, date:null, table:null, tableMax:null, button:null, players:[], actions:[], board:[], hero:null, hero_cards:[], hero_net:0, hero_net_bb:0, hero_folded:false, hero_showdown:false, winner:null, pot_total:0, bb:1, sb:0 };
+  const mh = lines[0].match(/CoinPoker Hand #(\d+):\s*(\w+)\s*\(([\d.,]+)\/([\d.,]+)(?:\/([\d.,]+))?\)\s*([\d\/]+ [\d:]+)\s*(\w+)/i);
+  if (!mh) return null;
+  hand.id = mh[1]; hand.sb = parseFloat((mh[3]||'0').replace(/,/g,'')); hand.bb = parseFloat((mh[4]||'1').replace(/,/g,'')) || 1;
+  hand.ante = mh[5] ? parseFloat(mh[5].replace(/,/g,'')) : 0; hand.blinds = [hand.sb, hand.bb]; hand.date = mh[6] + ' ' + mh[7];
+  const mt = lines[1] && lines[1].match(/Tournament '([^']+)' '([^']+)' (\d+)-max Seat #(\d+) is the button/i);
+  if (mt) { hand.tournamentName = mt[1]; hand.tournament = mt[2]; hand.tableMax = parseInt(mt[3],10); hand.button = parseInt(mt[4],10); }
+  for (const line of lines) {
+    const mp = line.match(/^Seat (\d+): ([\w.\-]+) \(([\d,.]+) in chips\)/i);
+    if (mp) hand.players.push({ seat: parseInt(mp[1],10), name: mp[2], stack: parseFloat(mp[3].replace(/,/g,'')), sitting_out:false, waiting:false });
+  }
+  let street = 'preflop'; let board_cards = [];
+  for (const line of lines) {
+    let m;
+    if ((m = line.match(/^Dealt to (\w+) \[([^\]]+)\]/))) { hand.hero = m[1]; hand.hero_cards = m[2].split(/\s+/).filter(Boolean); hand.actions.push({type:'deal_hole',player:hand.hero,cards:hand.hero_cards,street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+): posts ante ([\d,.]+)/i))) { hand.actions.push({type:'ante',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+): posts small blind ([\d,.]+)/i))) { hand.actions.push({type:'blind',player:m[1],blind:'small blind',amount:parseFloat(m[2].replace(/,/g,'')),street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+): posts big blind ([\d,.]+)/i))) { hand.actions.push({type:'blind',player:m[1],blind:'big blind',amount:parseFloat(m[2].replace(/,/g,'')),street:'preflop'}); continue; }
+    if ((m = line.match(/^\*\*\* (FLOP|TURN|RIVER) \*\*\* \[([^\]]+)\]/i))) {
+      street = m[1].toLowerCase(); const re = /([2-9TJQKA][shdc])/g; let mm;
+      while ((mm = re.exec(line)) !== null) if (!board_cards.includes(mm[1])) board_cards.push(mm[1]);
+      hand.board = [...board_cards]; hand.actions.push({type:'street',street,board:[...board_cards]}); continue;
+    }
+    if (/^\*\*\* SHOWDOWN \*\*\*/i.test(line)) { street = 'showdown'; continue; }
+    if (/^\*\*\* SUMMARY \*\*\*/i.test(line)) { street = 'summary'; continue; }
+    if ((m = line.match(/^(\w+): folds$/i))) { hand.actions.push({type:'fold',player:m[1],street}); continue; }
+    if ((m = line.match(/^(\w+): checks$/i))) { hand.actions.push({type:'check',player:m[1],street}); continue; }
+    if ((m = line.match(/^(\w+): calls ([\d,.]+)/i))) { hand.actions.push({type:'call',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^(\w+): ALLIN ([\d,.]+)/i))) { const amt = parseFloat(m[2].replace(/,/g,'')); hand.actions.push({type:'allin',player:m[1],amount:amt,to:amt,street,allin:true}); continue; }
+    if ((m = line.match(/^(\w+): bets ([\d,.]+)/i))) { hand.actions.push({type:'bet',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^(\w+): raises ([\d,.]+) to ([\d,.]+)/i))) { hand.actions.push({type:'raise',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),to:parseFloat(m[3].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^(\w+): RETURN ([\d,.]+)/i))) { hand.actions.push({type:'return',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^(\w+): shows \[([^\]]+)\] \(([^)]+)\)/i))) { hand.actions.push({type:'show',player:m[1],cards:m[2].split(/\s+/).filter(Boolean),desc:m[3],street:'showdown'}); if (hand.hero && m[1]===hand.hero) hand.hero_showdown = true; continue; }
+    if ((m = line.match(/^(\w+): mucks hand/i))) { hand.actions.push({type:'muck',player:m[1],street:'showdown'}); continue; }
+    if ((m = line.match(/^(\w+) collected ([\d,.]+) from pot/i))) { hand.actions.push({type:'collect',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),pot:'main',street}); continue; }
+    if ((m = line.match(/^(\w+) collected ([\d,.]+) from (main pot|side pot.*)/i))) { hand.actions.push({type:'collect',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),pot:m[3],street}); continue; }
+    if ((m = line.match(/^Total pot ([\d,.]+)/i))) { hand.pot_total = parseFloat(m[1].replace(/,/g,'')); continue; }
+    if ((m = line.match(/^Board \[ ([^\]]+) \]/i))) { const cards = m[1].split(/\s+/).filter(Boolean); if (cards.length) hand.board = cards; continue; }
+    if ((m = line.match(/^Seat \d+: ([\w.\-]+) (won|folded|showed|didn't show|mucked)(.*)/i))) {
+      const name = m[1], verb = m[2].toLowerCase(), rest = m[3] || '';
+      if (verb === 'won') { const wm = rest.match(/\(([\d,.]+)\)/); const amt = wm ? parseFloat(wm[1].replace(/,/g,'')) : 0; hand.actions.push({type:'collect',player:name,amount:amt,pot:'summary',street:'summary'}); }
+      else if (verb === 'showed') { const sm = rest.match(/\[([^\]]+)\] (.*)/); if (sm) { hand.actions.push({type:'show',player:name,cards:sm[1].split(/\s+/).filter(Boolean),desc:sm[2],street:'summary'}); if (hand.hero && name===hand.hero) hand.hero_showdown = true; } }
+    }
+  }
+  finalizeHand(hand);
+  return hand;
+}
+
+function parseACRLog(text) {
+  const hands = []; let cleanText = text;
+  const primeraLinea = text.split('\n', 1)[0];
+  if (/^\s*HH\d{8}\s+SCHEDULEDID-/i.test(primeraLinea)) cleanText = text.slice(primeraLinea.length).replace(/^\s*\n/, '');
+  const bloques = cleanText.split(/\n(?=Game Hand #)/);
+  for (const b of bloques) { const h = parseACRHand(b); if (h) hands.push(h); }
+  return hands;
+}
+function parseACRHand(bloque) {
+  const lines = bloque.split('\n').map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return null;
+  const hand = { id:null, site:'acr', tournament:null, tournamentName:null, level:null, blinds:null, ante:0, date:null, table:null, tableMax:null, button:null, players:[], actions:[], board:[], hero:null, hero_cards:[], hero_net:0, hero_net_bb:0, hero_folded:false, hero_showdown:false, winner:null, pot_total:0, bb:1, sb:0 };
+  const mh = lines[0].match(/Game Hand #(\d+)\s*-\s*Tournament #(\d+)\s*-\s*(\w+)\s*\(([^)]+)\)\s*-\s*Level (\d+)\s*\(([\d.,]+)\/([\d.,]+)\)\s*-\s*([\d\/]+ [\d:]+)\s*(\w+)/i);
+  if (!mh) return null;
+  hand.id = mh[1]; hand.tournament = mh[2]; hand.level = parseInt(mh[5],10);
+  hand.sb = parseFloat(mh[6].replace(/,/g,'')); hand.bb = parseFloat(mh[7].replace(/,/g,'')) || 1;
+  hand.blinds = [hand.sb, hand.bb]; hand.date = mh[8] + ' ' + mh[9];
+  const mt = lines[1] && lines[1].match(/Table '([^']+)' (\d+)-max Seat #(\d+) is the button/i);
+  if (mt) { hand.table = mt[1]; hand.tableMax = parseInt(mt[2],10); hand.button = parseInt(mt[3],10); }
+  for (const line of lines) {
+    let mp = line.match(/^Seat (\d+): ([\w.\-]+) \(([\d,.]+)\)(.*)/i);
+    if (mp) { hand.players.push({ seat: parseInt(mp[1],10), name: mp[2], stack: parseFloat(mp[3].replace(/,/g,'')), sitting_out:/sitting out/i.test(mp[4]||''), waiting:false }); continue; }
+    mp = line.match(/^Seat (\d+): ([\w.\-]+) will be allowed to play after the button/i);
+    if (mp) hand.players.push({ seat: parseInt(mp[1],10), name: mp[2], stack:0, sitting_out:false, waiting:true });
+  }
+  let street = 'preflop'; let board_cards = [];
+  for (const line of lines) {
+    let m;
+    if (/^Main pot [\d,.]+$/i.test(line)) continue;
+    if (/^Side pot(?:\((\d+)\))? [\d,.]+$/i.test(line)) continue;
+    if ((m = line.match(/^Dealt to (\w+) \[([^\]]+)\]/))) { hand.hero = m[1]; hand.hero_cards = m[2].split(/\s+/).filter(Boolean); hand.actions.push({type:'deal_hole',player:hand.hero,cards:hand.hero_cards,street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+) posts ante ([\d,.]+)(.*)$/i))) { hand.actions.push({type:'ante',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+) posts the small blind ([\d,.]+)(.*)$/i))) { hand.actions.push({type:'blind',player:m[1],blind:'small blind',amount:parseFloat(m[2].replace(/,/g,'')),street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+) posts the big blind ([\d,.]+)(.*)$/i))) { hand.actions.push({type:'blind',player:m[1],blind:'big blind',amount:parseFloat(m[2].replace(/,/g,'')),street:'preflop'}); continue; }
+    if ((m = line.match(/^\*\*\* (FLOP|TURN|RIVER) \*\*\* \[([^\]]+)\]/i))) {
+      street = m[1].toLowerCase(); const re = /([2-9TJQKA][shdc])/g; let mm;
+      while ((mm = re.exec(line)) !== null) if (!board_cards.includes(mm[1])) board_cards.push(mm[1]);
+      hand.board = [...board_cards]; hand.actions.push({type:'street',street,board:[...board_cards]}); continue;
+    }
+    if (/^\*\*\* SHOW ?DOWN \*\*\*/i.test(line)) { street = 'showdown'; continue; }
+    if (/^\*\*\* SUMMARY \*\*\*/i.test(line)) { street = 'summary'; continue; }
+    if ((m = line.match(/^(\w+) folds$/i))) { hand.actions.push({type:'fold',player:m[1],street}); continue; }
+    if ((m = line.match(/^(\w+) checks$/i))) { hand.actions.push({type:'check',player:m[1],street}); continue; }
+    if ((m = line.match(/^(\w+) raises ([\d,.]+) to ([\d,.]+) and is all-in/i))) { hand.actions.push({type:'allin',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),to:parseFloat(m[3].replace(/,/g,'')),street,allin:true}); continue; }
+    if ((m = line.match(/^(\w+) raises ([\d,.]+) to ([\d,.]+)/i))) { hand.actions.push({type:'raise',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),to:parseFloat(m[3].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^(\w+) bets ([\d,.]+) and is all-in/i))) { hand.actions.push({type:'allin',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street,allin:true}); continue; }
+    if ((m = line.match(/^(\w+) bets ([\d,.]+)/i))) { hand.actions.push({type:'bet',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^(\w+) calls ([\d,.]+) and is all-in/i))) { hand.actions.push({type:'allin',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street,allin:true}); continue; }
+    if ((m = line.match(/^(\w+) calls ([\d,.]+)/i))) { hand.actions.push({type:'call',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^Uncalled bet \(([\d,.]+)\) returned to (\w+)/i))) { hand.actions.push({type:'return',player:m[2],amount:parseFloat(m[1].replace(/,/g,'')),street}); continue; }
+    if ((m = line.match(/^(\w+) shows \[([^\]]+)\] \((.*)\)/i))) { hand.actions.push({type:'show',player:m[1],cards:m[2].split(/\s+/).filter(Boolean),desc:m[3],street:'showdown'}); if (hand.hero && m[1]===hand.hero) hand.hero_showdown = true; continue; }
+    if ((m = line.match(/^(\w+) shows \[([^\]]+)\]\s*$/i))) { hand.actions.push({type:'show',player:m[1],cards:m[2].split(/\s+/).filter(Boolean),desc:'',street:'showdown'}); if (hand.hero && m[1]===hand.hero) hand.hero_showdown = true; continue; }
+    if ((m = line.match(/^(\w+) (?:does not show|did not show)/i))) { hand.actions.push({type:'muck',player:m[1],street:'showdown'}); continue; }
+    if ((m = line.match(/^(\w+) mucks hand/i))) { hand.actions.push({type:'muck',player:m[1],street:'showdown'}); continue; }
+    if ((m = line.match(/^(\w+) collected ([\d,.]+) from (main pot|side pot-?\d*)/i))) { hand.actions.push({type:'collect',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),pot:m[3],street}); continue; }
+    if ((m = line.match(/^(\w+) collected ([\d,.]+) from pot/i))) { hand.actions.push({type:'collect',player:m[1],amount:parseFloat(m[2].replace(/,/g,'')),pot:'main',street}); continue; }
+    if ((m = line.match(/^Total pot ([\d,.]+)/i))) { hand.pot_total = parseFloat(m[1].replace(/,/g,'')); continue; }
+    if ((m = line.match(/^Board \[ ([^\]]+) \]/i))) { const cards = m[1].split(/\s+/).filter(Boolean); if (cards.length) hand.board = cards; continue; }
+    if ((m = line.match(/^Seat \d+: ([\w.\-]+)\s*(?:\([^)]+\))?\s+(.*)$/i))) {
+      const name = m[1], rest = m[2] || '';
+      const wonM = rest.match(/and won ([\d,.]+)/i);
+      if (wonM) hand.actions.push({type:'collect',player:name,amount:parseFloat(wonM[1].replace(/,/g,'')),pot:'summary',street:'summary'});
+      const showM = rest.match(/showed \[([^\]]+)\]/i);
+      if (showM) { hand.actions.push({type:'show',player:name,cards:showM[1].split(/\s+/).filter(Boolean),desc:rest,street:'summary'}); if (hand.hero && name===hand.hero) hand.hero_showdown = true; }
+    }
+  }
+  if (!hand.tournamentName) hand.tournamentName = `Torneo ${hand.tournament}`;
+  finalizeHand(hand);
+  return hand;
+}
+
+function parseGenericLog(text) {
+  const hands = [];
+  const bloques = text.split(/\n(?=Game Hand #|#Game No :)/);
+  for (const b of bloques) { const t = b.trim(); if (!t) continue; const h = parseHandGeneric(b); if (h) hands.push(h); }
+  return hands;
+}
+function parseHandGeneric(bloque) {
+  const lines = bloque.split('\n').map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return null;
+  const hand = { id:null, site:'generic', tournament:null, tournamentName:null, level:null, blinds:null, date:null, table:null, button:null, players:[], actions:[], board:[], hero:null, hero_cards:[], hero_net:0, hero_net_bb:0, hero_folded:false, hero_showdown:false, winner:null, pot_total:0, bb:1 };
+  const mh = lines[0].match(/Game Hand #(\d+) - Tournament #(\d+) - Holdem \(No Limit\) - Level (\d+) \(([\d.]+)\/([\d.]+)\) - ([\d\/]+ [\d:]+ UTC)/);
+  if (mh) { hand.id = mh[1]; hand.tournament = mh[2]; hand.level = parseInt(mh[3]); hand.blinds = [parseFloat(mh[4]), parseFloat(mh[5])]; hand.bb = parseFloat(mh[5]) || 1; hand.date = mh[6]; }
+  else { const mid = lines[0].match(/#(\d+)/); if (mid) hand.id = mid[1]; }
+  const mt = lines[1] && lines[1].match(/Table '(\d+)' (\d+)-max Seat #(\d+) is the button/);
+  if (mt) { hand.table = mt[1]; hand.button = parseInt(mt[3]); }
+  for (const line of lines) {
+    let mp = line.match(/^Seat (\d+): ([\w.\-]+) \(([\d.]+)\)(.*)/);
+    if (mp) { hand.players.push({seat:parseInt(mp[1]),name:mp[2],stack:parseFloat(mp[3]),sitting_out:/sitting out/i.test(mp[4]||''),waiting:false}); continue; }
+    mp = line.match(/^Seat (\d+): ([\w.\-]+) will be allowed to play after the button/i);
+    if (mp) hand.players.push({seat:parseInt(mp[1]),name:mp[2],stack:0,sitting_out:true,waiting:true});
+  }
+  let street = 'preflop'; let board_cards = [];
+  for (const line of lines) {
+    let m;
+    if ((m = line.match(/^Dealt to (\w+) \[([^\]]+)\]/))) { hand.hero = m[1]; hand.hero_cards = m[2].split(/\s+/); hand.actions.push({type:'deal_hole',player:hand.hero,cards:hand.hero_cards,street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+) posts ante ([\d.]+)/))) { hand.actions.push({type:'ante',player:m[1],amount:parseFloat(m[2]),street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+) posts (the small blind|the big blind) ([\d.]+)/))) { hand.actions.push({type:'blind',player:m[1],blind:m[2],amount:parseFloat(m[3]),street:'preflop'}); continue; }
+    if ((m = line.match(/^(\w+) folds/))) { hand.actions.push({type:'fold',player:m[1],street}); continue; }
+    if ((m = line.match(/^(\w+) checks/))) { hand.actions.push({type:'check',player:m[1],street}); continue; }
+    if ((m = line.match(/^(\w+) raises ([\d.]+) to ([\d.]+) and is all-in/i))) { hand.actions.push({type:'allin',player:m[1],amount:parseFloat(m[2]),to:parseFloat(m[3]),street,allin:true}); continue; }
+    if ((m = line.match(/^(\w+) (bets|calls) ([\d.]+) and is all-in/i))) { hand.actions.push({type:'allin',player:m[1],amount:parseFloat(m[3]),street,allin:true}); continue; }
+    if ((m = line.match(/^(\w+) calls ([\d.]+)/))) { hand.actions.push({type:'call',player:m[1],amount:parseFloat(m[2]),street}); continue; }
+    if ((m = line.match(/^(\w+) bets ([\d.]+)/))) { hand.actions.push({type:'bet',player:m[1],amount:parseFloat(m[2]),street}); continue; }
+    if ((m = line.match(/^(\w+) raises ([\d.]+) to ([\d.]+)/))) { hand.actions.push({type:'raise',player:m[1],amount:parseFloat(m[2]),to:parseFloat(m[3]),street}); continue; }
+    if ((m = line.match(/^\*\*\* (FLOP|TURN|RIVER) \*\*\* \[([^\]]+)\]/))) {
+      street = m[1].toLowerCase(); const re = /([2-9TJQKA][shdc])/g; let mm;
+      while ((mm = re.exec(line)) !== null) if (!board_cards.includes(mm[1])) board_cards.push(mm[1]);
+      hand.board = [...board_cards]; hand.actions.push({type:'street',street,board:[...board_cards]}); continue;
+    }
+    if ((m = line.match(/^(\w+) shows \[([^\]]+)\] \((.*)\)/))) { hand.actions.push({type:'show',player:m[1],cards:m[2].split(/\s+/),desc:m[3],street}); if (hand.hero && m[1]===hand.hero) hand.hero_showdown = true; continue; }
+    if ((m = line.match(/^(\w+) collected ([\d.]+) from (main pot|side pot.*)/))) { hand.actions.push({type:'collect',player:m[1],amount:parseFloat(m[2]),pot:m[3],street}); continue; }
+    if ((m = line.match(/^Uncalled bet \(([\d.]+)\) returned to (\w+)/))) { hand.actions.push({type:'return',player:m[2],amount:parseFloat(m[1]),street}); continue; }
+    if ((m = line.match(/^Seat \d+: ([\w.\-]+).*?\band won ([\d.]+)/i))) {
+      const playerName = m[1], amount = parseFloat(m[2]);
+      const ya = hand.actions.some(a => a.type === 'collect' && a.player === playerName && Math.abs((a.amount||0)-amount) < 0.01);
+      if (!ya) hand.actions.push({type:'collect',player:playerName,amount,pot:'summary',street});
+    }
+  }
+  finalizeHand(hand);
+  return hand;
+}
+
+function parsePokerStarsLog(text) { return parseGenericLog(text.replace(/PokerStars Hand #/g, 'Game Hand #')); }
+
+function parsePokerLog(text) {
+  const sitio = detectarSitio(text);
+  let hands = [];
+  try {
+    if (sitio === 'coinpoker') hands = parseCoinPokerLog(text);
+    else if (sitio === 'pokerstars') hands = parsePokerStarsLog(text);
+    else if (sitio === 'acr') hands = parseACRLog(text);
+    else if (sitio === 'generic') hands = parseGenericLog(text);
+    else { hands = parseACRLog(text); if (!hands.length) hands = parseCoinPokerLog(text); if (!hands.length) hands = parseGenericLog(text); }
+  } catch (err) { console.warn('Error parseando:', err); }
+  hands.forEach(h => { if (!h.site) h.site = sitio || 'generic'; });
+  return hands;
+}
+
+function finalizeHand(hand) {
+  if (!hand.hero && hand.players.length) {
+    for (const a of hand.actions) if (a.type === 'deal_hole' && a.cards && a.cards.length) { hand.hero = a.player; hand.hero_cards = a.cards; break; }
+  }
+  if (hand.hero) {
+    let ganado = 0, gastado = 0, devuelto = 0;
+    for (const a of hand.actions) {
+      if (a.player !== hand.hero) continue;
+      if (a.type === 'collect') ganado += a.amount || 0;
+      else if (a.type === 'return') devuelto += a.amount || 0;
+      else if (['ante','blind','call','bet','allin'].includes(a.type)) gastado += a.amount || 0;
+      else if (a.type === 'raise') gastado += (a.amount != null ? a.amount : (a.to || 0));
+    }
+    hand.hero_net = Math.round((ganado + devuelto - gastado) * 100) / 100;
+    hand.hero_net_bb = hand.bb > 0 ? Math.round((hand.hero_net / hand.bb) * 100) / 100 : 0;
+    hand.hero_folded = hand.actions.some(a => a.type === 'fold' && a.player === hand.hero);
+  }
+  const collectors = [...new Set(hand.actions.filter(a => a.type === 'collect' && a.pot !== 'summary').map(a => a.player))];
+  if (collectors.length === 1) hand.winner = collectors[0];
+  else if (!hand.winner && hand.hero && hand.hero_net > 0) hand.winner = hand.hero;
+  if (!hand.pot_total) {
+    hand.pot_total = Math.round(hand.actions.filter(a => a.type === 'collect' && a.pot !== 'summary').reduce((s,a) => s + a.amount, 0) * 100) / 100;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DETECCIÓN DE FORMATO
+   ═══════════════════════════════════════════════════════════ */
+function detectFormat(text) {
+  const trimmed = text.trim();
+  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+    try {
+      const data = JSON.parse(trimmed);
+      if (Array.isArray(data)) return { type: 'feltlab', data };
+      if (data.manos && Array.isArray(data.manos)) return { type: 'feltlab', data };
+      if (data.hands && Array.isArray(data.hands)) return { type: 'feltlab', data };
+      return null;
+    } catch (e) { return null; }
+  }
+  const sitio = detectarSitio(text);
+  if (sitio !== 'unknown') return { type: 'log', site: sitio };
+  return null;
+}
+
+function parseHandsFromJSON(data) {
+  if (data.manos && Array.isArray(data.manos)) return data.manos;
+  if (Array.isArray(data)) return data;
+  if (data.hands && Array.isArray(data.hands)) return data.hands;
+  throw new Error('Formato JSON no reconocido');
+}
+
+function normalizeHand(h) {
+  return {
+    id: h.id || '', site: h.site || 'generic',
+    tournament: h.tournament || null, tournamentName: h.tournamentName || null,
+    date: h.date || null, hero: h.hero || '',
+    hero_cards: h.hero_cards || h.heroCards || [],
+    board: h.board || [],
+    hero_net: typeof h.hero_net === 'number' ? h.hero_net : (h.heroNet || 0),
+    hero_net_bb: typeof h.hero_net_bb === 'number' ? h.hero_net_bb : (h.heroNetBb || 0),
+    bb: h.bb || 1,
+    hero_folded: h.hero_folded || h.heroFolded || false,
+    hero_showdown: h.hero_showdown || h.heroShowdown || false,
+    winner: h.winner || null, actions: h.actions || [], players: h.players || [],
+    button: h.button != null ? h.button : null, tableMax: h.tableMax || null
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DETECCIÓN DE TAMAÑO DE MESA
+   ═══════════════════════════════════════════════════════════ */
+function getHandPlayerCount(h) {
+  if (!h) return 0;
+  if (h.players && h.players.length) {
+    const seated = h.players.filter(p => !p.waiting).length;
+    if (seated >= 2) return seated;
+  }
+  if (h.tableMax) {
+    const n = parseInt(h.tableMax, 10);
+    if (n >= 2 && n <= 9) return n;
+  }
+  return 0;
+}
+
+const ANALYSIS_POS_LABELS = ['UTG', 'MP', 'HJ', 'CO', 'BTN', 'SB', 'BB'];
+
+function getPositionLabels(n) {
+  if (n <= 1) return ['BTN'];
+  if (n === 2) return ['BTN', 'BB'];
+  if (n === 3) return ['BTN', 'SB', 'BB'];
+  if (n === 4) return ['BTN', 'SB', 'BB', 'CO'];
+  if (n === 5) return ['BTN', 'SB', 'BB', 'UTG', 'CO'];
+  if (n === 6) return ['BTN', 'SB', 'BB', 'UTG', 'HJ', 'CO'];
+  if (n === 7) return ['BTN', 'SB', 'BB', 'UTG', 'UTG+1', 'HJ', 'CO'];
+  if (n === 8) return ['BTN', 'SB', 'BB', 'UTG', 'UTG+1', 'MP', 'HJ', 'CO'];
+  if (n === 9) return ['BTN', 'SB', 'BB', 'UTG', 'UTG+1', 'UTG+2', 'MP', 'HJ', 'CO'];
+  const labels = ['BTN', 'SB', 'BB'];
+  const early = Math.max(0, n - 4);
+  for (let i = 0; i < early; i++) {
+    if (i === 0) labels.push('UTG');
+    else if (i === 1) labels.push('UTG+1');
+    else labels.push('MP' + i);
+  }
+  if (n >= 4) labels.push('CO');
+  return labels.slice(0, n);
+}
+
+function findButtonIndex(orderedPlayers, btnSeat) {
+  const n = orderedPlayers.length;
+  if (!n) return 0;
+  if (btnSeat == null || !isFinite(btnSeat)) return 0;
+  const exact = orderedPlayers.findIndex(p => Number(p.seat) === Number(btnSeat));
+  if (exact >= 0) return exact;
+  let firstCW = orderedPlayers.findIndex(p => Number(p.seat) > Number(btnSeat));
+  if (firstCW < 0) firstCW = 0;
+  return (firstCW - 1 + n) % n;
+}
+
+function getAnalysisPosition(h) {
+  if (!h || !h.hero || !h.players || h.players.length === 0) return null;
+  const players = [...h.players].filter(p => !p.waiting);
+  const n = players.length;
+  if (n < 7 || n > 9) return null;
+  players.sort((a, b) => Number(a.seat) - Number(b.seat));
+  const btnSeat = h.button != null ? Number(h.button) : null;
+  const btnIdx = findButtonIndex(players, btnSeat);
+  const heroIdx = players.findIndex(p => p.name === h.hero);
+  if (heroIdx < 0) return null;
+  const relIdx = (heroIdx - btnIdx + n) % n;
+  if (relIdx === 0) return 'BTN';
+  if (relIdx === 1) return 'SB';
+  if (relIdx === 2) return 'BB';
+  if (n === 7) {
+    if (relIdx === 3 || relIdx === 4) return 'UTG';
+    if (relIdx === 5) return 'HJ';
+    if (relIdx === 6) return 'CO';
+  }
+  if (n === 8) {
+    if (relIdx === 3 || relIdx === 4) return 'UTG';
+    if (relIdx === 5) return 'MP';
+    if (relIdx === 6) return 'HJ';
+    if (relIdx === 7) return 'CO';
+  }
+  if (n === 9) {
+    if (relIdx === 3 || relIdx === 4 || relIdx === 5) return 'UTG';
+    if (relIdx === 6) return 'MP';
+    if (relIdx === 7) return 'HJ';
+    if (relIdx === 8) return 'CO';
+  }
+  return null;
+}
+
+function strategyPosAlias(position) {
+  if (position === 'UTG') return ['UTG+1', 'UTG'];
+  if (position === 'LJ') return ['LJ', 'MP'];
+  if (position === 'MP') return ['MP', 'LJ'];
+  return [position];
+}
+
+function isHandInGtoRange(handKey, position, tableSize, stackBb) {
+  if (!handKey || !position) return null;
+  if (state.tables) {
+    if (position === 'BB') {
+      let entry = null;
+      for (const [key, val] of Object.entries(state.tables)) {
+        const p = String(key).split('|');
+        if (p[0] !== 'BB') continue;
+        const range = (val && val.range) || extractRangeObject(val);
+        if (!range) continue;
+        entry = { range, stack: parseInt(p[2], 10) || 60, key };
+        if (p[1] === 'BTN') break;
+      }
+      if (!entry || !entry.range) return null;
+      const freq = entry.range[handKey];
+      if (!freq) return false;
+      return dominantPlayFreq(freq).play >= 50;
+    }
+    const aliases = strategyPosAlias(position);
+    for (const pos of aliases) {
+      const r = isHandInStrategyRange(handKey, pos, stackBb);
+      if (r !== null) return r;
+    }
+    return null;
+  }
+  if (position === 'BB') return GTO_BB_DEF_VS_BTN.hands.includes(handKey);
+  if (position === 'UTG') {
+    const r = GTO_RFI_8MAX['UTG+1'] || GTO_RFI_8MAX['UTG'];
+    return r ? r.hands.includes(handKey) : null;
+  }
+  const posMap = { 'UTG+1':'UTG+1', 'MP':'MP', 'LJ':'MP', 'HJ':'HJ', 'CO':'CO', 'BTN':'BTN', 'SB':'SB' };
+  const key = posMap[position];
+  if (!key || !GTO_RFI_8MAX[key]) return null;
+  return GTO_RFI_8MAX[key].hands.includes(handKey);
+}
+
+function getGtoRangeForPosition(position, stackBb) {
+  const targetStack = stackBb != null && isFinite(stackBb) ? Number(stackBb) : strategyStackForFilter();
+  if (state.tables) {
+    if (position === 'BB') {
+      const candidates = [];
+      for (const [key, val] of Object.entries(state.tables)) {
+        const p = String(key).split('|');
+        if (p[0] !== 'BB') continue;
+        const range = (val && val.range) || extractRangeObject(val);
+        if (!range) continue;
+        candidates.push({ key, stack: parseInt(p[2], 10) || 0, range });
+      }
+      if (!candidates.length) return { label: 'BB · sin tabla', pct: 0, hands: [], incomplete: true };
+      candidates.sort((a, b) => Math.abs(a.stack - targetStack) - Math.abs(b.stack - targetStack));
+      const best = candidates[0];
+      const hands = [];
+      for (const [hk, freq] of Object.entries(best.range)) {
+        if (dominantPlayFreq(freq).play >= 50) hands.push(hk);
+      }
+      return { label: `BB · ${best.stack}bb (${Math.round(hands.length/169*1000)/10}%)`, pct: Math.round(hands.length / 169 * 1000) / 10, hands, stack: best.stack, key: best.key, incomplete: false };
+    }
+    const aliases = strategyPosAlias(position);
+    for (const pos of aliases) {
+      const r = getStrategyRangeForPosition(pos, targetStack);
+      if (r) {
+        if (position === 'UTG' && r.label) return { ...r, label: r.label.replace(/^UTG\+1/, 'UTG') };
+        return r;
+      }
+    }
+    return { label: `${position} · sin tabla`, pct: 0, hands: [], incomplete: true };
+  }
+  if (position === 'BB') return GTO_BB_DEF_VS_BTN;
+  if (position === 'UTG') {
+    const r = GTO_RFI_8MAX['UTG+1'] || GTO_RFI_8MAX['UTG'];
+    if (r) return { ...r, label: (r.label || 'UTG+1').replace(/^UTG\+1/, 'UTG') };
+    return null;
+  }
+  if (GTO_RFI_8MAX[position]) return GTO_RFI_8MAX[position];
+  if (position === 'LJ' && GTO_RFI_8MAX['MP']) return GTO_RFI_8MAX['MP'];
+  return null;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CARGA DESDE HAND LAB / PREFLOP LAB
+   ═══════════════════════════════════════════════════════════ */
+async function fetchAllHandLabHands() {
+  const pageSize = 4000;
+  const first = await FeltLabAPI.feltlab.listHands({ limit: pageSize, offset: 0 });
+  if (!Array.isArray(first) || first.length < pageSize) return first || [];
+  const all = first.slice();
+  let offset = pageSize;
+  while (true) {
+    const chunk = await FeltLabAPI.feltlab.listHands({ limit: pageSize, offset });
+    if (!chunk || !chunk.length) break;
+    all.push(...chunk);
+    if (chunk.length < pageSize) break;
+    offset += pageSize;
+    await new Promise(r => setTimeout(r, 0));
+  }
+  return all;
+}
+
+async function loadFromHandLab() {
+  if (typeof FeltLabAPI === 'undefined') { showToast('API no disponible', 'error'); return; }
+  setProgress(true, 'Consultando Hand Lab…', 20);
+  try {
+    const me = await FeltLabAPI.auth.me();
+    if (!me || !me.authenticated) { setProgress(false); showToast('No autenticado. Vuelve al portal.', 'error'); return; }
+    setProgress(true, 'Descargando manos…', 45);
+    const raw = await fetchAllHandLabHands();
+    const hands = (raw || []).map(normalizeHand).filter(h => h.hero_cards && h.hero_cards.length === 2);
+    if (!hands.length) { setProgress(false); showToast('Hand Lab no tiene manos con hole cards', 'error'); return; }
+    const hadBefore = (state.hands && state.hands.length) || 0;
+    const result = appendHands(hands, 'handlab');
+    try { await persistSession(); } catch (e) { console.warn('persist', e); }
+    updateImportStatusUI();
+    setProgress(false);
+    const needTables = !(state.tables && Object.keys(state.tables).length);
+    let msg;
+    if (hadBefore) {
+      msg = `✓ +${result.added} de Hand Lab (total ${result.total.toLocaleString('es-ES')})`;
+      if (result.dupes) msg += ` · ${result.dupes} ya estaban`;
+    } else {
+      msg = `✓ ${result.total.toLocaleString('es-ES')} manos de Hand Lab`;
+    }
+    showToast(msg + (needTables ? ' · falta importar tablas' : ' · ya puedes Analizar'), 'success');
+  } catch (e) {
+    setProgress(false);
+    console.error(e);
+    showToast('Error Hand Lab: ' + (e.message || e), 'error');
+  }
+}
+
+async function loadTablesFromPreflopLab() {
+  if (typeof FeltLabAPI === 'undefined') { showToast('API no disponible', 'error'); return; }
+  setProgress(true, 'Cargando tablas de Preflop Lab…', 30);
+  try {
+    const me = await FeltLabAPI.auth.me();
+    if (!me || !me.authenticated) { setProgress(false); showToast('No autenticado. Vuelve al portal.', 'error'); return; }
+    const list = await FeltLabAPI.preflop.list(true);
+    if (!list || !list.length) { setProgress(false); showToast('No hay tablas guardadas en Preflop Lab', 'error'); return; }
+    const tables = {};
+    const coverage = [];
+    for (const full of list) {
+      const hero = full.hero || '';
+      const vs = full.vs || full.vs_pos || '-';
+      const stack = full.stack != null ? full.stack : 40;
+      const sit = full.situation || 'OR';
+      const range = full.range || {};
+      if (!range || typeof range !== 'object' || !Object.keys(range).length) continue;
+      const vsNorm = (vs === '' || vs == null) ? '-' : vs;
+      const key = `${hero}|${vsNorm}|${stack}|${sit}`;
+      tables[key] = { range, sequence: full.sequence || '', raiseSize: full.raise_size || full.raiseSize || '' };
+      coverage.push(key);
+    }
+    if (!Object.keys(tables).length) { setProgress(false); showToast('Las tablas de Preflop Lab no tienen rangos', 'error'); return; }
+    state.tables = tables;
+    state.tablesRaw = { version: 'preflop-lab-server', tables8: tables };
+    state.tablesMeta = { count: Object.keys(tables).length, version: 'preflop-lab-server', loadedAt: Date.now(), coverage: coverage.sort(), tableSize: 8, source: 'preflop-lab', sourceName: 'Preflop Lab (servidor)' };
+    state.analysis = null;
+    state.analyzed = false;
+    await persistSession();
+    updateImportStatusUI();
+    const tf = document.getElementById('tablesFiles');
+    if (tf) { tf.classList.add('show'); tf.innerHTML = `<div class="df-item"><span>♠ Preflop Lab (servidor)</span><span style="color:var(--text-3);">${state.tablesMeta.count} spots</span></div>`; }
+    setProgress(false);
+    showToast(`✓ ${state.tablesMeta.count} tablas desde Preflop Lab`, 'success');
+  } catch (e) {
+    setProgress(false);
+    console.error(e);
+    showToast('Error Preflop Lab: ' + (e.message || e), 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PROCESAMIENTO DE ARCHIVOS
+   ═══════════════════════════════════════════════════════════ */
+function appendHands(newHands, sourceLabel) {
+  try {
+    if (!Array.isArray(newHands) || !newHands.length) return { added: 0, total: (state.hands && state.hands.length) || 0, dupes: 0 };
+    if (!Array.isArray(state.hands)) state.hands = [];
+    const seen = Object.create(null);
+    for (let i = 0; i < state.hands.length; i++) {
+      const id = state.hands[i] && state.hands[i].id;
+      if (id != null && id !== '') seen[String(id)] = true;
+    }
+    let added = 0, dupes = 0;
+    for (let i = 0; i < newHands.length; i++) {
+      const h = newHands[i];
+      if (!h || !h.hero_cards || h.hero_cards.length !== 2) continue;
+      const id = h.id != null && h.id !== '' ? String(h.id) : null;
+      if (id && seen[id]) { dupes++; continue; }
+      if (id) seen[id] = true;
+      state.hands.push(h);
+      added++;
+    }
+    const prevSrc = (state.handsMeta && Array.isArray(state.handsMeta.sources)) ? state.handsMeta.sources.slice() : [];
+    if (sourceLabel) prevSrc.push(sourceLabel);
+    state.handsMeta = { count: state.hands.length, sources: prevSrc.slice(-50), loadedAt: Date.now() };
+    state.analysis = null;
+    state.analyzed = false;
+    return { added, total: state.hands.length, dupes };
+  } catch (err) {
+    console.error('appendHands', err);
+    return { added: 0, total: (state.hands && state.hands.length) || 0, dupes: 0, error: err };
+  }
+}
+
+async function processFiles(files) {
+  if (!files || files.length === 0) { showToast('No hay archivos', 'error'); return; }
+  state.loading = true;
+  setProgress(true, 'Leyendo archivos…', 5);
+  showToast(`Procesando ${files.length} archivo(s)…`, '');
+  const allHands = []; let processed = 0; let errors = [];
+  const sources = [];
+  for (const file of files) {
+    try {
+      const text = await file.text();
+      const detected = detectFormat(text);
+      if (!detected) { errors.push(`"${file.name}": formato no reconocido`); processed++; setProgress(true, `Procesando ${processed}/${files.length}…`, Math.round(processed/files.length*100)); continue; }
+      let hands = [];
+      if (detected.type === 'feltlab') hands = parseHandsFromJSON(detected.data).map(normalizeHand);
+      else hands = parsePokerLog(text).map(normalizeHand).filter(h => h.hero_cards && h.hero_cards.length === 2);
+      if (hands.length === 0) errors.push(`"${file.name}": sin manos válidas`);
+      else { allHands.push(...hands); sources.push(file.name); }
+    } catch (e) { errors.push(`"${file.name}": ${e.message}`); }
+    processed++;
+    setProgress(true, `Procesando ${processed}/${files.length}… (${allHands.length} manos)`, Math.round(processed/files.length*100));
+    await new Promise(r => setTimeout(r, 0));
+  }
+  if (allHands.length === 0) { setProgress(false); state.loading = false; showToast('No se encontraron manos válidas', 'error'); console.warn('Errores:', errors); return; }
+  const hadBefore = (state.hands && state.hands.length) || 0;
+  const result = appendHands(allHands, sources.join(', ') || 'archivos');
+  try { await persistSession(); } catch (e) { console.warn('persist', e); }
+  updateImportStatusUI();
+  setProgress(false);
+  state.loading = false;
+  let msg;
+  if (hadBefore) {
+    msg = `✓ +${result.added} manos (total ${result.total.toLocaleString('es-ES')})`;
+    if (result.dupes) msg += ` · ${result.dupes} duplicadas omitidas`;
+  } else {
+    msg = `✓ ${result.total.toLocaleString('es-ES')} manos cargadas`;
+  }
+  if (errors.length) msg += ` · ${errors.length} archivo(s) con problemas`;
+  showToast(msg, 'success');
+}
+
+async function processTablesFile(file) {
+  if (!file) return;
+  try {
+    setProgress(true, 'Leyendo tablas…', 40);
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const parsed = parsePreflopExport(data);
+    state.tables = parsed.tables;
+    state.tablesRaw = parsed.raw;
+    state.tablesMeta = { ...parsed.meta, sourceName: file.name || parsed.meta.sourceName || 'archivo importado' };
+    state.analysis = null;
+    state.analyzed = false;
+    await persistSession();
+    updateImportStatusUI();
+    const tf = document.getElementById('tablesFiles');
+    if (tf) { tf.classList.add('show'); tf.innerHTML = `<div class="df-item"><span>📋 ${escapeHtml(file.name)}</span><span style="color:var(--text-3);">${parsed.meta.count} spots</span></div>`; }
+    setProgress(false);
+    showToast(`✓ ${parsed.meta.count} tablas importadas · ${file.name}`, 'success');
+  } catch (e) {
+    setProgress(false);
+    showToast('Error tablas: ' + e.message, 'error');
+  }
+}
+
+function runFullAnalysis() {
+  if (!state.hands || !state.hands.length) { showToast('Faltan manos', 'error'); return; }
+  if (!state.tables || !Object.keys(state.tables).length) { showToast('Faltan tablas preflop', 'error'); return; }
+  setProgress(true, `Analizando ${state.hands.length} manos…`, 60);
+  setTimeout(async () => {
+    try {
+      const analysis = analyzeHands(state.hands);
+      state.analyzed = true;
+      renderAnalysis(analysis);
+      await persistSession();
+      if (typeof showAnalysisView === 'function') showAnalysisView('stats');
+      showToast(`✓ Análisis listo · ${state.hands.length} manos vs tus tablas`, 'success');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {
+      showToast('Error: ' + e.message, 'error');
+    } finally {
+      setProgress(false);
+    }
+  }, 40);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANÁLISIS
+   ═══════════════════════════════════════════════════════════ */
+function isOpenRaiseSpot(h) {
+  if (!h || !h.hero || !h.actions) return false;
+  const pos = getAnalysisPosition(h);
+  if (pos === 'BB') return false;
+  const preflop = h.actions.filter(a => a.street === 'preflop');
+  for (const a of preflop) {
+    if (a.player === h.hero) {
+      if (a.type === 'fold' || a.type === 'call' || a.type === 'raise' || a.type === 'allin' || a.type === 'bet' || a.type === 'check') return true;
+      continue;
+    }
+    if (a.type === 'raise' || a.type === 'allin') return false;
+  }
+  return false;
+}
+
+function heroDidOpenRaise(h) {
+  if (!isOpenRaiseSpot(h)) return false;
+  const preflop = h.actions.filter(a => a.street === 'preflop' && a.player === h.hero);
+  for (const a of preflop) {
+    if (a.type === 'raise' || a.type === 'allin') return true;
+    if (a.type === 'fold' || a.type === 'call' || a.type === 'check' || a.type === 'bet') return false;
+  }
+  return false;
+}
+
+function analyzeHands(rawHands) {
+  const allHands = rawHands.map(normalizeHand).filter(h => h.hero_cards && h.hero_cards.length === 2);
+  const hands = allHands.filter(h => {
+    const n = getHandPlayerCount(h);
+    return n >= 7 && n <= 9;
+  });
+  if (hands.length === 0) {
+    throw new Error(
+      allHands.length
+        ? `Ninguna mano con 7–9 jugadores (hay ${allHands.length} manos; se omiten mesas <7).`
+        : 'No se encontraron manos válidas con cartas del héroe.'
+    );
+  }
+  const tableSize = 8;
+  state.tableSize = tableSize;
+  const posLabels = ANALYSIS_POS_LABELS.slice();
+  state.availablePositions = posLabels;
+  const gto = GTO_TABLE[8] || GTO_STATS_8MAX;
+
+  const n7 = hands.filter(h => getHandPlayerCount(h) === 7).length;
+  const n8 = hands.filter(h => getHandPlayerCount(h) === 8).length;
+  const n9 = hands.filter(h => getHandPlayerCount(h) === 9).length;
+  const omitted = allHands.length - hands.length;
+
+  const analysis = {
+    totalHands: hands.length, tableSize, posLabels, gto, hands,
+    hands7: n7, hands8: n8, hands9: n9, handsOmitted: omitted,
+    vpip: 0, pfr: 0, threeBet: 0, foldVs3Bet: 0,
+    cbetFlop: 0, cbetOpportunities: 0, wtsd: 0, wtsdOpportunities: 0,
+    totalNet: 0, totalNetBB: 0,
+    byPosition: {}, handFrequency: {}, rangeByPosition: {},
+    handDeviations: [], incompleteByPos: {},
+    handsWithTable: 0, handsWithoutTable: 0,
+    usingImportedTables: !!(state.tables && Object.keys(state.tables).length),
+    leaks: []
+  };
+
+  posLabels.forEach(p => {
+    analysis.byPosition[p] = { hands:0, vpip:0, pfr:0, threeBet:0, net:0, netBB:0, wins:0, losses:0, showdown:0, showdownWins:0, gtoHandsPlayed:0, gtoHandsMatched:0, withTable:0, withoutTable:0 };
+    analysis.incompleteByPos[p] = 0;
+  });
+
+  hands.forEach(h => {
+    const pos = getAnalysisPosition(h);
+    if (!pos) return;
+    const posStats = analysis.byPosition[pos];
+    if (!posStats) return;
+    posStats.hands++;
+    const stackBb = getHeroStackBb(h);
+
+    const heroActions = h.actions.filter(a => a.player === h.hero);
+    const vpipActions = heroActions.filter(a => a.type === 'call' || a.type === 'bet' || a.type === 'raise' || a.type === 'allin');
+    const pfrActions = heroActions.filter(a => (a.type === 'raise' || a.type === 'allin') && a.street === 'preflop');
+    const hasVpip = vpipActions.length > 0;
+    const hasPfr = pfrActions.length > 0;
+    const orSpot = isOpenRaiseSpot(h);
+    const didOR = heroDidOpenRaise(h);
+
+    if (hasVpip) { analysis.vpip++; posStats.vpip++; }
+    if (hasPfr) { analysis.pfr++; posStats.pfr++; }
+
+    const preflopActions = h.actions.filter(a => a.street === 'preflop');
+    let raiseSeen = false; let heroDidThreeBet = false;
+    for (const a of preflopActions) {
+      if ((a.type === 'raise' || a.type === 'allin') && a.player !== h.hero) raiseSeen = true;
+      else if ((a.type === 'raise' || a.type === 'allin') && a.player === h.hero && raiseSeen) { heroDidThreeBet = true; break; }
+    }
+    if (heroDidThreeBet) { analysis.threeBet++; posStats.threeBet++; }
+
+    const lastPreflopRaiser = getLastPreflopRaiser(h);
+    if (lastPreflopRaiser === h.hero && h.board && h.board.length >= 3) {
+      analysis.cbetOpportunities++;
+      const flopBet = h.actions.some(a => a.player === h.hero && a.street === 'flop' && (a.type === 'bet' || a.type === 'allin'));
+      if (flopBet) analysis.cbetFlop++;
+    }
+    if (!h.hero_folded && h.board && h.board.length >= 3) {
+      analysis.wtsdOpportunities++;
+      if (h.hero_showdown) analysis.wtsd++;
+    }
+
+    analysis.totalNet += h.hero_net;
+    analysis.totalNetBB += h.hero_net_bb;
+    posStats.net += h.hero_net;
+    posStats.netBB += h.hero_net_bb;
+    if (h.hero_net > 0) posStats.wins++;
+    else if (h.hero_net < 0) posStats.losses++;
+
+    const handKey = getHandKey(h.hero_cards);
+    if (!handKey) return;
+
+    if (orSpot) {
+      if (!analysis.rangeByPosition[pos]) analysis.rangeByPosition[pos] = {};
+      if (!analysis.rangeByPosition[pos][handKey]) analysis.rangeByPosition[pos][handKey] = { played: 0, total: 0 };
+      analysis.rangeByPosition[pos][handKey].total++;
+      if (didOR) analysis.rangeByPosition[pos][handKey].played++;
+
+      if (!analysis.handFrequency[handKey]) analysis.handFrequency[handKey] = { played: 0, total: 0 };
+      analysis.handFrequency[handKey].total++;
+      if (didOR) analysis.handFrequency[handKey].played++;
+
+      const inGto = isHandInGtoRange(handKey, pos, tableSize, stackBb);
+      if (inGto === null) {
+        analysis.handsWithoutTable++;
+        posStats.withoutTable++;
+        analysis.incompleteByPos[pos] = (analysis.incompleteByPos[pos] || 0) + 1;
+      } else {
+        analysis.handsWithTable++;
+        posStats.withTable++;
+        if (inGto) posStats.gtoHandsPlayed++;
+        if (inGto && didOR) posStats.gtoHandsMatched++;
+        if (didOR && !inGto) analysis.handDeviations.push({ hand: handKey, position: pos, type: 'error', net: h.hero_net_bb, hand_obj: h });
+        if (!didOR && inGto) analysis.handDeviations.push({ hand: handKey, position: pos, type: 'under', net: h.hero_net_bb, hand_obj: h });
+      }
+    }
+  });
+
+  const n = analysis.totalHands;
+  analysis.vpipPct = (analysis.vpip / n) * 100;
+  analysis.pfrPct = (analysis.pfr / n) * 100;
+  analysis.threeBetPct = (analysis.threeBet / n) * 100;
+  analysis.cbetFlopPct = analysis.cbetOpportunities > 0 ? (analysis.cbetFlop / analysis.cbetOpportunities) * 100 : 0;
+  analysis.wtsdPct = analysis.wtsdOpportunities > 0 ? (analysis.wtsd / analysis.wtsdOpportunities) * 100 : 0;
+  analysis.winrateBB = analysis.totalNetBB / n * 100;
+
+  let aligned = 0, total = 0;
+  hands.forEach(h => {
+    const pos = getAnalysisPosition(h);
+    if (!pos) return;
+    if (pos === 'BB') return;
+    if (!isOpenRaiseSpot(h)) return;
+    const handKey = getHandKey(h.hero_cards);
+    const stackBb = getHeroStackBb(h);
+    const inGto = isHandInGtoRange(handKey, pos, tableSize, stackBb);
+    if (inGto === null) return;
+    const didOR = heroDidOpenRaise(h);
+    const hasVpip = didOR;
+    total++;
+    if ((inGto && hasVpip) || (!inGto && !hasVpip)) aligned++;
+  });
+  analysis.compliancePct = total > 0 ? (aligned / total) * 100 : 0;
+  analysis.complianceSample = total;
+
+  analysis.leaks = detectLeaks(analysis);
+  return analysis;
+}
+
+function getLastPreflopRaiser(h) {
+  const preflop = h.actions.filter(a => a.street === 'preflop');
+  let last = null;
+  for (const a of preflop) if (a.type === 'raise' || a.type === 'allin') last = a.player;
+  return last;
+}
+
+function getHandKey(cards) {
+  if (!cards || cards.length < 2) return null;
+  const r1 = cards[0].slice(0, -1).toUpperCase();
+  const r2 = cards[1].slice(0, -1).toUpperCase();
+  const s1 = cards[0].slice(-1).toLowerCase();
+  const s2 = cards[1].slice(-1).toLowerCase();
+  if (!r1 || !r2) return null;
+  const ord = { '2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14 };
+  let high = r1, low = r2;
+  if ((ord[r1] || 0) < (ord[r2] || 0)) [high, low] = [low, high];
+  if (high === low) return high + low;
+  const suited = s1 === s2;
+  return high + low + (suited ? 's' : 'o');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DETECCIÓN DE LEAKS
+   ═══════════════════════════════════════════════════════════ */
+function detectLeaks(a) {
+  const leaks = [];
+  const gto = a.gto;
+
+  if (a.handsWithoutTable > 0) {
+    const pct = Math.round(100 * a.handsWithoutTable / Math.max(1, a.totalHands));
+    leaks.push({
+      icon: '📋', severity: pct >= 40 ? 'med' : 'low', color: 'var(--gold)',
+      title: 'Tablas incompletas',
+      text: `<strong>${a.handsWithoutTable}</strong> de ${a.totalHands} manos (${pct}%) no tienen tabla preflop aplicable. Esas manos <strong>no cuentan</strong> en el match ni como leak.`,
+      tip: 'Exporta desde Preflop Lab más spots (OR por posición, BB vs BTN, 3-bet, stacks cercanos a los de tus manos) e impórtalos de nuevo.'
+    });
+  }
+
+  if (a.vpipPct > gto.vpip.max + 7) {
+    leaks.push({ icon: '📈', severity: 'high', color: 'var(--red)', title: 'VPIP demasiado alto',
+      text: `Juegas el <strong>${a.vpipPct.toFixed(1)}%</strong>. GTO ${a.tableSize}-max: <strong>${gto.vpip.min}-${gto.vpip.max}%</strong>. En 8-max debes ser más tight porque hay más jugadores detrás.`,
+      tip: 'Revisa tus RFI (raise first in). En 8-max UTG solo abre ~14%, no el 20% de 6-max.' });
+  } else if (a.vpipPct < gto.vpip.min - 4 && a.totalHands > 50) {
+    leaks.push({ icon: '🔒', severity: 'med', color: 'var(--gold)', title: 'VPIP demasiado bajo (nit)',
+      text: `Solo juegas el <strong>${a.vpipPct.toFixed(1)}%</strong>. GTO ${a.tableSize}-max: ${gto.vpip.min}-${gto.vpip.max}%.`,
+      tip: 'Amplía en late position. En BTN 8-max puedes abrir ~45% de manos (raise-or-fold).' });
+  }
+
+  const gap = a.vpipPct - a.pfrPct;
+  if (gap > 10) {
+    leaks.push({ icon: '⚠️', severity: 'high', color: 'var(--red)', title: 'Diferencia VPIP-PFR muy grande',
+      text: `Juegas ${a.vpipPct.toFixed(1)}% pero solo subes ${a.pfrPct.toFixed(1)}%. Gap: <strong>${gap.toFixed(1)} pts</strong> (ideal 3-6).`,
+      tip: 'Estás llamando demasiado. <strong>Raise or fold</strong>.' });
+  }
+
+  if (a.pfrPct < gto.pfr.min - 3) {
+    leaks.push({ icon: '📉', severity: 'high', color: 'var(--red)', title: 'PFR muy bajo',
+      text: `Solo subes preflop el <strong>${a.pfrPct.toFixed(1)}%</strong>. GTO ${a.tableSize}-max: ${gto.pfr.min}-${gto.pfr.max}%.`,
+      tip: 'En torneos con antes la agresión preflop es clave.' });
+  }
+
+  if (a.cbetOpportunities >= 15 && a.cbetFlopPct < gto.cbet_flop.min - 10) {
+    leaks.push({ icon: '🛑', severity: 'med', color: 'var(--gold)', title: 'C-Bet demasiado bajo',
+      text: `Haces c-bet <strong>${a.cbetFlopPct.toFixed(1)}%</strong>. GTO: ${gto.cbet_flop.min}-${gto.cbet_flop.max}%.`,
+      tip: 'En 8-max los boards favorecen al raiser. C-bet 60%+ en boards secos.' });
+  }
+  if (a.cbetOpportunities >= 15 && a.cbetFlopPct > gto.cbet_flop.max + 10) {
+    leaks.push({ icon: '🎯', severity: 'med', color: 'var(--gold)', title: 'C-Bet demasiado alto',
+      text: `Haces c-bet <strong>${a.cbetFlopPct.toFixed(1)}%</strong>. Es predecible y explotable.`,
+      tip: 'Contra rivales que flotan, mezcla checks.' });
+  }
+
+  if (a.wtsdOpportunities >= 15 && a.wtsdPct > gto.wtsd.max + 6) {
+    leaks.push({ icon: '🐟', severity: 'high', color: 'var(--red)', title: 'Vas demasiado al showdown',
+      text: `WTSD <strong>${a.wtsdPct.toFixed(1)}%</strong>. GTO: ${gto.wtsd.min}-${gto.wtsd.max}%.`,
+      tip: 'Estás pagando demasiado en river.' });
+  } else if (a.wtsdOpportunities >= 15 && a.wtsdPct < gto.wtsd.min - 5) {
+    leaks.push({ icon: '🎈', severity: 'med', color: 'var(--gold)', title: 'Vas demasiado poco al showdown',
+      text: `WTSD <strong>${a.wtsdPct.toFixed(1)}%</strong>. Estás foldando manos que deberías mostrar.`,
+      tip: 'A veces hay que pagar con manos marginales.' });
+  }
+
+  if (a.totalHands >= 50 && a.threeBetPct < gto.threebet.min - 2) {
+    leaks.push({ icon: '🐢', severity: 'high', color: 'var(--red)', title: '3-Bet prácticamente nulo',
+      text: `3-bet <strong>${a.threeBetPct.toFixed(1)}%</strong>. GTO ${a.tableSize}-max: ${gto.threebet.min}-${gto.threebet.max}%.`,
+      tip: 'En 8-max el 3-bet debe ser polarizado: value + bluffs (A5s-A2s, KQs).' });
+  } else if (a.totalHands >= 50 && a.threeBetPct > gto.threebet.max + 5) {
+    leaks.push({ icon: '🔥', severity: 'med', color: 'var(--gold)', title: '3-Bet demasiado alto',
+      text: `3-bet <strong>${a.threeBetPct.toFixed(1)}%</strong>. Es explotable en 8-max.`,
+      tip: 'En 8-max los rangos de open son más fuertes. 3-bet 6% es suficiente.' });
+  }
+
+  if (a.totalHands >= 100 && a.winrateBB < -5) {
+    leaks.push({ icon: '💸', severity: 'high', color: 'var(--red)', title: 'Winrate negativo',
+      text: `Winrate <strong>${a.winrateBB.toFixed(1)} bb/100</strong>. Estás perdiendo dinero a largo plazo.`,
+      tip: 'Revisa: defensa de BB excesiva, call en river con manos medias, falta de agresión en BTN vs ciegas.' });
+  }
+
+  const errorPlays = a.handDeviations.filter(d => d.type === 'error');
+  if (errorPlays.length >= 3) {
+    const byHand = {};
+    errorPlays.forEach(d => { byHand[d.hand] = (byHand[d.hand] || 0) + 1; });
+    const topHands = Object.entries(byHand).sort((x,y) => y[1]-x[1]).slice(0, 5);
+    const listStr = topHands.map(([h, c]) => `${h} (${c}x)`).join(', ');
+    leaks.push({ icon: '🚨', severity: 'high', color: 'var(--red)', title: 'Errores: OR fuera de estrategia',
+      text: `<strong>${errorPlays.length}</strong> open-raises de manos que la tabla marca fold. Top: ${listStr}.`,
+      tip: 'Estas manos no están en tu rango de apertura. Elimínalas del RFI en esa posición.' });
+  }
+
+  const underPlays = a.handDeviations.filter(d => d.type === 'under');
+  if (underPlays.length >= 3) {
+    const byHand = {};
+    underPlays.forEach(d => { byHand[d.hand] = (byHand[d.hand] || 0) + 1; });
+    const topHands = Object.entries(byHand).sort((x,y) => y[1]-x[1]).slice(0, 5);
+    const listStr = topHands.map(([h, c]) => `${h} (${c}x)`).join(', ');
+    leaks.push({ icon: '📉', severity: 'med', color: 'var(--gold)', title: 'Underplay: foldas manos de tu rango',
+      text: `<strong>${underPlays.length}</strong> veces foldaste manos que la tabla abre. Top: ${listStr}.`,
+      tip: 'Estás dejando valor. Amplía tu RFI con estas combinaciones.' });
+  }
+
+  const bbStats = a.byPosition['BB'];
+  if (bbStats && bbStats.hands >= 20) {
+    const bbVpip = (bbStats.vpip / bbStats.hands) * 100;
+    if (bbVpip < 25) leaks.push({
+      icon: '👎', severity: 'med', color: 'var(--gold)', title: 'BB demasiado tight vs steals',
+      text: `En BB juegas solo <strong>${bbVpip.toFixed(1)}%</strong>. GTO 8-max: defender 45-55% vs BTN.`,
+      tip: 'Con el descuento de BB y las odds, defiende más: suited gappers, A-x suited, K-x suited.' });
+  }
+
+  const sbStats = a.byPosition['SB'];
+  if (sbStats && sbStats.hands >= 15) {
+    const sbVpip = (sbStats.vpip / sbStats.hands) * 100;
+    if (sbVpip > 55) leaks.push({
+      icon: '🚫', severity: 'med', color: 'var(--gold)', title: 'SB juega demasiado',
+      text: `En SB juegas <strong>${sbVpip.toFixed(1)}%</strong>. GTO 8-max: 35-40% raise-or-fold.`,
+      tip: 'Desde SB juega <strong>raise or fold</strong>. Llamar es -EV.' });
+  }
+
+  const sevOrder = { high: 0, med: 1, low: 2 };
+  leaks.sort((x, y) => sevOrder[x.severity] - sevOrder[y.severity]);
+  return leaks;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════════════════════════ */
+function renderAnalysis(analysis) {
+  state.analysis = analysis;
+  state.tableSize = analysis.tableSize;
+  state.availablePositions = analysis.posLabels;
+
+  const badge = document.getElementById('tableSizeBadge');
+  const badgeText = document.getElementById('tableSizeText');
+  if (badge && badgeText) {
+    const cov = analysis.handsWithTable != null ? ` · ${analysis.handsWithTable}/${analysis.totalHands} con tabla` : '';
+    const ref = analysis.usingImportedTables ? 'vs tus tablas' : 'GTO ref.';
+    const parts = [];
+    if (analysis.hands7) parts.push(`${analysis.hands7}×7`);
+    if (analysis.hands8) parts.push(`${analysis.hands8}×8`);
+    if (analysis.hands9) parts.push(`${analysis.hands9}×9`);
+    const mix = parts.length ? ` · ${parts.join(' + ')}` : '';
+    const omit = analysis.handsOmitted > 0 ? ` · omitidas <7: ${analysis.handsOmitted}` : '';
+    badgeText.textContent = `7–9 max (early→UTG) · ${ref}${mix}${omit}${cov}`;
+    badge.style.display = 'inline-flex';
+  }
+
+  document.getElementById('sTotalHands').textContent = analysis.totalHands.toLocaleString('es-ES');
+  document.getElementById('sTotalDetail').textContent = `manos 7–9 max` + (analysis.handsOmitted > 0 ? ` · −${analysis.handsOmitted} omitidas` : '');
+
+  const wr = analysis.winrateBB;
+  const wrEl = document.getElementById('sWinrate');
+  wrEl.textContent = (wr >= 0 ? '+' : '') + wr.toFixed(1);
+  wrEl.style.color = wr >= 0 ? 'var(--green)' : 'var(--red)';
+
+  document.getElementById('sVpip').textContent = analysis.vpipPct.toFixed(1) + '%';
+  document.getElementById('sPfr').textContent = analysis.pfrPct.toFixed(1) + '%';
+  document.getElementById('sVpipGto').textContent = analysis.usingImportedTables
+    ? `Ref. tablas: ${analysis.gto.vpip.min}-${analysis.gto.vpip.max}%`
+    : `GTO: ${analysis.gto.vpip.min}-${analysis.gto.vpip.max}%`;
+  document.getElementById('sPfrGto').textContent = analysis.usingImportedTables
+    ? `Ref. tablas: ${analysis.gto.pfr.min}-${analysis.gto.pfr.max}%`
+    : `GTO: ${analysis.gto.pfr.min}-${analysis.gto.pfr.max}%`;
+
+  const leaksCount = analysis.leaks.filter(l => l.severity !== 'low').length;
+  document.getElementById('sLeaks').textContent = leaksCount;
+  document.getElementById('sLeaksDetail').textContent = leaksCount === 1 ? 'detectado' : 'detectados';
+
+  const gtoSub = document.getElementById('gtoSubtitle');
+  if (gtoSub) {
+    if (analysis.handsWithoutTable > 0) {
+      gtoSub.innerHTML = `⚠ <strong>${analysis.handsWithoutTable}</strong> manos sin tabla aplicable (marcadas como incompletas)`;
+      gtoSub.style.color = 'var(--gold)';
+    } else if (analysis.usingImportedTables) {
+      gtoSub.textContent = 'Comparado contra tus tablas Preflop Lab';
+      gtoSub.style.color = '';
+    } else {
+      gtoSub.textContent = 'Rangos de referencia';
+      gtoSub.style.color = '';
+    }
+  }
+
+  renderPositionTabs(analysis);
+  renderLeaks(analysis.leaks);
+  renderHeatmap(analysis);
+  renderStatsBars(analysis);
+  renderPositionTable(analysis);
+}
+
+function renderPositionTabs(analysis) {
+  const container = document.getElementById('positionTabs');
+  if (!container) return;
+  const positions = ['all', ...analysis.posLabels];
+  container.innerHTML = positions.map(p => {
+    const label = p === 'all' ? 'Todas' : p;
+    const active = p === state.currentPosition ? 'active' : '';
+    return `<button class="tab-btn ${active}" data-pos="${p}">${label}</button>`;
+  }).join('');
+}
+
+function renderLeaks(leaks) {
+  const container = document.getElementById('leaksList');
+  if (leaks.length === 0) {
+    container.innerHTML = `
+      <div class="no-leaks">
+        <div class="no-leaks-icon">✅</div>
+        <div class="no-leaks-title">¡Sin leaks destacados!</div>
+        <div class="no-leaks-text">Tu juego está alineado con el GTO 8-max en las áreas analizadas.</div>
+      </div>`;
+    return;
+  }
+  const sevLabel = { high: 'ALTO', med: 'MEDIO', low: 'INFO' };
+  const sevClass = { high: 'severity-high', med: 'severity-med', low: 'severity-low' };
+  container.innerHTML = leaks.map(l => `
+    <div class="leak-card" style="--leak-color: ${l.color};">
+      <div class="leak-icon">${l.icon}</div>
+      <div class="leak-body">
+        <div class="leak-head">
+          <div class="leak-title">${escapeHtml(l.title)}</div>
+          <div class="leak-severity ${sevClass[l.severity]}">${sevLabel[l.severity]}</div>
+        </div>
+        <div class="leak-text">${l.text}</div>
+        <div class="leak-tip"><strong>💡 Cómo mejorar:</strong> ${l.tip}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/** Construye frecuencias OR del heatmap filtrando por posición y bucket de BB. */
+function buildHeatmapRangeData(analysis, pos, bbFilter) {
+  const data = {};
+  let handsInFilter = 0;
+  let orSpots = 0;
+  let orPlayed = 0;
+  const hands = (analysis && analysis.hands) || [];
+  for (let i = 0; i < hands.length; i++) {
+    const h = hands[i];
+    const hPos = getAnalysisPosition(h);
+    if (!hPos) continue;
+    if (pos !== 'all' && hPos !== pos) continue;
+    const stackBb = getHeroStackBb(h);
+    if (bbFilter != null) {
+      const bucket = closestBbBucket(stackBb);
+      if (bucket !== bbFilter) continue;
+    }
+    handsInFilter++;
+    if (!isOpenRaiseSpot(h)) continue;
+    const handKey = getHandKey(h.hero_cards);
+    if (!handKey) continue;
+    orSpots++;
+    if (!data[handKey]) data[handKey] = { played: 0, total: 0 };
+    data[handKey].total++;
+    if (heroDidOpenRaise(h)) {
+      data[handKey].played++;
+      orPlayed++;
+    }
+  }
+  return { data, handsInFilter, orSpots, orPlayed };
+}
+
+function renderHeatmap(analysis) {
+  const pos = state.currentPosition;
+  const bbFilter = state.currentBbFilter;
+  const stratStack = strategyStackForFilter();
+  const grid = document.getElementById('heatmapGrid');
+
+  const built = buildHeatmapRangeData(analysis, pos, bbFilter);
+  const data = built.data;
+
+  const banner = document.getElementById('complianceBanner');
+  const gtoRange = getGtoRangeForPosition(pos, stratStack);
+  if (pos !== 'all' && gtoRange && !gtoRange.incomplete && built.orSpots > 0) {
+    let aligned = 0, total = 0;
+    for (const hk in data) {
+      const d = data[hk];
+      const inGto = gtoRange.hands.includes(hk);
+      const played = d.played;
+      const notPlayed = d.total - d.played;
+      if (inGto && played > 0) aligned += Math.min(played, d.total);
+      if (!inGto && notPlayed > 0) aligned += notPlayed;
+      total += d.total;
+    }
+    const pct = total > 0 ? (aligned / total) * 100 : 0;
+    banner.style.display = 'flex';
+    const circle = document.getElementById('complianceCircle');
+    const pctEl = document.getElementById('compliancePct');
+    let color = 'var(--red)';
+    let msg = 'Muy por debajo de tu estrategia. Revisa tus rangos.';
+    if (pct >= 85) { color = 'var(--green)'; msg = 'Excelente alineación con tu estrategia.'; }
+    else if (pct >= 70) { color = 'var(--cyan)'; msg = 'Buena alineación, con margen de mejora.'; }
+    else if (pct >= 55) { color = 'var(--gold)'; msg = 'Desviaciones notables. Ajusta tu rango.'; }
+    circle.style.setProperty('--cc-pct', pct.toFixed(0) + '%');
+    circle.style.setProperty('--cc-color', color);
+    pctEl.textContent = pct.toFixed(0) + '%';
+    document.getElementById('complianceTitle').textContent = `Cumplimiento en ${pos}${bbFilter != null ? ' · ' + bbFilter + 'bb' : ''}: ${pct.toFixed(0)}%`;
+    document.getElementById('complianceSub').innerHTML = `<strong>${built.handsInFilter}</strong> manos · ${msg}` +
+      (gtoRange.stack != null ? ` · tabla ${gtoRange.stack}bb` : '');
+  } else {
+    banner.style.display = 'none';
+  }
+
+  const gtoSet = (gtoRange && !gtoRange.incomplete) ? new Set(gtoRange.hands) : null;
+  const stratFreqMap = (pos !== 'all') ? buildStrategyFreqMap(pos, stratStack) : null;
+
+  let html = '';
+  for (let i = 0; i < 13; i++) {
+    for (let j = 0; j < 13; j++) {
+      let label;
+      if (i === j) label = RANKS[i] + RANKS[j];
+      else if (i < j) label = RANKS[i] + RANKS[j] + 's';
+      else label = RANKS[j] + RANKS[i] + 'o';
+
+      const d = data[label] || { played: 0, total: 0 };
+      const total = d.total;
+      const played = d.played;
+      const freq = total > 0 ? played / total : 0;
+      const isEmpty = total === 0;
+      const inGto = gtoSet ? gtoSet.has(label) : false;
+      const stratPct = stratFreqMap && stratFreqMap[label] != null ? stratFreqMap[label] : (inGto ? 100 : (gtoSet ? 0 : null));
+
+      const verdict = classifyHeatCell({ played, total, freq, stratPct, inGto, hasTable: !!gtoSet, pos });
+      const bg = verdict.bg;
+      const statusClass = verdict.status;
+
+      html += `<div class="hm-cell ${i === j ? 'pair' : ''} ${isEmpty ? 'empty' : ''} ${statusClass}"
+        data-hand="${label}" data-played="${played}" data-total="${total}" data-freq="${freq.toFixed(2)}"
+        data-ingto="${inGto}" data-strat="${stratPct == null ? '' : stratPct}" data-verdict="${verdict.key}"
+        style="background: ${bg};">${label}</div>`;
+    }
+  }
+  grid.innerHTML = html;
+  fitHeatmapCells(grid);
+
+  grid.querySelectorAll('.hm-cell').forEach(cell => {
+    cell.addEventListener('mouseenter', (e) => showHandTooltip(e, cell, pos, gtoRange));
+    cell.addEventListener('mouseleave', hideTooltip);
+    cell.addEventListener('mousemove', (e) => moveTooltip(e));
+  });
+}
+
+function buildStrategyFreqMap(position, stackBb) {
+  if (!position || position === 'all') return null;
+  const targetStack = stackBb != null && isFinite(stackBb) ? Number(stackBb) : strategyStackForFilter();
+  const map = {};
+  if (state.tables) {
+    const aliases = strategyPosAlias(position);
+    let entry = null;
+    for (const pos of aliases) {
+      entry = findBestTable(pos, targetStack, 'OR');
+      if (entry && entry.range) break;
+    }
+    if ((!entry || !entry.range) && position === 'BB') {
+      const candidates = [];
+      for (const [key, val] of Object.entries(state.tables)) {
+        const p = String(key).split('|');
+        if (p[0] !== 'BB') continue;
+        const range = (val && val.range) || extractRangeObject(val);
+        if (!range) continue;
+        candidates.push({ range, stack: parseInt(p[2], 10) || 0 });
+      }
+      if (candidates.length) {
+        candidates.sort((a, b) => Math.abs(a.stack - targetStack) - Math.abs(b.stack - targetStack));
+        entry = candidates[0];
+      }
+    }
+    if (entry && entry.range) {
+      for (const [hk, freq] of Object.entries(entry.range)) {
+        map[hk] = Math.round(dominantPlayFreq(freq).play);
+      }
+      return map;
+    }
+  }
+  const gr = getGtoRangeForPosition(position);
+  if (gr && gr.hands && !gr.incomplete) {
+    const set = new Set(gr.hands);
+    for (let i = 0; i < 13; i++) {
+      for (let j = 0; j < 13; j++) {
+        let label;
+        if (i === j) label = RANKS[i] + RANKS[j];
+        else if (i < j) label = RANKS[i] + RANKS[j] + 's';
+        else label = RANKS[j] + RANKS[i] + 'o';
+        map[label] = set.has(label) ? 100 : 0;
+      }
+    }
+    return map;
+  }
+  return null;
+}
+
+function classifyHeatCell({ played, total, freq, stratPct, inGto, hasTable, pos }) {
+  const emptyBg = 'var(--bg-3)';
+  const COL = { ok: '#22c55e', under: '#fde047', over: '#ea580c', error: '#f87171' };
+
+  if (total === 0) {
+    if (hasTable && stratPct != null && stratPct > 15) {
+      return { key: 'strat', status: 'status-strat', bg: 'rgba(34,197,94,0.18)' };
+    }
+    return { key: 'empty', status: 'empty', bg: emptyBg };
+  }
+
+  if (pos === 'all' || !hasTable || stratPct == null) {
+    if (played === 0) return { key: 'empty', status: 'empty', bg: emptyBg };
+    return { key: 'freq', status: 'status-ok', bg: COL.ok };
+  }
+
+  const heroPct = freq * 100;
+  const target = Number(stratPct) || 0;
+  const diff = heroPct - target;
+
+  // Fuera de estrategia: si la jugaste → error (rojo). No solapa con amarillo.
+  if (target <= 15) {
+    if (played > 0) return { key: 'error', status: 'status-error', bg: COL.error };
+    return { key: 'empty', status: 'empty', bg: emptyBg };
+  }
+
+  // En estrategia: OK / over / under
+  if (Math.abs(diff) < 12.5) return { key: 'ok', status: 'status-ok', bg: COL.ok };
+  if (diff >= 25) return { key: 'over', status: 'status-over', bg: COL.over };
+  if (diff > 0) return { key: 'ok', status: 'status-ok', bg: COL.ok };
+  // diff < 0: por debajo de la tabla
+  // OR = 0 (nunca la jugaste) → error rojo; amarillo solo si OR > 0 pero aún under
+  if (played <= 0) return { key: 'error', status: 'status-error', bg: COL.error };
+  return { key: 'under', status: 'status-under', bg: COL.under };
+}
+
+function fitHeatmapCells(grid) {
+  if (!grid) return;
+  const wrap = grid.parentElement;
+  const avail = (wrap && wrap.clientWidth) ? wrap.clientWidth : (window.innerWidth - 32);
+  const gapTotal = 12;
+  const ideal = Math.floor((avail - gapTotal) / 13);
+  const isWide = window.innerWidth >= 720;
+  const minC = isWide ? 22 : 16;
+  const maxC = isWide ? 40 : 28;
+  const cell = Math.max(minC, Math.min(maxC, ideal));
+  grid.style.setProperty('--ra-cell', cell + 'px');
+}
+
+window.addEventListener('resize', () => {
+  const grid = document.getElementById('heatmapGrid');
+  if (grid && grid.children.length) fitHeatmapCells(grid);
+});
+
+function showHandTooltip(e, cell, pos, gtoRange) {
+  const tip = document.getElementById('tooltip');
+  const hand = cell.dataset.hand;
+  const played = parseInt(cell.dataset.played, 10);
+  const total = parseInt(cell.dataset.total, 10);
+  const freq = parseFloat(cell.dataset.freq);
+  const inGto = cell.dataset.ingto === 'true';
+  const stratRaw = cell.dataset.strat;
+  const stratPct = stratRaw === '' || stratRaw == null ? null : Number(stratRaw);
+  const verdict = cell.dataset.verdict || '';
+
+  const verdictLabel = {
+    ok: { t: 'Verde · OK', c: 'tt-badge-in' },
+    under: { t: 'Amarillo · Underplay', c: 'tt-badge-out' },
+    over: { t: 'Naranja · Overplay', c: 'tt-badge-out' },
+    error: { t: 'Rojo · Error', c: 'tt-badge-out' },
+    strat: { t: 'En estrategia (sin datos)', c: 'tt-badge-in' },
+    empty: { t: 'Sin datos / fold fuera de rango', c: '' },
+    freq: { t: 'Frecuencia OR', c: '' }
+  }[verdict] || null;
+
+  let html = `<strong>${hand}</strong>`;
+  if (verdictLabel) {
+    html += `<div style="margin-top:6px;"><span class="tt-badge ${verdictLabel.c}">${verdictLabel.t}</span></div>`;
+  } else if (gtoRange && pos !== 'all') {
+    if (gtoRange.incomplete) {
+      html += `<div style="margin-top:6px;"><span class="tt-badge tt-badge-out">⚠ Sin tabla importada</span></div>`;
+    } else {
+      html += `<div style="margin-top:6px;"><span class="tt-badge ${inGto ? 'tt-badge-in' : 'tt-badge-out'}">${inGto ? '◉ En tu estrategia' : '○ Fuera de estrategia'}</span></div>`;
+    }
+  }
+
+  if (total === 0) {
+    html += `<div style="margin-top:6px;color:var(--text-3);">No registrada en esta posición (OR)</div>`;
+    if (stratPct != null) html += `<div class="tt-row"><span class="tt-label">Estrategia</span><span class="tt-val">${stratPct}%</span></div>`;
+  } else {
+    html += `
+      <div class="tt-row"><span class="tt-label">OR</span><span class="tt-val">${played}/${total}</span></div>
+      <div class="tt-row"><span class="tt-label">Tu freq.</span><span class="tt-val">${(freq * 100).toFixed(0)}%</span></div>
+    `;
+    if (stratPct != null && pos !== 'all') {
+      html += `<div class="tt-row"><span class="tt-label">Estrategia</span><span class="tt-val">${stratPct}%</span></div>`;
+      const d = Math.round(freq * 100 - stratPct);
+      const dStr = (d >= 0 ? '+' : '') + d + ' pts';
+      html += `<div class="tt-row"><span class="tt-label">Δ</span><span class="tt-val">${dStr}</span></div>`;
+    }
+  }
+  tip.innerHTML = html;
+  tip.classList.add('show');
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  const tip = document.getElementById('tooltip');
+  if (!tip.classList.contains('show')) return;
+  const x = Math.min(e.clientX + 14, window.innerWidth - 270);
+  const y = Math.min(e.clientY + 14, window.innerHeight - 140);
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('show');
+}
+
+function renderStatsBars(analysis) {
+  const container = document.getElementById('statsBars');
+  const gto = analysis.gto;
+  const stats = [
+    { name: 'VPIP', value: analysis.vpipPct, gto: gto.vpip, format: v => v.toFixed(1) + '%', desc: '% de manos jugadas voluntariamente' },
+    { name: 'PFR', value: analysis.pfrPct, gto: gto.pfr, format: v => v.toFixed(1) + '%', desc: '% de raises preflop' },
+    { name: '3-Bet', value: analysis.threeBetPct, gto: gto.threebet, format: v => v.toFixed(1) + '%', desc: '% de re-raises preflop' },
+    { name: 'C-Bet Flop', value: analysis.cbetFlopPct, gto: gto.cbet_flop, format: v => v.toFixed(1) + '%', desc: 'Continuation bet en flop', hideIfZero: analysis.cbetOpportunities < 10 },
+    { name: 'WTSD', value: analysis.wtsdPct, gto: gto.wtsd, format: v => v.toFixed(1) + '%', desc: 'Went to showdown', hideIfZero: analysis.wtsdOpportunities < 10 }
+  ];
+
+  container.innerHTML = stats.filter(s => !s.hideIfZero).map(s => {
+    const v = s.value;
+    const min = s.gto.min, max = s.gto.max;
+    let status, statusText, statusClass;
+    if (v >= min && v <= max) { status = 'good'; statusText = '✓ Dentro del rango'; statusClass = 'status-good'; }
+    else if (v < min) { status = 'low'; statusText = '↓ Por debajo'; statusClass = 'status-mid'; }
+    else { status = 'high'; statusText = '↑ Por encima'; statusClass = 'status-bad'; }
+
+    const maxBar = Math.max(v, max) * 1.3;
+    const fillPct = (v / maxBar) * 100;
+    const gtoPos = (s.gto.ideal / maxBar) * 100;
+    const rangeStart = (min / maxBar) * 100;
+    const rangeEnd = (max / maxBar) * 100;
+
+    const fillColor = status === 'good' ? 'linear-gradient(90deg, var(--green-dark), var(--green))'
+      : status === 'low' ? 'linear-gradient(90deg, var(--cyan-dark), var(--cyan))'
+      : 'linear-gradient(90deg, var(--gold-dark), var(--gold))';
+
+    return `
+      <div class="stat-bar-item">
+        <div class="stat-bar-head">
+          <div class="stat-bar-name">${s.name}</div>
+          <div class="stat-bar-value" style="color: ${status === 'good' ? 'var(--green)' : status === 'low' ? 'var(--cyan)' : 'var(--gold)'};">${s.format(v)}</div>
+        </div>
+        <div class="stat-bar-track">
+          <div style="position: absolute; left: ${rangeStart}%; width: ${rangeEnd - rangeStart}%; top: 0; bottom: 0; background: rgba(52,211,153,0.15); z-index: 0;"></div>
+          <div class="stat-bar-fill" style="width: ${fillPct}%; background: ${fillColor};"></div>
+          <div class="stat-bar-gto" style="left: ${gtoPos}%;"></div>
+        </div>
+        <div class="stat-bar-footer">
+          <span>${s.desc}</span>
+          <span class="stat-bar-status ${statusClass}">${statusText}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderPositionTable(analysis) {
+  const tbody = document.querySelector('#posTable tbody');
+  const orderedPositions = [];
+  ANALYSIS_POS_LABELS.forEach(p => {
+    if (analysis.byPosition[p] && analysis.byPosition[p].hands > 0) orderedPositions.push(p);
+  });
+
+  if (orderedPositions.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:20px;">Sin datos suficientes</td></tr>';
+    return;
+  }
+
+  let html = '';
+  for (const pos of orderedPositions) {
+    const s = analysis.byPosition[pos];
+    const vpip = (s.vpip / s.hands * 100).toFixed(1);
+    const pfr = (s.pfr / s.hands * 100).toFixed(1);
+    const wr = (s.netBB / s.hands * 100).toFixed(1);
+    const wrClass = parseFloat(wr) >= 0 ? 'pos' : 'neg';
+
+    const gtoRange = getGtoRangeForPosition(pos);
+    let complianceHtml = '<span style="color:var(--text-3);">—</span>';
+    if (gtoRange && gtoRange.incomplete) {
+      complianceHtml = '<span style="color:var(--gold);" title="Falta tabla para esta posición" data-i18n-title="rl.noTablePos">Sin tabla</span>';
+    } else if (gtoRange && analysis.rangeByPosition[pos]) {
+      let aligned = 0, total = 0;
+      for (const hk in analysis.rangeByPosition[pos]) {
+        const d = analysis.rangeByPosition[pos][hk];
+        const inGto = gtoRange.hands.includes(hk);
+        const played = d.played;
+        const notPlayed = d.total - d.played;
+        if (inGto && played > 0) aligned += Math.min(played, d.total);
+        if (!inGto && notPlayed > 0) aligned += notPlayed;
+        total += d.total;
+      }
+      const pct = total > 0 ? (aligned / total) * 100 : 0;
+      let color = 'var(--red)';
+      if (pct >= 85) color = 'var(--green)';
+      else if (pct >= 70) color = 'var(--cyan)';
+      else if (pct >= 55) color = 'var(--gold)';
+      const missing = s.withoutTable || 0;
+      complianceHtml = `<span style="color:${color};">${pct.toFixed(0)}%</span>` +
+        (missing ? ` <span style="color:var(--gold);font-size:10px;">(${missing} sin tabla)</span>` : '');
+    }
+
+    html += `
+      <tr>
+        <td class="pos-name">${pos}</td>
+        <td class="num">${s.hands}</td>
+        <td class="num">${vpip}%</td>
+        <td class="num">${pfr}%</td>
+        <td class="num ${wrClass}">${parseFloat(wr) >= 0 ? '+' : ''}${wr}</td>
+        <td class="compliance">${complianceHtml}</td>
+      </tr>`;
+  }
+  tbody.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EVENTOS
+   ═══════════════════════════════════════════════════════════ */
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const dropzoneFiles = document.getElementById('dropzoneFiles');
+
+dropzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  showFilesPreview(files);
+  processFiles(files);
+  e.target.value = '';
+});
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault(); dropzone.classList.remove('dragover');
+  const files = Array.from(e.dataTransfer.files || []);
+  if (!files.length) return;
+  showFilesPreview(files);
+  processFiles(files);
+});
+
+function showFilesPreview(files) {
+  dropzoneFiles.classList.add('show');
+  dropzoneFiles.innerHTML = files.map(f => `
+    <div class="df-item">
+      <span>📄 ${escapeHtml(f.name)}</span>
+      <span style="color: var(--text-3);">${(f.size / 1024).toFixed(1)} KB</span>
+    </div>
+  `).join('');
+}
+
+const dropzoneTables = document.getElementById('dropzoneTables');
+const tablesFileInput = document.getElementById('tablesFileInput');
+if (dropzoneTables && tablesFileInput) {
+  dropzoneTables.addEventListener('click', () => tablesFileInput.click());
+  tablesFileInput.addEventListener('change', (e) => {
+    const f = (e.target.files || [])[0];
+    if (f) processTablesFile(f);
+    e.target.value = '';
+  });
+  dropzoneTables.addEventListener('dragover', (e) => { e.preventDefault(); dropzoneTables.classList.add('dragover'); });
+  dropzoneTables.addEventListener('dragleave', () => dropzoneTables.classList.remove('dragover'));
+  dropzoneTables.addEventListener('drop', (e) => {
+    e.preventDefault(); dropzoneTables.classList.remove('dragover');
+    const f = (e.dataTransfer.files || [])[0];
+    if (f) processTablesFile(f);
+  });
+}
+
+document.getElementById('btnLoadHandLab')?.addEventListener('click', () => loadFromHandLab());
+document.getElementById('btnLoadPreflopLab')?.addEventListener('click', () => loadTablesFromPreflopLab());
+
+document.getElementById('btnAnalyze').addEventListener('click', () => {
+  runFullAnalysis();
+});
+
+document.getElementById('btnDemo').addEventListener('click', async () => {
+  const demoHands = generateDemoHands(200);
+  state.hands = demoHands;
+  state.handsMeta = { count: 200, sources: ['demo'], loadedAt: Date.now() };
+  const tables = {};
+  for (const [pos, info] of Object.entries(GTO_RFI_8MAX)) {
+    const range = {};
+    for (let i = 0; i < 13; i++) {
+      for (let j = 0; j < 13; j++) {
+        let label;
+        if (i === j) label = RANKS[i] + RANKS[j];
+        else if (i < j) label = RANKS[i] + RANKS[j] + 's';
+        else label = RANKS[j] + RANKS[i] + 'o';
+        const inR = info.hands.includes(label);
+        range[label] = inR
+          ? { limp: 0, call: 0, fold: 0, raise: 100, allin: 0 }
+          : { limp: 0, call: 0, fold: 100, raise: 0, allin: 0 };
+      }
+    }
+    tables[`${pos}|-|60|OR`] = { range, sequence: '', raiseSize: '' };
+  }
+  {
+    const range = {};
+    for (let i = 0; i < 13; i++) {
+      for (let j = 0; j < 13; j++) {
+        let label;
+        if (i === j) label = RANKS[i] + RANKS[j];
+        else if (i < j) label = RANKS[i] + RANKS[j] + 's';
+        else label = RANKS[j] + RANKS[i] + 'o';
+        const inR = GTO_BB_DEF_VS_BTN.hands.includes(label);
+        range[label] = inR
+          ? { limp: 0, call: 100, fold: 0, raise: 0, allin: 0 }
+          : { limp: 0, call: 0, fold: 100, raise: 0, allin: 0 };
+      }
+    }
+    tables[`BB|BTN|60|CALL`] = { range, sequence: '', raiseSize: '' };
+  }
+  state.tables = tables;
+  state.tablesRaw = { version: 'demo', tables8: tables };
+  state.tablesMeta = { count: Object.keys(tables).length, version: 'demo', loadedAt: Date.now(), coverage: Object.keys(tables).sort() };
+  await persistSession();
+  updateImportStatusUI();
+  if (typeof updateDrawerStatus === 'function') updateDrawerStatus();
+  runFullAnalysis();
+});
+
+document.getElementById('positionTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.currentPosition = btn.dataset.pos;
+  if (state.analysis) renderHeatmap(state.analysis);
+});
+
+document.getElementById('bbFilterTabs')?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.bb-filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('#bbFilterTabs .bb-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const raw = btn.dataset.bb;
+  state.currentBbFilter = (raw === '' || raw == null) ? null : parseInt(raw, 10);
+  if (state.analysis) renderHeatmap(state.analysis);
+});
+
+function generateDemoHands(n) {
+  const hands = [];
+  const tableSize = 8;
+  const posLabels = getPositionLabels(tableSize);
+  const allCards = [];
+  for (const r of RANKS) for (const s of ['s','h','d','c']) allCards.push(r + s);
+
+  const gtoHandsSet = {};
+  posLabels.forEach(p => {
+    if (p === 'BB') gtoHandsSet[p] = new Set(GTO_BB_DEF_VS_BTN.hands);
+    else if (GTO_RFI_8MAX[p]) gtoHandsSet[p] = new Set(GTO_RFI_8MAX[p].hands);
+    else gtoHandsSet[p] = new Set();
+  });
+
+  for (let i = 0; i < n; i++) {
+    const heroPos = posLabels[Math.floor(Math.random() * posLabels.length)];
+    const heroCards = shuffleArr([...allCards]).slice(0, 2);
+    const handKey = getHandKey(heroCards);
+    const inGtoRange = gtoHandsSet[heroPos] && gtoHandsSet[heroPos].has(handKey);
+    const plays = inGtoRange ? Math.random() < 0.85 : Math.random() < 0.08;
+    const raises = plays && Math.random() < 0.65;
+
+    const players = [];
+    posLabels.forEach((pos, idx) => {
+      players.push({ seat: idx + 1, name: pos === heroPos ? 'Hero' : 'Villain ' + idx, stack: 100, waiting: false });
+    });
+
+    const actions = [{ type: 'deal_hole', player: 'Hero', cards: heroCards, street: 'preflop' }];
+
+    for (let p = 0; p < tableSize; p++) {
+      const pName = posLabels[p] === heroPos ? 'Hero' : 'Villain ' + p;
+      const isHero = posLabels[p] === heroPos;
+      if (isHero) {
+        if (plays) {
+          if (raises) actions.push({ type: 'raise', player: 'Hero', amount: 3, to: 3, street: 'preflop' });
+          else actions.push({ type: 'call', player: 'Hero', amount: 1, street: 'preflop' });
+        } else actions.push({ type: 'fold', player: 'Hero', street: 'preflop' });
+      } else if (Math.random() < 0.7) {
+        if (Math.random() < 0.15) actions.push({ type: 'raise', player: pName, amount: 3, to: 3, street: 'preflop' });
+        else if (Math.random() < 0.5) actions.push({ type: 'call', player: pName, amount: 1, street: 'preflop' });
+        else actions.push({ type: 'fold', player: pName, street: 'preflop' });
+      }
+    }
+
+    const board = shuffleArr([...allCards].filter(c => !heroCards.includes(c))).slice(0, 5);
+    const heroFolded = !plays || (Math.random() < 0.5 && plays);
+    const wentToShowdown = !heroFolded && Math.random() < 0.4;
+    const bbWon = (Math.random() - 0.42) * 20;
+
+    hands.push({
+      id: 'demo_' + i, site: 'demo',
+      date: new Date(Date.now() - i * 3600000).toISOString(),
+      hero: 'Hero', hero_cards: heroCards, board: board.slice(0, 5),
+      hero_net: bbWon, hero_net_bb: bbWon, bb: 1,
+      hero_folded: heroFolded, hero_showdown: wentToShowdown,
+      winner: null, actions, players, button: 1, tableMax: tableSize
+    });
+  }
+  return hands;
+}
+
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+setTimeout(async () => {
+  const splash = document.getElementById('splash');
+  if (splash) { splash.classList.add('hide'); if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false); setTimeout(() => splash.remove(), 700); }
+  if (typeof initRaTabs === 'function') initRaTabs();
+  await loadUserAndConn();
+  try {
+    const ok = await restoreSession();
+    if (ok) showToast('Sesión restaurada', 'success');
+  } catch (e) { console.warn('restore', e); }
+  updateImportStatusUI();
+}, 1400);
+
+function openDrawer() {
+  document.getElementById('drawer')?.classList.add('show');
+  document.getElementById('drawerOverlay')?.classList.add('show');
+  updateDrawerStatus();
+}
+function closeDrawer() {
+  document.getElementById('drawer')?.classList.remove('show');
+  document.getElementById('drawerOverlay')?.classList.remove('show');
+}
+function updateDrawerStatus() {
+  const el = document.getElementById('drawerStatus');
+  if (!el) return;
+  const nh = state.hands?.length || 0;
+  const nt = state.tables ? Object.keys(state.tables).length : 0;
+  if (!nh && !nt) { el.innerHTML = 'Sin datos cargados'; return; }
+  el.innerHTML = `<b>${nh.toLocaleString('es-ES')}</b> manos · <b>${nt}</b> tablas` +
+    (state.analyzed ? ' · análisis listo' : '');
+}
+
+function showUploadView() {
+  const upload = document.getElementById('uploadCard');
+  const analysis = document.getElementById('analysisContainer');
+  const tabs = document.getElementById('raTabs');
+  if (upload) {
+    upload.classList.remove('ra-hidden');
+    upload.style.removeProperty('display');
+  }
+  if (analysis) {
+    analysis.classList.add('ra-hidden');
+    analysis.style.setProperty('display', 'none', 'important');
+  }
+  if (tabs) tabs.classList.add('ra-hidden');
+  updateImportStatusUI();
+  updateDrawerStatus();
+}
+
+function showAnalysisView(tabKey) {
+  const upload = document.getElementById('uploadCard');
+  const analysis = document.getElementById('analysisContainer');
+  const tabs = document.getElementById('raTabs');
+  if (upload) {
+    upload.classList.add('ra-hidden');
+    upload.style.setProperty('display', 'none', 'important');
+  }
+  if (analysis) {
+    analysis.classList.remove('ra-hidden');
+    analysis.style.removeProperty('display');
+  }
+  if (tabs) tabs.classList.remove('ra-hidden');
+  if (window._raShowTab) window._raShowTab(tabKey || 'stats');
+  updateDrawerStatus();
+}
+
+function initRaTabs() {
+  if (document.body.dataset.raInit === '1') return;
+  document.body.dataset.raInit = '1';
+
+  const tabs = document.querySelectorAll('#raTabs .ra-tab');
+  const main = document.querySelector('main.main, .main');
+  if (!main) return;
+
+  const keys = ['stats', 'leaks', 'heatmap', 'pos'];
+  const sections = main.querySelectorAll('#analysisContainer > .section');
+  Array.from(sections).forEach((el, i) => {
+    el.classList.add('ra-panel');
+    if (keys[i]) el.dataset.raPanel = keys[i];
+  });
+
+  const analysisContainer = main.querySelector('#analysisContainer');
+
+  function show(key) {
+    if (!keys.includes(key)) key = 'stats';
+    if (analysisContainer) {
+      analysisContainer.classList.remove('ra-hidden');
+      analysisContainer.style.removeProperty('display');
+    }
+    const upload = document.getElementById('uploadCard');
+    if (upload) {
+      upload.classList.add('ra-hidden');
+      upload.style.setProperty('display', 'none', 'important');
+    }
+    document.getElementById('raTabs')?.classList.remove('ra-hidden');
+
+    main.querySelectorAll('#analysisContainer > .section').forEach(el => {
+      const on = el.dataset.raPanel === key;
+      el.classList.toggle('active', on);
+      if (on) el.style.removeProperty('display');
+      else el.style.setProperty('display', 'none', 'important');
+    });
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.ra === key));
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.ra)));
+  window._raShowTab = show;
+
+  document.getElementById('btnMenu')?.addEventListener('click', openDrawer);
+  document.getElementById('drawerOverlay')?.addEventListener('click', closeDrawer);
+  document.getElementById('drawerImport')?.addEventListener('click', () => {
+    closeDrawer();
+    showUploadView();
+  });
+  document.getElementById('drawerReplaceHands')?.addEventListener('click', async () => {
+    closeDrawer();
+    if (!confirm('¿Borrar solo las manos? Se mantienen las tablas.')) return;
+    await clearPersisted('hands');
+    showUploadView();
+    showToast('Manos borradas. Importa otras.', '');
+  });
+  document.getElementById('drawerReplaceTables')?.addEventListener('click', async () => {
+    closeDrawer();
+    if (!confirm('¿Borrar solo las tablas? Se mantienen las manos.')) return;
+    await clearPersisted('tables');
+    showUploadView();
+    showToast('Tablas borradas. Importa otras.', '');
+  });
+  document.getElementById('drawerClearAll')?.addEventListener('click', async () => {
+    closeDrawer();
+    if (!confirm('¿Borrar manos, tablas y análisis?')) return;
+    await clearPersisted('all');
+    const df = document.getElementById('dropzoneFiles');
+    const tf = document.getElementById('tablesFiles');
+    if (df) df.innerHTML = '';
+    if (tf) tf.innerHTML = '';
+    showUploadView();
+    showToast('Sesión limpiada', 'success');
+  });
+  document.getElementById('drawerGoLeaks')?.addEventListener('click', () => {
+    closeDrawer();
+    if (state.analyzed && state.analysis) showAnalysisView('leaks');
+    else showToast('Primero importa datos y pulsa Analizar', '');
+  });
+
+  showUploadView();
+}
+
+document.addEventListener('DOMContentLoaded', initRaTabs);
+
+</script>
+
+<script>
+(function(){
+  function boot(){
+    if(!window.RangeLabI18n){ setTimeout(boot,40); return; }
+    RangeLabI18n.applyDom();
+    RangeLabI18n.wireLangButtons();
+    if(window.RangeLabProfile){
+      RangeLabProfile.ensureStyles();
+      var chip = document.querySelector('.user-chip');
+      if(chip) RangeLabProfile.wireUserChip(chip, null);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+})();
+</script>
+
+
+<script>
+(function(){
+  function applySite(s){
+    if(!s) return;
+    document.querySelectorAll('.rl-site-footer').forEach(function(el){ el.textContent = s.footer_text || el.textContent; });
+    document.querySelectorAll('.rl-site-footer-brand').forEach(function(el){ el.textContent = 'Creado por ' + (s.brand_name || 'RangeSoft'); });
+    document.querySelectorAll('.rl-site-brand-name').forEach(function(el){ el.textContent = 'Acerca de ' + (s.brand_name || 'RangeSoft'); });
+  }
+  if(window.__RL_SITE) applySite(window.__RL_SITE);
+  else RangeLabAPI.site().then(function(s){ window.__RL_SITE=s; applySite(s); }).catch(function(){});
+})();
+</script>
+<script>
+(function(){
+  if (window.RangeLabSkeleton) RangeLabSkeleton.registerSW('/sw.js');
+  else if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+
+<nav class="rl-bottom-nav" aria-label="Navegación">
+
+  <a href="/" class="rl-nav-item"><span class="rl-nav-ico">🏠</span><span class="rl-nav-label">Portal</span></a>
+  <button type="button" class="rl-nav-item active"><span class="rl-nav-ico">📊</span><span class="rl-nav-label">Range</span></button>
+  <button type="button" class="rl-nav-item" onclick="openDrawer()"><span class="rl-nav-ico">☰</span><span class="rl-nav-label">Menú</span></button>
+  <a href="/profile" class="rl-nav-item"><span class="rl-nav-ico">👤</span><span class="rl-nav-label">Perfil</span></a>
+
+</nav>
+
+</body>
+</html>

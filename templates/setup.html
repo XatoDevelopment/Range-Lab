@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Setup — RangeLab</title>
+  <link rel="stylesheet" href="/static/css/rangelab.css">
+  <style>
+    body.setup {
+      min-height: 100vh;
+      background: radial-gradient(1200px 600px at 20% -10%, #1a2744 0%, transparent 55%),
+                  radial-gradient(900px 500px at 90% 10%, #1e1530 0%, transparent 50%),
+                  var(--bg, #07090f);
+      color: var(--text, #e8ecf4);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 48px;
+    }
+    .setup-wrap { width: 100%; max-width: 600px; }
+    .setup-brand { text-align: center; margin-bottom: 24px; }
+    .setup-brand .logo { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; }
+    .setup-brand .logo span { color: var(--gold, #f0c14b); }
+    .setup-brand p { margin: 8px 0 0; color: var(--text-2, #9aa3b5); font-size: 14px; }
+    .setup-badge {
+      display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      background: rgba(240,193,75,.12); color: var(--gold, #f0c14b);
+      border: 1px solid rgba(240,193,75,.35);
+    }
+    .setup-card {
+      background: var(--card, #0e1420);
+      border: 1px solid var(--border, #1c2536);
+      border-radius: 16px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    }
+    .steps { display: flex; gap: 8px; margin-bottom: 24px; }
+    .steps .dot {
+      flex: 1; height: 4px; border-radius: 2px;
+      background: var(--border, #1c2536); transition: background .2s;
+    }
+    .steps .dot.on { background: var(--gold, #f0c14b); }
+    .steps .dot.done { background: var(--cyan, #3dd6c6); }
+    h1 { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+    .sub { font-size: 13px; color: var(--text-2, #9aa3b5); margin: 0 0 20px; }
+    label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--text-2, #9aa3b5); margin: 14px 0 6px;
+    }
+    input[type=text], input[type=password], input[type=email], input[type=number], select, textarea {
+      width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--border, #1c2536); background: var(--bg, #07090f);
+      color: var(--text, #e8ecf4); font-size: 14px; font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold, #f0c14b); }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    @media (max-width: 520px) {
+      .row2, .row3 { grid-template-columns: 1fr; }
+    }
+    .tools-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;
+    }
+    .tool-chip {
+      display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+      border-radius: 10px; border: 1px solid var(--border, #1c2536);
+      background: var(--bg, #07090f); cursor: pointer; font-size: 13px; user-select: none;
+    }
+    .tool-chip input { accent-color: var(--gold, #f0c14b); }
+    .tool-chip.on { border-color: var(--gold, #f0c14b); background: rgba(240,193,75,.08); }
+    .plan-card {
+      border: 1px solid var(--border, #1c2536);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: var(--bg, #07090f);
+    }
+    .plan-card h3 {
+      margin: 0 0 4px; font-size: 15px; font-weight: 700;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .plan-card h3 .pid {
+      font-size: 11px; font-weight: 600; color: var(--text-3, #6b7385);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+    .btn {
+      border: none; border-radius: 10px; padding: 11px 18px;
+      font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit;
+    }
+    .btn-ghost {
+      background: transparent; color: var(--text-2, #9aa3b5);
+      border: 1px solid var(--border, #1c2536);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #f0c14b, #e8a317); color: #1a1200;
+    }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .err {
+      margin-top: 14px; padding: 10px 12px; border-radius: 10px;
+      background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.35);
+      color: #fca5a5; font-size: 13px; display: none;
+    }
+    .err.show { display: block; }
+    .hint { font-size: 12px; color: var(--text-3, #6b7385); margin-top: 6px; }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 16px; padding: 12px; border-radius: 10px;
+      border: 1px solid var(--border, #1c2536); background: var(--bg, #07090f);
+    }
+    .toggle-row span { font-size: 13px; font-weight: 600; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .setup-foot {
+      text-align: center; margin-top: 24px; font-size: 12px; color: var(--text-3, #6b7385);
+    }
+    .welcome-box {
+      padding: 14px 16px; border-radius: 12px; margin-bottom: 18px;
+      background: rgba(61, 214, 198, 0.08); border: 1px solid rgba(61, 214, 198, 0.25);
+      font-size: 13px; line-height: 1.55; color: var(--text-2, #9aa3b5);
+    }
+    .welcome-box strong { color: var(--text, #e8ecf4); }
+  </style>
+  <script src="/static/js/skeleton.js" defer></script>
+  <script src="/static/js/offline.js" defer></script>
+</head>
+<body class="page-setup rl-loading setup">
+<div id="splash">
+  <div class="splash-logo"><img class="rl-brand-img" src="/static/icons/icon-192.png" alt="" width="192" height="192"></div>
+  <div class="splash-title">Range<span>Lab</span></div>
+  <div class="splash-sub">Setup</div>
+  <div class="splash-loader"></div>
+</div>
+
+  <div class="setup-wrap">
+    <div class="setup-brand">
+      <div class="logo">Range<span>Lab</span></div>
+      <p>First-time setup</p>
+      <div class="setup-badge">One-time setup · only this time</div>
+    </div>
+
+    <div class="setup-card">
+      <div class="steps">
+        <div class="dot on" data-s="0"></div>
+        <div class="dot" data-s="1"></div>
+        <div class="dot" data-s="2"></div>
+        <div class="dot" data-s="3"></div>
+      </div>
+
+      <!-- 0: Bienvenida + sitio -->
+      <div class="panel active" id="p0">
+        <h1>Bienvenido a RangeLab</h1>
+        <p class="sub">Configure the site. You will create the administrator next.</p>
+        <label>Installation token *</label>
+        <input type="text" id="setup_token" placeholder="Paste it from the server console" maxlength="64" autocomplete="off" spellcheck="false" style="font-family:monospace">
+        <p class="hint">It appears in the server console or logs when the server starts. This ensures only the server administrator can complete the installation.</p>
+        <div class="welcome-box">
+          <strong>First time:</strong> this wizard only appears when the system is not installed yet.
+          Create the <strong>admin</strong> account and you are done.
+        </div>
+        <label>Eslogan</label>
+        <input type="text" id="site_tagline" value="Poker analysis suite" maxlength="160" autocomplete="off">
+        <div class="row2">
+          <div>
+            <label>Brand (footer)</label>
+            <input type="text" id="brand_name" value="RangeSoft" maxlength="80" autocomplete="off">
+          </div>
+          <div>
+            <label>Default language</label>
+            <select id="default_lang">
+              <option value="es">Español</option>
+              <option value="en" selected>English</option>
+            </select>
+          </div>
+        </div>
+        <label>Contact / support email</label>
+        <input type="email" id="contact_email" placeholder="soporte@tudominio.com" maxlength="120" autocomplete="off">
+        <label>Footer text (optional)</label>
+        <input type="text" id="footer_text" placeholder="Empty = “Created by [brand] · © year”" maxlength="200" autocomplete="off">
+      </div>
+
+      <!-- 1: Admin -->
+      <div class="panel" id="p1">
+        <h1>Administrator account</h1>
+        <p class="sub">Username and password for the admin. Full access and the /admin panel.</p>
+        <label>Admin username *</label>
+        <input type="text" id="admin_username" minlength="3" maxlength="40" placeholder="ej. admin" autocomplete="username">
+        <label>Display name</label>
+        <input type="text" id="admin_display_name" maxlength="80" placeholder="Opcional" autocomplete="nickname">
+        <label>Password *</label>
+        <input type="password" id="admin_password" minlength="8" placeholder="at least 8 characters" autocomplete="new-password">
+        <label>Repeat password *</label>
+        <input type="password" id="admin_password2" minlength="8" placeholder="Confirm" autocomplete="new-password">
+        <p class="hint">Save these credentials. They are the only way to manage the system at first.</p>
+      </div>
+
+      <!-- 3: Registro -->
+      <div class="panel" id="p3">
+        <h1>Registration</h1>
+        <p class="sub">Decide whether anyone can create an account.</p>
+        <div class="toggle-row">
+          <span>Public registration open</span>
+          <input type="checkbox" id="registration_open" checked>
+        </div>
+        <p class="hint">If you turn this off, nobody can create new accounts from the website.</p>
+      </div>
+
+      <!-- 4: Resumen -->
+      <div class="panel" id="p4">
+        <h1>Confirm installation</h1>
+        <p class="sub">Review and install. This creates the administrator and the site.</p>
+        <div id="summary" style="margin-top:8px;padding:14px;border-radius:12px;background:var(--bg);border:1px solid var(--border);font-size:13px;line-height:1.65"></div>
+        <style>
+          .terms-scroll { margin-top:8px; max-height:240px; overflow:auto; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:var(--bg); font-size:13px; line-height:1.6; color:var(--text); -webkit-overflow-scrolling:touch; }
+          .terms-scroll h1 { font-size:15px; margin:0 0 8px; }
+          .terms-scroll h2 { font-size:13px; margin:14px 0 4px; color:var(--accent,#f2a83c); }
+          .terms-scroll p { margin:0 0 8px; }
+          .terms-scroll ul { padding-left:18px; margin:0 0 8px; }
+          .terms-scroll hr { display:none; }
+          .terms-scroll section + section { margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+        </style>
+      </div>
+
+      <div class="err" id="err"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="btnBack" style="display:none">Back</button>
+        <button type="button" class="btn btn-primary" id="btnNext">Continuar</button>
+      </div>
+    </div>
+    <div class="setup-foot">RangeLab · One-time setup · Your data stays on your server</div>
+  </div>
+
+  <script>
+  (function () {
+    var TOOLS = [
+      { id: 'equity', label: 'Equity Lab' },
+      { id: 'preflop', label: 'Preflop Lab' },
+      { id: 'tracker', label: 'Bankroll Lab' },
+      { id: 'feltlab', label: 'Hand Lab' },
+      { id: 'range-analyzer', label: 'Range Lab' },
+      { id: 'mtt-exploiter', label: 'MTT Exploiter' },
+      { id: 'ailab', label: 'AI Table' },
+      { id: 'tournament-lab', label: 'Tournament Lab' }
+    ];
+    var step = 0;
+    var total = 4;
+
+    function showErr(msg) {
+      var e = document.getElementById('err');
+      e.textContent = msg || '';
+      e.classList.toggle('show', !!msg);
+    }
+
+    function go(n) {
+      step = n;
+      document.querySelectorAll('.panel').forEach(function (p, i) {
+        p.classList.toggle('active', i === step);
+      });
+      document.querySelectorAll('.steps .dot').forEach(function (d, i) {
+        d.classList.toggle('on', i === step);
+        d.classList.toggle('done', i < step);
+      });
+      document.getElementById('btnBack').style.display = step === 0 ? 'none' : '';
+      document.getElementById('btnNext').textContent = step === total - 1 ? 'Install and sign in' : 'Continue';
+      showErr('');
+      if (step === 3) renderSummary();
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+      });
+    }
+
+    function renderSummary() {
+      document.getElementById('summary').innerHTML =
+        '<strong>RangeLab</strong><br>' +
+        'Brand: ' + esc(document.getElementById('brand_name').value) + '<br>' +
+        'Contact: ' + esc(document.getElementById('contact_email').value || '—') + '<br>' +
+        'Admin: <strong>' + esc(document.getElementById('admin_username').value) + '</strong><br>' +
+        'Registration: ' + (document.getElementById('registration_open').checked ? 'Open' : 'Closed');
+    }
+
+    function validate() {
+      if (step === 0) {
+        if (!document.getElementById('setup_token').value.trim()) return 'Enter the installation token (server console)';
+      }
+      if (step === 1) {
+        var u = document.getElementById('admin_username').value.trim();
+        var p = document.getElementById('admin_password').value;
+        var p2 = document.getElementById('admin_password2').value;
+        if (u.length < 3) return 'Admin username: at least 3 characters';
+        if (!/^[a-zA-Z0-9_]+$/.test(u)) return 'Username: letters, numbers and _ only';
+        if (p.length < 8) return 'Password: at least 8 characters';
+        if (p !== p2) return 'Passwords do not match';
+      }
+      return null;
+    }
+
+    document.getElementById('btnBack').onclick = function () {
+      if (step > 0) go(step - 1);
+    };
+
+    document.getElementById('btnNext').onclick = async function () {
+      var v = validate();
+      if (v) { showErr(v); return; }
+      if (step < total - 1) {
+        go(step + 1);
+        return;
+      }
+      var btn = document.getElementById('btnNext');
+      btn.disabled = true;
+      btn.textContent = 'Installing…';
+      showErr('');
+      var payload = {
+        setup_token: document.getElementById('setup_token').value.trim(),
+        site_name: 'RangeLab',
+        site_tagline: document.getElementById('site_tagline').value.trim(),
+        brand_name: document.getElementById('brand_name').value.trim(),
+        footer_text: document.getElementById('footer_text').value.trim(),
+        contact_email: document.getElementById('contact_email').value.trim(),
+        default_lang: document.getElementById('default_lang').value,
+        registration_open: document.getElementById('registration_open').checked,
+        admin_username: document.getElementById('admin_username').value.trim().toLowerCase(),
+        admin_password: document.getElementById('admin_password').value,
+        admin_display_name: document.getElementById('admin_display_name').value.trim()
+      };
+      try {
+        var res = await fetch('/api/setup/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Installation error');
+        window.location.href = '/';
+      } catch (e) {
+        showErr(e.message || String(e));
+        btn.disabled = false;
+        btn.textContent = 'Install and sign in';
+      }
+    };
+
+    fetch('/api/setup/status').then(function (r) { return r.json(); }).then(function (d) {
+      if (d.setup_completed) window.location.href = '/login';
+    }).catch(function () {});
+  })();
+  </script>
+  <script>
+  (function(){
+    function rlReady(){
+      if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+      else document.body.classList.remove('rl-loading');
+    }
+    window.addEventListener('load', function(){ setTimeout(rlReady, 200); });
+  })();
+  </script>
+
+<script>
+(function(){function h(){var s=document.getElementById('splash');if(s)s.classList.add('hide');}
+if(document.readyState==='complete')setTimeout(h,500);else window.addEventListener('load',function(){setTimeout(h,500);});})();
+</script>
+</body>
+</html>

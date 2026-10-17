@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════════════════════════════
+   Menús laterales en PC → ventana flotante centrada con cristal.
+   En móvil se mantiene la hoja inferior (ver rangelab.css, v1.4).
+   Se carga AL FINAL de cada herramienta: gana a sus estilos propios
+   (los selectores llevan body[class] para igualar su especificidad).
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+
+  /* Estado cerrado: panel invisible, desplazado y escalado un poco */
+  body[class] .side-menu,
+  body[class] .drawer,
+  body[class] #drawer,
+  body[class] .eq-drawer,
+  body[class] #eqDrawer,
+  body[class] .ai-menu-panel,
+  body[class] .portal-drawer,
+  body[class] .sheet {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+    width: min(440px, calc(100vw - 48px)) !important;
+    max-width: none !important;
+    max-height: min(80vh, 720px) !important;
+    border: 1px solid var(--glass-edge) !important;
+    border-radius: 22px !important;
+    background: var(--glass-panel) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5) !important;
+    transform: translate(-50%, -46%) scale(0.96) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.22s ease, transform 0.32s var(--ease-out),
+                visibility 0s linear 0.32s !important;
+  }
+
+  /* El "tirador" de la hoja inferior no tiene sentido en una ventana */
+  body[class] .side-menu::before,
+  body[class] .eq-drawer::before,
+  body[class] #eqDrawer::before {
+    display: none !important;
+  }
+
+  /* Estado abierto: aparece con fundido y escala */
+  body[class] .side-menu.open,
+  body[class] .side-menu.show,
+  body[class] .side-menu.active,
+  body[class] .menu-overlay.show .side-menu,
+  body[class] .drawer.show,
+  body[class] #drawer.show,
+  body[class] .eq-drawer.show,
+  body[class] #eqDrawer.show,
+  body[class] .ai-menu-panel.show,
+  body[class] .ai-menu.show .ai-menu-panel,
+  body[class] .portal-drawer.show,
+  body[class] .portal-drawer.open,
+  body[class] .sheet.open {
+    transform: translate(-50%, -50%) scale(1) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition: opacity 0.22s ease, transform 0.34s var(--ease-out),
+                visibility 0s !important;
+  }
+
+  /* Los elementos del menú entran en cascada al abrirse */
+  body[class] .side-menu.open .menu-item,
+  body[class] .side-menu.show .menu-item,
+  body[class] .side-menu.open .tool-mini-card,
+  body[class] .side-menu.show .tool-mini-card {
+    animation: rl-rise 0.32s var(--ease-out) backwards;
+  }
+}

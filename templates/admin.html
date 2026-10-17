@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0c13">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="RangeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script>(function(){try{var t=localStorage.getItem('rangelab-theme');if(!t){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<title>Admin — RangeLab</title>
+<link rel="stylesheet" href="/static/css/rangelab.css">
+<script src="/static/js/theme.js" defer></script>
+<script src="/static/js/offline.js" defer></script>
+<script src="/static/js/i18n.js" defer></script>
+<script src="/static/js/profile.js" defer></script>
+<script src="/static/js/skeleton.js" defer></script>
+<script src="/static/chart.js"></script>
+<style>
+  body.page-admin {
+    margin: 0; min-height: 100vh;
+    background: var(--bg, #0a0c13);
+    color: var(--text, #eef1f7);
+    font-family: var(--font, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  }
+  .admin-top {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: calc(10px + var(--safe-top, 0px)) 14px 10px;
+    background: color-mix(in srgb, var(--bg-1, #10131d) 94%, transparent);
+    border-bottom: 1px solid var(--border, #232a3c);
+     
+  }
+  .admin-top .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .admin-top .mark {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--accent, #f2a83c), var(--accent-2, #9b8bf4));
+    display: grid; place-items: center; font-weight: 900; font-size: 16px; color: #1a1400; flex-shrink: 0;
+  }
+  .admin-top .btitle { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+  .admin-top .btitle span {
+    background: linear-gradient(90deg, var(--accent, #f2a83c), var(--accent-2, #9b8bf4));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .admin-top .bsub { font-size: 10px; color: var(--text-3, #6b7590); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .admin-top .actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .admin-wrap {
+    max-width: 1100px; margin: 0 auto; padding: 16px 12px 90px;
+    padding-top: calc(72px + var(--safe-top, 0px));
+  }
+  .admin-header h1 { font-size: 1.2rem; margin: 0 0 4px; font-weight: 800; }
+  .admin-header .sub { font-size: 12px; color: var(--text-3, #6b7590); margin: 0 0 16px; line-height: 1.4; }
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+  @media (min-width: 640px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 900px) { .stats-row { grid-template-columns: repeat(6, 1fr); } }
+  .stat-card { background: var(--bg-1, #10131d); border: 1px solid var(--border, #232a3c); border-radius: 12px; padding: 12px 14px; }
+  .stat-card .num { font-size: 1.3rem; font-weight: 800; font-family: var(--font-mono, monospace); color: var(--cyan, #33d2e3); }
+  .stat-card .lbl { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .admin-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .admin-tab { padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-2, #a4acc0); font-size: 12px; font-weight: 600; cursor: pointer; }
+  .admin-tab.active { background: color-mix(in srgb, var(--cyan, #33d2e3) 16%, transparent); border-color: var(--cyan, #33d2e3); color: var(--cyan, #33d2e3); }
+  .tab-panel { display: none; } .tab-panel.active { display: block; }
+  .admin-section { background: var(--bg-1, #10131d); border: 1px solid var(--border, #232a3c); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+  .admin-section h2 { font-size: .95rem; margin: 0 0 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tools-check { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+  .tools-check label { display: flex; align-items: center; gap: 5px; font-size: 12px; padding: 5px 9px; border-radius: 8px; background: var(--bg, #0a0c13); border: 1px solid var(--border); cursor: pointer; user-select: none; color: var(--text-2); }
+  .tools-check label:has(input:checked) { border-color: var(--cyan, #33d2e3); background: color-mix(in srgb, var(--cyan, #33d2e3) 12%, transparent); color: var(--text); }
+  .form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 10px; }
+  .form-row .field { flex: 1 1 120px; min-width: 0; }
+  .form-row label { display: block; font-size: 10px; color: var(--text-3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+  .form-row input, .form-row select { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg, #0a0c13); color: var(--text); font-size: 14px; box-sizing: border-box; }
+  .btn { padding: 8px 14px; border-radius: 8px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .btn-primary { background: var(--cyan, #33d2e3); color: #0a0c13; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-2); text-decoration: none; display: inline-flex; align-items: center; }
+  .btn-danger { background: color-mix(in srgb, var(--red, #f2685f) 18%, transparent); color: var(--red, #f2685f); border: 1px solid var(--red, #f2685f); }
+  .btn-warn { background: color-mix(in srgb, var(--amber, #f4b93f) 18%, transparent); color: var(--amber, #f4b93f); border: 1px solid var(--amber, #f4b93f); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.admin-table { width: 100%; min-width: 480px; border-collapse: collapse; font-size: 12px; }
+  table.admin-table th { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); color: var(--text-3); font-weight: 600; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
+  table.admin-table td { padding: 9px 6px; border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent); vertical-align: middle; color: var(--text); }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .badge-admin { background: color-mix(in srgb, var(--amber) 20%, transparent); color: var(--amber); }
+  .badge-free { background: color-mix(in srgb, #64748b 25%, transparent); color: #94a3b8; }
+  .badge-used { background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--green); }
+  .badge-avail { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--cyan); }
+  .tool-chips { display: flex; flex-wrap: wrap; gap: 3px; max-width: 220px; }
+  .tool-chip { font-size: 9px; padding: 2px 5px; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); white-space: nowrap; color: var(--text-2); }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(16px); padding: 11px 16px; border-radius: 10px; background: var(--bg-2, #171c2a); border: 1px solid var(--cyan); color: var(--text); font-size: 13px; opacity: 0; transition: .25s; z-index: 999; pointer-events: none; max-width: 90vw; text-align: center; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 100; display: none; align-items: flex-end; justify-content: center; }
+  @media (min-width: 560px) { .modal-bg { align-items: center; padding: 16px; } }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--bg-1); border: 1px solid var(--border); border-radius: 16px 16px 0 0; padding: 18px; max-width: 480px; width: 100%; max-height: 88vh; overflow-y: auto; }
+  @media (min-width: 560px) { .modal { border-radius: 14px; } }
+  .modal h3 { margin: 0 0 12px; font-size: 1.05rem; color: var(--text); }
+  .code-mono { font-family: var(--font-mono, monospace); font-weight: 600; font-size: 12px; }
+  .empty { opacity: .55; text-align: center; padding: 20px; font-size: 13px; color: var(--text-3); }
+  .hint { font-size: 11px; color: var(--text-3); margin-top: 6px; line-height: 1.35; }
+  .db-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+  .bar-label { width: 110px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+  .bar-track { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--cyan); border-radius: 4px; min-width: 2px; }
+  .bar-num { width: 42px; text-align: right; font-family: var(--font-mono, monospace); font-size: 11px; color: var(--text-3); }
+  .user-card-mobile { display: none; }
+  @media (max-width: 600px) {
+    .users-desktop { display: none; }
+    .user-card-mobile { display: block; }
+    .user-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+    .user-card .uc-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .user-card .uc-actions { display: flex; gap: 6px; margin-top: 10px; }
+  }
+  .req-item { border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; background: var(--bg); }
+  .req-meta { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+</style>
+</head>
+<body class="rl-loading page-admin">
+
+<header class="admin-top">
+  <div class="brand">
+    <div class="mark">R</div>
+    <div>
+      <div class="btitle">Range<span>Lab</span></div>
+      <div class="bsub"><span data-i18n="portal.adminDash">Admin Dashboard</span></div>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="rl-lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang-set="es" title="Español">ES</button>
+        <button type="button" data-lang-set="en" title="English">EN</button>
+      </div>
+      <button class="theme-toggle" type="button" title="Tema" aria-label="Tema">
+      <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
+    <a href="/" class="btn btn-ghost btn-sm">← <span data-i18n="admin.portal">Portal</span></a>
+  </div>
+</header>
+
+<div class="admin-wrap">
+  <div class="admin-header">
+    <h1 data-i18n="admin.title">Admin dashboard</h1>
+    <p class="sub"><span data-i18n="admin.subtitle">Users · usage · database</span></p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="num" id="stUsers">—</div><div class="lbl" data-i18n="admin.users">Usuarios</div></div>
+    <div class="stat-card"><div class="num" id="stAdmins">—</div><div class="lbl" data-i18n="admin.admins">Admins</div></div>
+    <div class="stat-card"><div class="num" id="stOpens">—</div><div class="lbl" data-i18n="admin.opens">Aperturas</div></div>
+  </div>
+
+  <div class="admin-tabs">
+    <button type="button" class="admin-tab active" data-tab="users">👥 <span data-i18n="admin.tabUsers">Usuarios</span></button>
+    <button type="button" class="admin-tab" data-tab="usage">📊 <span data-i18n="admin.tabUsage">Uso</span></button>
+    <button type="button" class="admin-tab" data-tab="db">🗄️ <span data-i18n="admin.tabDb">BD</span></button>
+    <button type="button" class="admin-tab" data-tab="site">⚙️ <span>Sitio</span></button>
+    <button type="button" class="admin-tab" data-tab="system">🖥️ <span>Sistema</span></button>
+  </div>
+
+  <div class="tab-panel active" id="panel-users">
+    <div class="admin-section"><h2 data-i18n="admin.users">Usuarios</h2><div id="usersTableWrap"><div class="empty">Cargando…</div></div></div>
+  </div>
+
+  <div class="tab-panel" id="panel-usage">
+    <div class="admin-section">
+      <h2 data-i18n="admin.usageByTool">Usage by tool</h2>
+      <div class="admin-chart-wrap" style="height:220px;margin-bottom:16px"><canvas id="adminChartTools"></canvas></div>
+      <div id="usageByTool"><div class="empty">Cargando…</div></div>
+    </div>
+    <div class="admin-section">
+      <h2 data-i18n="admin.usageByUser">Usage by user</h2>
+      <div class="admin-chart-wrap" style="height:200px;margin-bottom:16px"><canvas id="adminChartUsers"></canvas></div>
+      <div class="table-scroll" id="usageByUser"><div class="empty">Cargando…</div></div>
+    </div>
+    <div class="admin-section">
+      <h2 data-i18n="admin.recentActivity">Actividad reciente</h2>
+      <div class="table-scroll" id="usageRecent"><div class="empty">Cargando…</div></div>
+      <div class="db-actions"><button class="btn btn-danger btn-sm" id="btnClearUsage">Clear history</button></div>
+    </div>
+  </div>
+
+  
+  <div class="tab-panel" id="panel-site">
+    <div class="admin-section">
+      <h2>Site settings</h2>
+      <p class="hint" style="margin-top:0;margin-bottom:14px;">Brand, footer and contact email. Changes apply immediately.</p>
+      <div class="form-row" style="display:flex;flex-wrap:wrap;gap:12px;">
+        <div class="field" style="flex:1 1 180px;"><label>Marca (brand)</label><input id="siteBrand" type="text" maxlength="80"></div>
+        <div class="field" style="flex:1 1 220px;"><label>Email contacto</label><input id="siteEmail" type="email" maxlength="120"></div>
+        <div class="field" style="flex:1 1 120px;"><label>Idioma default</label>
+          <select id="siteLang"><option value="es">Español</option><option value="en">English</option></select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px;"><label>Eslogan</label><input id="siteTagline" type="text" maxlength="160"></div>
+      <div class="field" style="margin-top:10px;"><label>Footer text (empty = automatic)</label><input id="siteFooter" type="text" maxlength="200" placeholder="Created by Brand · © year"></div>
+      <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;">
+          <input type="checkbox" id="siteRegOpen"> Public registration open
+        </label>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" id="btnSaveSite">Save settings</button>
+      </div>
+    </div>
+  </div>
+<div class="tab-panel" id="panel-system">
+    <div class="admin-section">
+      <h2>System status</h2>
+      <div class="stats-row" id="systemStats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:16px">
+        <div class="stat-card"><div class="num" id="sysUsers">—</div><div class="lbl">Usuarios</div></div>
+        <div class="stat-card"><div class="num" id="sysHands">—</div><div class="lbl">Manos HL</div></div>
+        <div class="stat-card"><div class="num" id="sysVersion">1.3.4</div><div class="lbl">Version</div></div>
+      </div>
+      <div id="systemInfo" style="font-size:13px;color:var(--text-2);line-height:1.6">
+        <p>PWA cache: <strong id="sysCache">—</strong></p>
+        <p>Service Worker: <strong id="sysSW">—</strong></p>
+        <p>Tema actual: <strong id="sysTheme">—</strong></p>
+      </div>
+      <div class="db-actions" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px">
+        <button class="btn btn-sm" id="btnRefreshCache" type="button">Refresh PWA cache</button>
+        <button class="btn btn-sm" id="btnClearCache" type="button">Clear offline cache</button>
+        <button class="btn btn-sm" id="btnExportUsers" type="button">Exportar usuarios (JSON)</button>
+      </div>
+    </div>
+    <div class="admin-section">
+      <h2>Quick actions</h2>
+      <p style="font-size:13px;color:var(--text-3);margin-bottom:12px">Maintenance tools that do not affect user accounts.</p>
+      <div class="db-actions" style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="btn btn-sm" id="btnReloadStats" type="button">Reload statistics</button>
+        <a class="btn btn-sm" href="/" style="text-decoration:none">Ir al portal</a>
+        <a class="btn btn-sm" href="/tool/feltlab" style="text-decoration:none">Abrir Hand Lab</a>
+      </div>
+    </div>
+  </div>
+
+
+<div class="tab-panel" id="panel-db">
+    <div class="admin-section">
+      <h2 data-i18n="admin.database">Base de datos</h2>
+      <div id="dbInfo"><div class="empty">Cargando…</div></div>
+      <div class="db-actions">
+        <button class="btn btn-warn btn-sm" id="btnVacuum">VACUUM</button>
+        <a class="btn btn-sm" id="btnBackup" href="/api/admin/db/backup" download>Download backup</a>
+        <button class="btn btn-ghost btn-sm" id="btnRefreshDb">Actualizar</button>
+      </div>
+    </div>
+    <div class="admin-section"><h2 data-i18n="admin.tables">Tablas</h2><div class="table-scroll" id="dbTables"><div class="empty">Cargando…</div></div></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h3 id="editModalTitle" data-i18n="admin.editUser">Edit user</h3>
+    <input type="hidden" id="editUid"><input type="hidden" id="editReqId">
+    <div class="form-row">
+      <div class="field"><label>Role</label><select id="editRole"><option value="user">User</option><option value="admin">Administrator</option></select></div>
+    </div>
+    <div style="font-size:11px;color:var(--text-3);margin:8px 0 6px;">Herramientas:</div>
+    <div class="tools-check" id="editToolsCheck"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btnSaveUser" data-i18n="admin.save">Save</button>
+      <button class="btn btn-ghost" id="btnCloseModal" data-i18n="admin.cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
+  
+
+<script>
+const ALL_TOOLS = {{ all_tools | tojson }};
+const TOOL_LABELS = {{ tool_labels | tojson }};
+const FREE_TOOLS = ['equity', 'mtt-exploiter'];
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show');},2800);}
+function toolChecks(id,sel){var box=document.getElementById(id);box.innerHTML='';ALL_TOOLS.forEach(function(t){var lab=document.createElement('label');lab.innerHTML='<input type="checkbox" value="'+t+'" '+(sel.indexOf(t)!==-1?'checked':'')+'> '+(TOOL_LABELS[t]||t);box.appendChild(lab);});}
+function getChecked(id){return Array.from(document.querySelectorAll('#'+id+' input:checked')).map(function(i){return i.value;});}
+async function api(method,path,body){var opts={method:method,headers:{'Content-Type':'application/json'},credentials:'same-origin'};if(body!==undefined)opts.body=JSON.stringify(body);var res=await fetch(path,opts);var data=await res.json().catch(function(){return{};});if(!res.ok)throw new Error(data.error||('HTTP '+res.status));return data;}
+document.querySelectorAll('.admin-tab').forEach(function(btn){btn.onclick=function(){document.querySelectorAll('.admin-tab').forEach(function(b){b.classList.remove('active');});document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});btn.classList.add('active');var panel=document.getElementById('panel-'+btn.dataset.tab);if(panel)panel.classList.add('active');if(btn.dataset.tab==='usage')loadUsage();if(btn.dataset.tab==='db')loadDb();if(btn.dataset.tab==='site')loadSite();};});
+async function loadStats(){var s=await api('GET','/api/admin/stats');document.getElementById('stUsers').textContent=s.users;document.getElementById('stAdmins').textContent=s.admins!=null?s.admins:'—';document.getElementById('stOpens').textContent=s.tool_opens!=null?s.tool_opens:'0';}
+function bits(u){return{chips:(u.allowed_tools||[]).map(function(t){return '<span class="tool-chip">'+(TOOL_LABELS[t]||t)+'</span>';}).join(''),role:u.is_admin?'<span class="badge badge-admin">Admin</span>':'<span class="badge badge-free">User</span>'};}
+async function loadUsers(){var users=await api('GET','/api/admin/users');var wrap=document.getElementById('usersTableWrap');if(!users.length){wrap.innerHTML='<div class="empty">No users</div>';return;}var html='<div class="users-desktop table-scroll"><table class="admin-table"><thead><tr><th>User</th><th>Role</th><th>Tools</th><th></th></tr></thead><tbody>';users.forEach(function(u){var b=bits(u);html+='<tr><td><strong>'+(u.display_name||u.username)+'</strong><br><span style="opacity:.55;font-size:11px;">@'+u.username+'</span></td><td>'+b.role+'</td><td><div class="tool-chips">'+b.chips+'</div></td><td><button class="btn btn-ghost btn-sm" data-edit="'+u.id+'">Edit</button> '+(u.is_admin?'':'<button class="btn btn-danger btn-sm" data-del-user="'+u.id+'">Delete</button>')+'</td></tr>';});html+='</tbody></table></div><div class="user-card-mobile">';users.forEach(function(u){var b=bits(u);html+='<div class="user-card"><div class="uc-top"><div><strong>'+(u.display_name||u.username)+'</strong><br><span style="opacity:.55;font-size:11px;">@'+u.username+'</span></div>'+b.role+'</div><div style="font-size:12px;margin-bottom:6px;"></div><div class="tool-chips">'+b.chips+'</div><div class="uc-actions"><button class="btn btn-ghost btn-sm" data-edit="'+u.id+'">Edit</button> '+(u.is_admin?'':'<button class="btn btn-danger btn-sm" data-del-user="'+u.id+'">Delete</button>')+'</div></div>';});html+='</div>';wrap.innerHTML=html;wrap.querySelectorAll('[data-edit]').forEach(function(btn){btn.onclick=function(){openEdit(users.find(function(x){return x.id===+btn.dataset.edit;}));};});wrap.querySelectorAll('[data-del-user]').forEach(function(btn){btn.onclick=async function(){if(!confirm('Delete user?'))return;try{await api('DELETE','/api/admin/users/'+btn.dataset.delUser);toast('Deleted');loadUsers();loadStats();}catch(e){toast(e.message);}};});}
+function openEdit(u,reqId){if(!u)return;document.getElementById('editUid').value=u.id;document.getElementById('editReqId').value=reqId||'';document.getElementById('editModalTitle').textContent=reqId?('Aprobar · @'+u.username):('Editar @'+u.username);document.getElementById('editRole').value=u.role||'user';toolChecks('editToolsCheck',u.allowed_tools||FREE_TOOLS);document.getElementById('editModal').classList.add('show');}
+document.getElementById('btnCloseModal').onclick=function(){document.getElementById('editModal').classList.remove('show');};
+document.getElementById('editModal').onclick=function(e){if(e.target.id==='editModal')e.target.classList.remove('show');};
+document.getElementById('btnSaveUser').onclick=async function(){var uid=document.getElementById('editUid').value;var reqId=document.getElementById('editReqId').value;try{await api('PUT','/api/admin/users/'+uid,{role:document.getElementById('editRole').value,allowed_tools:getChecked('editToolsCheck')});toast('User updated');document.getElementById('editModal').classList.remove('show');loadUsers();loadStats();}catch(e){toast(e.message);}};
+async function loadUsage(){try{var data=await api('GET','/api/admin/usage');var max=1;(data.by_tool||[]).forEach(function(t){if(t.opens>max)max=t.opens;});var byTool='';if(!(data.by_tool||[]).length)byTool='<div class="empty">Sin aperturas aún.</div>';else data.by_tool.forEach(function(t){var pct=Math.round((t.opens/max)*100);byTool+='<div class="bar-row"><div class="bar-label">'+t.label+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div><div class="bar-num">'+t.opens+'</div></div>';});document.getElementById('usageByTool').innerHTML=byTool;var byUser='<table class="admin-table"><thead><tr><th>Usuario</th><th>Aperturas</th><th>Tools</th><th>Último</th></tr></thead><tbody>';(data.by_user||[]).forEach(function(u){byUser+='<tr><td>@'+u.username+'</td><td class="code-mono">'+u.opens+'</td><td>'+u.tools_used+'</td><td style="font-size:11px;color:var(--text-3);">'+(u.last_used||'—')+'</td></tr>';});byUser+='</tbody></table>';document.getElementById('usageByUser').innerHTML=byUser;var recent='<table class="admin-table"><thead><tr><th>Cuándo</th><th>Usuario</th><th>Tool</th></tr></thead><tbody>';(data.recent||[]).forEach(function(r){recent+='<tr><td style="font-size:11px;color:var(--text-3);">'+(r.created_at||'')+'</td><td>@'+r.username+'</td><td>'+(r.label||r.tool_id)+'</td></tr>';});if(!(data.recent||[]).length)recent+='<tr><td colspan="3" class="empty">Sin actividad</td></tr>';recent+='</tbody></table>';document.getElementById('usageRecent').innerHTML=recent;}catch(e){toast(e.message);}}
+document.getElementById('btnClearUsage').onclick=async function(){if(!confirm('Clear history?'))return;try{await api('POST','/api/admin/usage/clear');toast('Cleared');loadUsage();loadStats();}catch(e){toast(e.message);}};
+
+async function loadSite(){
+  try{
+    var data = await api('GET','/api/admin/site');
+    var s = data.settings || {};
+    document.getElementById('siteBrand').value = s.brand_name || '';
+    document.getElementById('siteEmail').value = s.contact_email || '';
+    document.getElementById('siteTagline').value = s.site_tagline || '';
+    document.getElementById('siteFooter').value = s.footer_text || '';
+    document.getElementById('siteLang').value = (s.default_lang === 'en') ? 'en' : 'es';
+    document.getElementById('siteRegOpen').checked = String(s.registration_open||'1') === '1' || s.registration_open === 'true';
+  }catch(e){ toast(e.message); }
+}
+document.getElementById('btnSaveSite') && (document.getElementById('btnSaveSite').onclick = async function(){
+  try{
+    await api('PUT','/api/admin/site',{
+      brand_name: document.getElementById('siteBrand').value.trim(),
+      contact_email: document.getElementById('siteEmail').value.trim(),
+      site_tagline: document.getElementById('siteTagline').value.trim(),
+      footer_text: document.getElementById('siteFooter').value.trim(),
+      default_lang: document.getElementById('siteLang').value,
+      registration_open: document.getElementById('siteRegOpen').checked
+    });
+    toast('Sitio guardado');
+  }catch(e){ toast(e.message); }
+});
+
+async function loadDb(){try{var info=await api('GET','/api/admin/db');document.getElementById('dbInfo').innerHTML='<div style="font-size:13px;line-height:1.6;"><div><b>Size:</b> '+info.size_mb+' MB</div><div><b>Tables:</b> '+info.table_count+'</div></div>';var clearable={tool_usage:1,equity_sessions:1,hand_notes:1,hand_favorites:1,feltlab_files:1,hand_library_pack_hands:1,hand_library_packs:1,tournaments:1,transactions:1,};var tbl='<table class="admin-table"><thead><tr><th>Table</th><th>Rows</th><th></th></tr></thead><tbody>';(info.tables||[]).forEach(function(t){tbl+='<tr><td class="code-mono">'+t.name+'</td><td>'+t.rows+'</td><td>'+(clearable[t.name]?'<button class="btn btn-danger btn-sm" data-clear-table="'+t.name+'">Vaciar</button>':'—')+'</td></tr>';});tbl+='</tbody></table>';document.getElementById('dbTables').innerHTML=tbl;document.querySelectorAll('[data-clear-table]').forEach(function(btn){btn.onclick=async function(){if(!confirm('¿Vaciar '+btn.dataset.clearTable+'?'))return;try{await api('POST','/api/admin/db/clear-table',{table:btn.dataset.clearTable});toast('Vaciada');loadDb();loadStats();}catch(e){toast(e.message);}};});}catch(e){toast(e.message);}}
+document.getElementById('btnVacuum').onclick=async function(){try{var r=await api('POST','/api/admin/db/vacuum');toast('VACUUM · '+r.size_mb+' MB');loadDb();}catch(e){toast(e.message);}};
+document.getElementById('btnRefreshDb').onclick=function(){loadDb();};
+loadStats().catch(function(e){toast(e.message);});
+loadUsers().catch(function(e){toast(e.message);});
+</script>
+
+<script>
+(function(){
+  function boot(){
+    if(!window.RangeLabI18n){ setTimeout(boot,40); return; }
+    RangeLabI18n.applyDom();
+    RangeLabI18n.wireLangButtons();
+    if(window.RangeLabProfile){
+      RangeLabProfile.ensureStyles();
+      var chip = document.querySelector('.user-chip');
+      if(chip) RangeLabProfile.wireUserChip(chip, null);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+})();
+</script>
+
+<script>
+(function(){
+  if (window.RangeLabSkeleton) RangeLabSkeleton.registerSW('/sw.js');
+  else if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+
+<script>
+(function(){
+  function rlReady(){
+    if (window.RangeLabSkeleton) RangeLabSkeleton.setLoading(false);
+    else document.body.classList.remove('rl-loading');
+  }
+  if (document.readyState === 'complete') setTimeout(rlReady, 300);
+  else window.addEventListener('load', function(){ setTimeout(rlReady, 300); });
+})();
+</script>
+
+<!-- Bottom Nav nativo Admin -->
+<nav class="rl-bottom-nav" aria-label="Admin navigation">
+  <a href="/" class="rl-nav-item" data-nav="home">
+    <span class="rl-nav-ico">🏠</span>
+    <span class="rl-nav-label">Portal</span>
+  </a>
+  <button type="button" class="rl-nav-item active" data-nav="admin" onclick="document.querySelector('.admin-tab[data-tab=users]')?.click()">
+    <span class="rl-nav-ico">⚙</span>
+    <span class="rl-nav-label">Admin</span>
+  </button>
+  <button type="button" class="rl-nav-item" data-nav="users" onclick="document.querySelector('.admin-tab[data-tab=users]')?.click()">
+    <span class="rl-nav-ico">👥</span>
+    <span class="rl-nav-label">Users</span>
+  </button>
+  <button type="button" class="rl-nav-item" data-nav="system" onclick="document.querySelector('.admin-tab[data-tab=system]')?.click()">
+    <span class="rl-nav-ico">🖥️</span>
+    <span class="rl-nav-label">Sistema</span>
+  </button>
+  <a href="/profile" class="rl-nav-item" data-nav="profile">
+    <span class="rl-nav-ico">👤</span>
+    <span class="rl-nav-label">Perfil</span>
+  </a>
+</nav>
+
+</body>
+</html>
+
+<script>
+(function(){
+  var _adminCharts = {};
+
+  function destroyAdminCharts() {
+    Object.keys(_adminCharts).forEach(function(k) {
+      try { _adminCharts[k].destroy(); } catch(e) {}
+    });
+    _adminCharts = {};
+  }
+
+  function chartColors() {
+    var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    return {
+      tick: isDark ? '#8b93a7' : '#6b7280',
+      grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+      palette: ['#f2a83c','#22d3ee','#a78bfa','#34d399','#f87171','#60a5fa','#fb923c','#e879f9']
+    };
+  }
+
+  // Hook into existing usage render if possible
+  var origRenderUsage = window.renderUsageByTool;
+  window._adminEnhanceUsageCharts = function(byTool, byUser) {
+    if (typeof Chart === 'undefined') return;
+    destroyAdminCharts();
+    var c = chartColors();
+    var ctxT = document.getElementById('adminChartTools');
+    if (ctxT && byTool && byTool.length) {
+      _adminCharts.tools = new Chart(ctxT, {
+        type: 'bar',
+        data: {
+          labels: byTool.map(function(x){ return x.tool || x.name || x.id || '?'; }),
+          datasets: [{
+            label: 'Usos',
+            data: byTool.map(function(x){ return x.count || x.uses || x.total || 0; }),
+            backgroundColor: byTool.map(function(_,i){ return c.palette[i % c.palette.length] + 'cc'; }),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: c.tick, font: { size: 11 } }, grid: { display: false } },
+            y: { ticks: { color: c.tick, font: { size: 11 } }, grid: { color: c.grid }, border: { display: false } }
+          }
+        }
+      });
+    }
+    var ctxU = document.getElementById('adminChartUsers');
+    if (ctxU && byUser && byUser.length) {
+      var top = byUser.slice(0, 10);
+      _adminCharts.users = new Chart(ctxU, {
+        type: 'bar',
+        data: {
+          labels: top.map(function(x){ return x.username || x.user || x.name || '?'; }),
+          datasets: [{
+            label: 'Usos',
+            data: top.map(function(x){ return x.count || x.uses || x.total || 0; }),
+            backgroundColor: '#60a5facc',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: c.tick, font: { size: 11 } }, grid: { color: c.grid }, border: { display: false } },
+            y: { ticks: { color: c.tick, font: { size: 11 } }, grid: { display: false } }
+          }
+        }
+      });
+    }
+  };
+
+  // Observe usage containers for data updates (MutationObserver fallback)
+  function tryParseUsageFromDom() {
+    var toolEl = document.getElementById('usageByTool');
+    var userEl = document.getElementById('usageByUser');
+    if (!toolEl || !userEl) return;
+    // If tables exist, extract numbers
+    var tools = [];
+    toolEl.querySelectorAll('tr, .usage-row, .stat-row').forEach(function(row) {
+      var cells = row.querySelectorAll('td, span, .lbl, .num');
+      if (cells.length >= 2) {
+        var name = (cells[0].textContent || '').trim();
+        var num = parseInt((cells[1].textContent || '').replace(/\D/g,''), 10);
+        if (name && !isNaN(num)) tools.push({ tool: name, count: num });
+      }
+    });
+    var users = [];
+    userEl.querySelectorAll('tr, .usage-row').forEach(function(row) {
+      var cells = row.querySelectorAll('td, span');
+      if (cells.length >= 2) {
+        var name = (cells[0].textContent || '').trim();
+        var num = parseInt((cells[1].textContent || '').replace(/\D/g,''), 10);
+        if (name && !isNaN(num)) users.push({ username: name, count: num });
+      }
+    });
+    if (tools.length || users.length) window._adminEnhanceUsageCharts(tools, users);
+  }
+
+  // System tab logic
+  function loadSystemInfo() {
+    var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    var elT = document.getElementById('sysTheme');
+    if (elT) elT.textContent = theme;
+    var elSW = document.getElementById('sysSW');
+    if (elSW) {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(function(reg) {
+          elSW.textContent = reg ? (reg.active ? 'Activo' : 'Registrado') : 'Not registered';
+        }).catch(function(){ elSW.textContent = 'Error'; });
+      } else {
+        elSW.textContent = 'Not supported';
+      }
+    }
+    var elC = document.getElementById('sysCache');
+    if (elC && 'caches' in window) {
+      caches.keys().then(function(keys) {
+        elC.textContent = keys.length ? keys.join(', ') : 'Empty';
+      }).catch(function(){ elC.textContent = 'N/A'; });
+    }
+    // Copy top stats
+    var u = document.getElementById('stUsers');
+    var su = document.getElementById('sysUsers');
+    if (u && su) su.textContent = u.textContent;
+  }
+
+  document.addEventListener('click', function(e) {
+    var tab = e.target.closest && e.target.closest('.admin-tab');
+    if (tab && tab.getAttribute('data-tab') === 'system') {
+      setTimeout(loadSystemInfo, 50);
+    }
+    if (tab && tab.getAttribute('data-tab') === 'usage') {
+      setTimeout(tryParseUsageFromDom, 400);
+    }
+  });
+
+  var btnCache = document.getElementById('btnRefreshCache');
+  if (btnCache) btnCache.onclick = function() {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'CACHE_URLS', urls: ['/', '/login', '/tool/feltlab', '/static/css/rangelab.css', '/static/chart.js'] });
+      alert('PWA cache updated in the background.');
+    } else {
+      alert('Service Worker is not active. Reload the page.');
+    }
+  };
+  var btnClear = document.getElementById('btnClearCache');
+  if (btnClear) btnClear.onclick = function() {
+    if (!('caches' in window)) return;
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).then(function() {
+      alert('Offline cache cleared. Reload to regenerate it.');
+      var elC = document.getElementById('sysCache');
+      if (elC) elC.textContent = 'Empty';
+    });
+  };
+  var btnExp = document.getElementById('btnExportUsers');
+  if (btnExp) btnExp.onclick = function() {
+    fetch('/api/admin/users', { credentials: 'same-origin' }).then(function(r){ return r.json(); }).then(function(data) {
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'rangelab-users.json';
+      a.click();
+    }).catch(function(){ alert('Could not export (is the endpoint available?)'); });
+  };
+  var btnRel = document.getElementById('btnReloadStats');
+  if (btnRel) btnRel.onclick = function() {
+    location.reload();
+  };
+
+  // Try to intercept fetch for usage API to feed charts
+  var _origFetch = window.fetch;
+  window.fetch = function() {
+    var args = arguments;
+    return _origFetch.apply(this, args).then(function(res) {
+      try {
+        var url = (typeof args[0] === 'string') ? args[0] : (args[0] && args[0].url) || '';
+        if (url.indexOf('/api/admin/usage') !== -1 || url.indexOf('/api/admin/stats') !== -1) {
+          res.clone().json().then(function(data) {
+            var byTool = data.by_tool || data.byTool || data.tools || [];
+            var byUser = data.by_user || data.byUser || data.users || [];
+            if (Array.isArray(byTool) || Array.isArray(byUser)) {
+              setTimeout(function(){ window._adminEnhanceUsageCharts(byTool || [], byUser || []); }, 100);
+            }
+          }).catch(function(){});
+        }
+      } catch(e) {}
+      return res;
+    });
+  };
+})();
+</script>
+
