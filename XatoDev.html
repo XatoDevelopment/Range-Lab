@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XatoDev · Independent developer</title>
+<meta name="description" content="XatoDev, independent developer. I build web applications, analysis tools, PWAs and my own systems.">
+<meta property="og:title" content="XatoDev · Independent developer">
+<meta property="og:description" content="Web applications, analysis tools, PWAs and my own systems. Projects: RangeLab and XatoPos.">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23f5b942'/%3E%3Ctext x='16' y='23' font-family='system-ui' font-size='20' font-weight='900' text-anchor='middle' fill='%23111'%3EX%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0b1020; --surface: #131a2e; --surface-2: #1a2440; --border: #26315a;
+    --text: #e8ecf8; --muted: #9aa6c8; --accent: #f5b942; --accent-2: #3dd6b5;
+    --radius: 14px; --max: 1100px;
+    --ease: cubic-bezier(.22,.61,.36,1);
+    --ease-out: cubic-bezier(.16,1,.3,1);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; font-size: 16px;
+    overflow-x: hidden;
+  }
+  a { color: var(--accent); text-decoration: none; transition: color .2s var(--ease); }
+  a:hover, a:focus-visible { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; border-radius: 6px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--accent); color: #111; padding: 8px 12px; border-radius: 8px; z-index: 100; }
+  .skip:focus { left: 8px; }
+  .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+  section { padding: 72px 0; position: relative; }
+  section + section { border-top: 1px solid var(--border); }
+  h1, h2, h3 { line-height: 1.2; margin: 0 0 12px; }
+  h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); letter-spacing: -0.02em; }
+  h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); }
+  h3 { font-size: 1.2rem; }
+  p { margin: 0 0 14px; color: var(--muted); }
+  .eyebrow { display: inline-block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent-2); margin-bottom: 14px; font-weight: 600; }
+  .eyebrow::before { content: attr(data-num) " / "; font-family: var(--mono); color: var(--accent-2); opacity: 0.55; }
+  .lead { font-size: clamp(1.05rem, 2.2vw, 1.25rem); color: var(--text); opacity: 0.9; max-width: 680px; }
+
+  /* ===== SCROLL REVEAL ===== */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+  .reveal.is-visible { opacity: 1; transform: none; }
+  .reveal[data-delay="1"] { transition-delay: .08s; }
+  .reveal[data-delay="2"] { transition-delay: .16s; }
+  .reveal[data-delay="3"] { transition-delay: .24s; }
+
+  /* ===== HEADER ===== */
+  header.top { position: sticky; top: 0; z-index: 50; background: rgba(11,16,32,0.72); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid transparent; padding-top: env(safe-area-inset-top, 0px); transition: background .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease); }
+  header.top.scrolled { background: rgba(11,16,32,0.92); border-bottom-color: var(--border); box-shadow: 0 8px 30px rgba(0,0,0,0.35); }
+  .top-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 60px; max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+  .brand { font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; transition: transform .25s var(--ease); }
+  .brand:hover { text-decoration: none; transform: scale(1.03); }
+  .brand-mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; color: #111; font-size: 0.85rem; font-weight: 900; transition: transform .4s var(--ease), box-shadow .3s var(--ease); }
+  .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.08); box-shadow: 0 0 20px rgba(245,185,66,0.4); }
+
+  nav.links { display: flex; align-items: center; gap: 18px; }
+  nav.links a { color: var(--muted); font-size: 0.95rem; position: relative; transition: color .2s var(--ease); }
+  nav.links a::after { content: ""; position: absolute; left: 0; bottom: -4px; width: 100%; height: 2px; background: var(--accent-2); transform: scaleX(0); transform-origin: right; transition: transform .3s var(--ease); border-radius: 2px; }
+  nav.links a:hover { color: var(--text); text-decoration: none; }
+  nav.links a:hover::after { transform: scaleX(1); transform-origin: left; }
+  .lang { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 0.85rem; cursor: pointer; font-weight: 600; transition: border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease); }
+  .lang:hover { border-color: var(--accent); background: var(--surface); }
+  .lang:active { transform: scale(0.94); }
+
+  /* ===== HAMBURGER BUTTON ===== */
+  .hamburger { display: none; position: relative; width: 46px; height: 46px; background: transparent; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; z-index: 70; padding: 0; transition: background .25s var(--ease), border-color .25s var(--ease), transform .2s var(--ease); }
+  .hamburger:hover { background: var(--surface); border-color: var(--accent-2); }
+  .hamburger:active { transform: scale(0.95); }
+  .hamburger .hamburger-icon { position: absolute; inset: 0; margin: auto; width: 22px; height: 16px; }
+  .hamburger .bar { position: absolute; left: 0; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: transform .45s var(--ease-out), opacity .25s var(--ease), width .3s var(--ease), top .45s var(--ease-out), background .25s var(--ease); }
+  .hamburger .bar:nth-child(1) { top: 0; }
+  .hamburger .bar:nth-child(2) { top: 7px; width: 16px; }
+  .hamburger .bar:nth-child(3) { top: 14px; }
+  .hamburger:hover .bar:nth-child(2) { width: 22px; }
+  .hamburger.active { background: var(--surface); border-color: var(--accent-2); }
+  .hamburger.active .bar:nth-child(1) { top: 7px; transform: rotate(45deg); background: var(--accent-2); }
+  .hamburger.active .bar:nth-child(2) { opacity: 0; transform: translateX(20px); }
+  .hamburger.active .bar:nth-child(3) { top: 7px; transform: rotate(-45deg); background: var(--accent-2); }
+
+  /* ===== DRAWER MENU ===== */
+  .drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(7, 10, 22, 0.6);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    z-index: 65;
+    opacity: 0; pointer-events: none;
+    transition: opacity .35s var(--ease);
+  }
+  .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: min(340px, 85vw);
+    background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+    border-left: 1px solid var(--border);
+    z-index: 66;
+    transform: translateX(100%);
+    transition: transform .45s var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+    overflow-y: auto;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .drawer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    color: var(--text);
+    font-size: 1rem;
+  }
+  .drawer-brand .brand-mark { width: 28px; height: 28px; font-size: 0.8rem; }
+  .drawer-close {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: border-color .2s var(--ease), color .2s var(--ease), transform .2s var(--ease);
+  }
+  .drawer-close:hover { border-color: var(--accent-2); color: var(--text); transform: rotate(90deg); }
+  .drawer-close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; }
+
+  .drawer-nav { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
+  .drawer-nav a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 12px;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: background .2s var(--ease), color .2s var(--ease), padding-left .25s var(--ease), opacity .4s var(--ease), transform .4s var(--ease-out);
+  }
+  .drawer.open .drawer-nav a { opacity: 1; transform: none; }
+  .drawer.open .drawer-nav a:nth-child(1) { transition-delay: .08s; }
+  .drawer.open .drawer-nav a:nth-child(2) { transition-delay: .14s; }
+  .drawer.open .drawer-nav a:nth-child(3) { transition-delay: .2s; }
+  .drawer.open .drawer-nav a:nth-child(4) { transition-delay: .26s; }
+  .drawer-nav a::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 50%;
+    width: 3px; height: 0;
+    background: var(--accent-2);
+    border-radius: 2px;
+    transform: translateY(-50%);
+    transition: height .25s var(--ease);
+  }
+  .drawer-nav a:hover { background: var(--surface-2); color: var(--accent-2); padding-left: 18px; text-decoration: none; }
+  .drawer-nav a:hover::before { height: 60%; }
+  .drawer-nav a .num {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent-2);
+    opacity: 0.6;
+    font-weight: 600;
+    min-width: 20px;
+  }
+  .drawer-nav a .arrow {
+    margin-left: auto;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity .2s var(--ease), transform .2s var(--ease);
+    color: var(--accent-2);
+    font-size: 1rem;
+  }
+  .drawer-nav a:hover .arrow { opacity: 1; transform: none; }
+
+  .drawer-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .drawer-lang {
+    align-self: flex-start;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 10px 20px;
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .drawer-lang:hover { border-color: var(--accent); background: var(--surface); }
+  .drawer-social { display: flex; gap: 10px; }
+  .drawer-social a {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    transition: color .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease);
+  }
+  .drawer-social a:hover { color: var(--accent-2); border-color: var(--accent-2); transform: translateY(-2px); text-decoration: none; }
+  .drawer-social svg { width: 18px; height: 18px; }
+
+  body.menu-open { overflow: hidden; }
+
+  /* ===== BUTTONS ===== */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 0.98rem; border: 1px solid transparent; cursor: pointer; text-decoration: none !important; min-height: 44px; position: relative; overflow: hidden; transition: background .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease), box-shadow .25s var(--ease); }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+  .btn-primary { background: var(--accent); color: #111; }
+  .btn-primary:hover { background: #ffc965; box-shadow: 0 8px 24px rgba(245,185,66,0.32); }
+  .btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+  .btn-ghost:hover { border-color: var(--accent-2); box-shadow: 0 6px 20px rgba(61,214,181,0.18); }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+  /* ===== HERO ===== */
+  .hero { padding: 96px 0 96px; position: relative; overflow: hidden; }
+  .hero::before { content: ""; position: absolute; inset: -20% -10% auto auto; width: 520px; height: 520px; background: radial-gradient(circle, rgba(61,214,181,0.18), transparent 60%); pointer-events: none; animation: float 14s ease-in-out infinite; }
+  .hero::after { content: ""; position: absolute; inset: auto auto -30% -10%; width: 480px; height: 480px; background: radial-gradient(circle, rgba(245,185,66,0.14), transparent 60%); pointer-events: none; animation: float 18s ease-in-out infinite reverse; }
+  .hero-grid { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(154,166,200,0.12) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%); }
+  @keyframes float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(20px,-24px); } }
+  .hero .wrap { position: relative; z-index: 2; }
+
+  .code-bits { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+  .code-bits .bit { position: absolute; font-family: var(--mono); color: var(--accent-2); opacity: 0.13; font-weight: 700; animation: drift 22s ease-in-out infinite; user-select: none; }
+  .bit-1 { top: 12%; left: 6%; font-size: 1.6rem; }
+  .bit-2 { top: 72%; left: 10%; font-size: 1.15rem; animation-delay: -3s; }
+  .bit-3 { top: 22%; right: 9%; font-size: 1.4rem; animation-delay: -6s; }
+  .bit-4 { top: 64%; right: 14%; font-size: 2rem; animation-delay: -9s; color: var(--accent); opacity: 0.09; }
+  .bit-5 { top: 42%; left: 46%; font-size: 1.3rem; animation-delay: -2s; opacity: 0.07; }
+  .bit-6 { top: 82%; right: 32%; font-size: 1.2rem; animation-delay: -12s; }
+  @keyframes drift {
+    0%, 100% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(15px,-20px) rotate(3deg); }
+    50% { transform: translate(-10px,15px) rotate(-2deg); }
+    75% { transform: translate(20px,10px) rotate(2deg); }
+  }
+
+  .avail-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(61,214,181,0.1); border: 1px solid rgba(61,214,181,0.3); font-size: 0.82rem; font-weight: 600; color: var(--accent-2); margin-bottom: 20px; opacity: 0; animation: heroIn .7s .2s var(--ease-out) forwards; }
+  .dot-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); animation: pulse2 1.5s infinite; }
+  @keyframes pulse2 { 0% { box-shadow: 0 0 0 0 rgba(61,214,181,0.6); } 70% { box-shadow: 0 0 0 8px rgba(61,214,181,0); } 100% { box-shadow: 0 0 0 0 rgba(61,214,181,0); } }
+
+  .terminal-line { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; font-family: var(--mono); font-size: 0.9rem; color: var(--accent-2); max-width: 100%; flex-wrap: wrap; opacity: 0; animation: heroIn .6s var(--ease-out) forwards; }
+  .terminal-line .prompt { color: var(--accent); font-weight: 700; }
+  .terminal-line .cmd { color: var(--muted); min-height: 1.2em; }
+  .cursor-blink { display: inline-block; width: 8px; height: 16px; background: var(--accent-2); animation: blink 1s step-end infinite; border-radius: 1px; flex: none; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .hero-title { min-height: 1.2em; }
+  .name-glow {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: shimmer 6s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: 200% center; } }
+
+  .type-cursor { display: inline-block; width: 3px; height: 0.95em; background: var(--accent-2); margin-left: 4px; vertical-align: -0.05em; animation: blink 1s step-end infinite; border-radius: 1px; transition: opacity .4s var(--ease); }
+  .type-cursor.done { opacity: 0; animation: none; }
+
+  .hero .lead { opacity: 0; animation: heroIn .7s 1.2s var(--ease-out) forwards; }
+  .hero .actions { opacity: 0; animation: heroIn .7s 1.4s var(--ease-out) forwards; }
+  @keyframes heroIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .scroll-hint {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    color: var(--muted); font-size: 0.72rem; font-family: var(--mono);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    opacity: 0; animation: heroIn 1s 2s var(--ease-out) forwards; z-index: 3;
+  }
+  .scroll-hint:hover { text-decoration: none; color: var(--accent-2); }
+  .scroll-hint svg { animation: bounceDown 2s ease-in-out infinite; }
+  @keyframes bounceDown { 0%, 100% { transform: translateY(0); opacity: 0.6; } 50% { transform: translateY(6px); opacity: 1; } }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .chip { font-size: 0.82rem; color: var(--muted); border: 1px solid var(--border); background: var(--surface); padding: 5px 11px; border-radius: 999px; opacity: 0; transform: translateY(10px) scale(0.92); transition: opacity .5s var(--ease), transform .5s var(--ease), color .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease); }
+  .chips.chips-visible .chip { opacity: 1; transform: none; }
+  .chips.chips-visible .chip:nth-child(1) { transition-delay: .05s; }
+  .chips.chips-visible .chip:nth-child(2) { transition-delay: .12s; }
+  .chips.chips-visible .chip:nth-child(3) { transition-delay: .19s; }
+  .chips.chips-visible .chip:nth-child(4) { transition-delay: .26s; }
+  .chips.chips-visible .chip:nth-child(5) { transition-delay: .33s; }
+  .chips.chips-visible .chip:nth-child(6) { transition-delay: .4s; }
+  .chips.chips-visible .chip:nth-child(7) { transition-delay: .47s; }
+  .chip:hover { color: var(--accent-2); border-color: var(--accent-2); background: var(--surface-2); }
+
+  .sec-prompt { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; font-family: var(--mono); font-size: 0.82rem; opacity: 0.85; flex-wrap: wrap; }
+  .sec-prompt .prompt { color: var(--accent); font-weight: 700; }
+  .sec-prompt .cmd { color: var(--accent-2); min-height: 1.2em; }
+  .sec-prompt .cursor-blink { width: 7px; height: 14px; }
+
+  /* ===== CARDS ===== */
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-top: 32px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; position: relative; overflow: hidden; transition: border-color .25s var(--ease), transform .3s var(--ease), box-shadow .3s var(--ease); }
+  .card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(400px circle at var(--mx,50%) var(--my,0%), rgba(61,214,181,0.10), transparent 50%); opacity: 0; transition: opacity .3s var(--ease); pointer-events: none; }
+  .card:hover { border-color: var(--accent-2); transform: translateY(-4px); box-shadow: 0 14px 34px rgba(0,0,0,0.35); }
+  .card:hover::after { opacity: 1; }
+  .card .icon { width: 42px; height: 42px; border-radius: 11px; background: var(--surface-2); display: grid; place-items: center; margin-bottom: 14px; transition: background .25s var(--ease), transform .35s var(--ease); }
+  .card .icon svg { width: 22px; height: 22px; stroke: var(--accent-2); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .35s var(--ease); }
+  .card:hover .icon { background: rgba(61,214,181,0.12); transform: scale(1.06); }
+  .card:hover .icon svg { transform: scale(1.08) rotate(-4deg); }
+  .card p { font-size: 0.95rem; margin: 0 0 10px; }
+
+  /* ===== PROJECTS ===== */
+  .project { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: clamp(22px, 4vw, 36px); margin-top: 28px; transition: border-color .25s var(--ease), box-shadow .3s var(--ease); }
+  .project:hover { border-color: rgba(61,214,181,0.5); box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+  .project-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .project-tech { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .project-tech span { font-size: 0.72rem; font-family: var(--mono); color: var(--accent-2); background: rgba(61,214,181,0.08); border: 1px solid rgba(61,214,181,0.2); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.03em; }
+  .status { font-size: 0.78rem; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--accent-2); color: var(--accent-2); font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
+  .status.wip { border-color: var(--accent); color: var(--accent); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(61,214,181,0.5); } 70% { box-shadow: 0 0 0 7px rgba(61,214,181,0); } 100% { box-shadow: 0 0 0 0 rgba(61,214,181,0); } }
+  .status.wip::before { animation-name: pulse-wip; }
+  @keyframes pulse-wip { 0% { box-shadow: 0 0 0 0 rgba(245,185,66,0.5); } 70% { box-shadow: 0 0 0 7px rgba(245,185,66,0); } 100% { box-shadow: 0 0 0 0 rgba(245,185,66,0); } }
+  .project ul { margin: 14px 0 0; padding-left: 20px; color: var(--muted); }
+  .project ul li { margin-bottom: 6px; }
+  .project .actions { margin-top: 22px; }
+
+  /* ===== TWO COL ===== */
+  .two-col { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: start; }
+  .checklist { list-style: none; padding: 0; margin: 0; }
+  .checklist li { padding: 12px 0 12px 32px; border-bottom: 1px solid var(--border); color: var(--muted); position: relative; transition: color .2s var(--ease), padding-left .25s var(--ease); }
+  .checklist li::before { content: "✓"; position: absolute; left: 0; top: 11px; color: var(--accent-2); font-weight: 800; transition: transform .25s var(--ease); }
+  .checklist li:hover { color: var(--text); padding-left: 36px; }
+  .checklist li:hover::before { transform: scale(1.2); }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist strong { color: var(--text); }
+
+  /* ===== CODE WINDOW ===== */
+  .code-window { background: #070b18; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color .25s var(--ease), box-shadow .3s var(--ease); }
+  .code-window:hover { border-color: var(--accent-2); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+  .code-window-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.3); }
+  .code-window-bar .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; } .dot-yellow { background: #febc2e; } .dot-green { background: #28c840; }
+  .code-window-title { margin-left: 8px; font-size: 0.75rem; color: var(--muted); font-family: var(--mono); }
+  pre.code { background: transparent; border: none; border-radius: 0; padding: 18px 14px; overflow-x: auto; font-size: 0.9rem; color: #cfd8f2; margin: 0; font-family: var(--mono); line-height: 1.7; }
+  pre.code .c { color: #6c7aa3; }
+  .code-line { display: block; opacity: 0; transform: translateY(4px); transition: opacity .3s var(--ease), transform .3s var(--ease); }
+  .code-line.visible { opacity: 1; transform: none; }
+  .code-line .ln { display: inline-block; width: 2em; text-align: right; margin-right: 1.1em; color: #3a4568; user-select: none; font-size: 0.85em; }
+
+  .notice { border-left: 3px solid var(--accent); background: var(--surface); padding: 18px 20px; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 28px; transition: border-color .25s var(--ease), transform .25s var(--ease); }
+  .notice:hover { border-left-color: var(--accent-2); transform: translateX(4px); }
+  .notice p { margin: 0; font-size: 0.95rem; }
+
+  /* ===== CONTACT ===== */
+  .contact-box { background: linear-gradient(135deg, var(--surface), var(--surface-2)); border: 1px solid var(--border); border-radius: 18px; padding: clamp(24px, 4vw, 40px); transition: border-color .25s var(--ease), box-shadow .3s var(--ease); }
+  .contact-box:hover { border-color: rgba(61,214,181,0.5); box-shadow: 0 18px 44px rgba(0,0,0,0.3); }
+  .email-big { display: inline-block; font-size: clamp(1.05rem, 3vw, 1.4rem); font-weight: 700; color: var(--text); word-break: break-all; margin: 8px 0 4px; transition: color .2s var(--ease); }
+  .email-big:hover { color: var(--accent); }
+  .contact-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+
+  /* ===== FOOTER ===== */
+  footer { padding: 34px 0 calc(34px + env(safe-area-inset-bottom, 0px)); color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--border); }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; }
+
+  .progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); z-index: 60; transition: width .1s linear; border-radius: 0 3px 3px 0; }
+
+  .to-top { position: fixed; bottom: 24px; right: 24px; width: 48px; height: 48px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--accent-2); cursor: pointer; z-index: 40; opacity: 0; transform: translateY(16px); pointer-events: none; transition: opacity .3s var(--ease), transform .3s var(--ease), border-color .2s var(--ease), background .2s var(--ease); font-size: 1.2rem; display: grid; place-items: center; }
+  .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+  .to-top:hover { border-color: var(--accent-2); background: var(--surface-2); transform: translateY(-3px); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (min-width: 820px) {
+    .two-col { grid-template-columns: 1fr 1fr; }
+    .hero { padding: 130px 0 110px; }
+  }
+  @media (max-width: 768px) {
+    nav.links { display: none; }
+    .hamburger { display: block; }
+    section { padding: 56px 0; }
+    .top-inner { height: 60px; }
+    .actions .btn, .contact-list .btn { flex: 1 1 100%; }
+    .grid { grid-template-columns: 1fr; }
+    .hero { padding: 64px 0 88px; }
+    .project { padding: 20px; }
+    .brand-mark { width: 28px; height: 28px; }
+    .code-bits { display: none; }
+    .to-top { bottom: 16px; right: 16px; width: 44px; height: 44px; }
+    .scroll-hint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+    .reveal { opacity: 1; transform: none; }
+    .chip { opacity: 1 !important; transform: none !important; }
+    .hero .lead, .hero .actions, .avail-pill, .terminal-line, .scroll-hint { opacity: 1 !important; }
+    .code-bits { display: none; }
+    .code-line { opacity: 1; transform: none; }
+    .type-cursor { display: none; }
+    .drawer-nav a { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+
+<header class="top" id="siteHeader">
+  <div class="top-inner">
+    <a class="brand" href="#top" aria-label="XatoDev">
+      <span class="brand-mark" aria-hidden="true">X</span>
+      <span>XatoDev</span>
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#servicios" data-i18n="nav_what">What I do</a>
+      <a href="#proyectos" data-i18n="nav_projects">Projects</a>
+      <a class="hide-sm" href="#sobre" data-i18n="nav_about">About</a>
+      <a href="#contacto" data-i18n="nav_contact">Contact</a>
+      <button class="lang" id="langBtn" type="button" aria-label="Switch language">ES</button>
+    </nav>
+    <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+      <span class="hamburger-icon">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </span>
+    </button>
+  </div>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+
+<aside class="drawer" id="drawer" aria-label="Navigation menu" aria-hidden="true">
+  <div class="drawer-header">
+    <div class="drawer-brand">
+      <span class="brand-mark" aria-hidden="true">X</span>
+      <span>XatoDev</span>
+    </div>
+    <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <nav class="drawer-nav">
+    <a href="#servicios"><span class="num">01</span><span data-i18n="nav_what">What I do</span><span class="arrow">→</span></a>
+    <a href="#proyectos"><span class="num">02</span><span data-i18n="nav_projects">Projects</span><span class="arrow">→</span></a>
+    <a href="#sobre"><span class="num">03</span><span data-i18n="nav_about">About</span><span class="arrow">→</span></a>
+    <a href="#contacto"><span class="num">04</span><span data-i18n="nav_contact">Contact</span><span class="arrow">→</span></a>
+  </nav>
+  <div class="drawer-footer">
+    <button class="drawer-lang" id="langBtnMobile" type="button">ES</button>
+    <div class="drawer-social">
+      <a href="https://github.com/XatoDevelopment" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="https://www.reddit.com/user/Legitimate_Toe_4344" target="_blank" rel="noopener" aria-label="Reddit">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9.5" cy="12.5" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="12.5" r="1" fill="currentColor" stroke="none"/><path d="M9 15.5c.9.7 2 1 3 1s2.1-.3 3-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="9" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="9" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 6.5v-3l3 .8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </a>
+      <a href="mailto:xatodev.contacto@gmail.com" aria-label="Email">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<main id="main">
+
+  <!-- HERO -->
+  <div class="hero" id="top">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="code-bits" aria-hidden="true">
+      <span class="bit bit-1">{ }</span>
+      <span class="bit bit-2">&lt;/&gt;</span>
+      <span class="bit bit-3">=&gt;</span>
+      <span class="bit bit-4">();</span>
+      <span class="bit bit-5">[ ]</span>
+      <span class="bit bit-6">&amp;&amp;</span>
+    </div>
+    <div class="wrap">
+      <div class="avail-pill">
+        <span class="dot-pulse"></span>
+        <span data-i18n="avail">Available for projects</span>
+      </div>
+      <div class="terminal-line">
+        <span class="prompt">$</span>
+        <span class="cmd" id="terminalText"></span>
+        <span class="cursor-blink"></span>
+      </div>
+      <h1 class="hero-title" id="heroTitle" aria-label="Hi, I'm XatoDev.">
+        <span aria-hidden="true"><span id="heroGreet"></span><span id="heroName" class="name-glow"></span><span id="heroPeriod"></span><span class="type-cursor" id="titleCursor"></span></span>
+      </h1>
+      <p class="lead" data-i18n="hero_lead">I design and build software end to end: web applications, analysis tools, installable apps and my own systems. From the idea to deployment.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#proyectos" data-i18n="cta_projects">See projects</a>
+        <a class="btn btn-ghost" href="#contacto" data-i18n="cta_contact">Get in touch</a>
+        <a class="btn btn-ghost" href="https://github.com/XatoDevelopment" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z" fill="currentColor" stroke="none"/></svg>
+          GitHub
+        </a>
+        <a class="btn btn-ghost" href="https://www.reddit.com/user/Legitimate_Toe_4344" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9.5" cy="12.5" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="12.5" r="1" fill="currentColor" stroke="none"/><path d="M9 15.5c.9.7 2 1 3 1s2.1-.3 3-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="9" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="9" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 6.5v-3l3 .8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          Reddit
+        </a>
+      </div>
+      <div class="chips" id="chipsContainer">
+        <span class="chip">Python</span><span class="chip">Flask</span><span class="chip">JavaScript</span>
+        <span class="chip">SQLite</span><span class="chip">Docker</span><span class="chip">PWA</span>
+        <span class="chip" data-i18n="chip_sys">Systems</span>
+      </div>
+    </div>
+    <a href="#servicios" class="scroll-hint" aria-label="Scroll to content">
+      <span data-i18n="scroll">scroll</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+    </a>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="servicios">
+    <div class="wrap">
+      <div class="sec-prompt reveal">
+        <span class="prompt">$</span>
+        <span class="cmd" data-prompt-key="services"></span>
+        <span class="cursor-blink"></span>
+      </div>
+      <span class="eyebrow" data-num="01" data-i18n="what_eyebrow">What I do</span>
+      <h2 class="reveal" data-delay="1" data-i18n="what_title">I build complete tools, not just prototypes</h2>
+      <p class="lead reveal" data-delay="2" data-i18n="what_lead">I cover the whole process: interface design, logic, database, testing, deployment and documentation.</p>
+      <div class="grid">
+        <article class="card reveal" data-delay="1">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 18v3M16 18v3"/></svg></div>
+          <h3 data-i18n="s1_t">Web applications</h3>
+          <p data-i18n="s1_d">Flask backends, relational databases, authentication, roles and well-organised APIs.</p>
+        </article>
+        <article class="card reveal" data-delay="2">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 18h6"/></svg></div>
+          <h3 data-i18n="s2_t">Responsive interfaces and PWAs</h3>
+          <p data-i18n="s2_d">Designs that work on mobile and desktop, with offline mode and browser installation.</p>
+        </article>
+        <article class="card reveal" data-delay="3">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg></div>
+          <h3 data-i18n="s3_t">Analysis tools</h3>
+          <p data-i18n="s3_d">Calculations, simulations and data processing, with interfaces to explore and review them.</p>
+        </article>
+        <article class="card reveal" data-delay="1">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h12"/><circle cx="19" cy="18" r="2"/></svg></div>
+          <h3 data-i18n="s4_t">Management systems</h3>
+          <p data-i18n="s4_d">Point of sale, inventory, profits and expenses for small and medium businesses.</p>
+        </article>
+        <article class="card reveal" data-delay="2">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></div>
+          <h3 data-i18n="s5_t">Deployment and maintenance</h3>
+          <p data-i18n="s5_d">Docker, HTTPS, automated backups and documentation so the project keeps running.</p>
+        </article>
+        <article class="card reveal" data-delay="3">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div>
+          <h3 data-i18n="s6_t">Open source and collaboration</h3>
+          <p data-i18n="s6_d">Documented repositories, contribution guides, issue templates and CI with automated tests.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="proyectos">
+    <div class="wrap">
+      <div class="sec-prompt reveal">
+        <span class="prompt">$</span>
+        <span class="cmd" data-prompt-key="projects"></span>
+        <span class="cursor-blink"></span>
+      </div>
+      <span class="eyebrow" data-num="02" data-i18n="proj_eyebrow">Projects</span>
+      <h2 class="reveal" data-delay="1" data-i18n="proj_title">What I've built</h2>
+      <p class="lead reveal" data-delay="2" data-i18n="proj_lead">Two very different projects: a poker study suite and a point-of-sale system for businesses.</p>
+
+      <article class="project reveal">
+        <div class="project-head">
+          <h3 style="margin:0">RangeLab Suite</h3>
+          <span class="status" data-i18n="st_live">Available</span>
+        </div>
+        <div class="project-tech"><span>Flask</span><span>SQLite</span><span>PWA</span><span>Docker</span></div>
+        <p data-i18n="rl_desc">Poker study suite with eight tools: Monte Carlo equity, preflop ranges, bankroll control, hand history review, tournament analysis and practice against bots. It runs on your own server, in English and Spanish, and can be installed as an app.</p>
+        <ul>
+          <li data-i18n="rl_1">Flask application with SQLite, per-user data and login lockout after failed attempts.</li>
+          <li data-i18n="rl_2">Hand history import for CoinPoker, PokerStars and ACR, using my own parsers.</li>
+          <li data-i18n="rl_3">PWA with a service worker for offline use, and Docker deployment.</li>
+          <li data-i18n="rl_4">Source available under a non-commercial license.</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/XatoDevelopment/Range-Lab" target="_blank" rel="noopener" data-i18n="rl_btn">View on GitHub</a>
+        </div>
+      </article>
+
+      <article class="project reveal">
+        <div class="project-head">
+          <h3 style="margin:0">XatoPos</h3>
+          <span class="status wip" data-i18n="st_wip">In development</span>
+        </div>
+        <div class="project-tech"><span>Flask</span><span>SQLite</span><span>JavaScript</span><span>Roles</span></div>
+        <p data-i18n="xp_desc">Point-of-sale system designed for small and medium businesses. It manages sales, inventory, profits and expenses in one place, with clear reports to track how the business is doing.</p>
+        <ul>
+          <li data-i18n="xp_1">Point of sale with cart, checkout and receipt generation.</li>
+          <li data-i18n="xp_2">Inventory management: stock, low-stock alerts and stock intake.</li>
+          <li data-i18n="xp_3">Profit and expense tracking with summaries by period.</li>
+          <li data-i18n="xp_4">User roles so each employee has the permissions they need.</li>
+        </ul>
+        <div class="notice" style="margin-top:20px">
+          <p data-i18n="xp_note">This project is in development. It is not yet available for general download.</p>
+        </div>
+      </article>
+
+      <div class="notice reveal">
+        <p data-i18n="more_note">I have more ideas in progress. If you have a project that needs a custom tool, get in touch.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="sobre">
+    <div class="wrap two-col">
+      <div class="reveal">
+        <div class="sec-prompt" style="margin-bottom:14px">
+          <span class="prompt">$</span>
+          <span class="cmd" data-prompt-key="about"></span>
+          <span class="cursor-blink"></span>
+        </div>
+        <span class="eyebrow" data-num="03" data-i18n="about_eyebrow">About me</span>
+        <h2 data-i18n="about_title">A developer who finishes what he starts</h2>
+        <p data-i18n="about_p1">I'm XatoDev, an independent developer. I work alone on my projects: design, backend, interface, testing and documentation.</p>
+        <p data-i18n="about_p2">I want to build things that really work: fast, clear and honest about their limits. That's why I document every project and publish the code when I can.</p>
+        <p data-i18n="about_p3">I'm open to collaborating with other people and to custom projects.</p>
+      </div>
+      <ul class="checklist reveal" data-delay="1" aria-label="Principles">
+        <li><strong data-i18n="p1_t">I finish it.</strong> <span data-i18n="p1_d">Every project reaches a usable, documented state.</span></li>
+        <li><strong data-i18n="p2_t">I test it.</strong> <span data-i18n="p2_d">Automated tests and checks on different devices.</span></li>
+        <li><strong data-i18n="p3_t">I explain it.</strong> <span data-i18n="p3_d">Clear documentation for users and for anyone who wants to contribute.</span></li>
+        <li><strong data-i18n="p4_t">Bilingual.</strong> <span data-i18n="p4_d">I work and publish in English and Spanish.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TECH -->
+  <section id="tech">
+    <div class="wrap two-col">
+      <div class="reveal">
+        <div class="sec-prompt" style="margin-bottom:14px">
+          <span class="prompt">$</span>
+          <span class="cmd" data-prompt-key="tech"></span>
+          <span class="cursor-blink"></span>
+        </div>
+        <span class="eyebrow" data-num="04" data-i18n="tech_eyebrow">Tech</span>
+        <h2 data-i18n="tech_title">Tools I use</h2>
+        <p data-i18n="tech_p1">Python and Flask on the server, SQLite for data, framework-free JavaScript on the client and Docker for deployment. For management systems, I work with relational databases and role-based control.</p>
+        <p data-i18n="tech_p2">Basic security from the start: hashed passwords, security headers and per-user data separation.</p>
+      </div>
+      <div class="code-window reveal" data-delay="1">
+        <div class="code-window-bar">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+          <span class="code-window-title">~/xatodev — bash</span>
+        </div>
+        <pre class="code" data-code-lines><span class="code-line"><span class="ln">1</span><span class="c"># Run RangeLab locally</span></span>
+<span class="code-line"><span class="ln">2</span>pip install -r requirements.txt</span>
+<span class="code-line"><span class="ln">3</span>python app.py</span>
+<span class="code-line"><span class="ln">4</span>&nbsp;</span>
+<span class="code-line"><span class="ln">5</span><span class="c"># Or with Docker</span></span>
+<span class="code-line"><span class="ln">6</span>docker compose up -d</span>
+<span class="code-line"><span class="ln">7</span>&nbsp;</span>
+<span class="code-line"><span class="ln">8</span><span class="c"># Open http://localhost:5000</span></span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contacto">
+    <div class="wrap">
+      <div class="contact-box reveal">
+        <div class="sec-prompt" style="margin-bottom:14px">
+          <span class="prompt">$</span>
+          <span class="cmd" data-prompt-key="contact"></span>
+          <span class="cursor-blink"></span>
+        </div>
+        <span class="eyebrow" data-num="05" data-i18n="contact_eyebrow">Contact</span>
+        <h2 data-i18n="contact_title">Shall we talk about your project?</h2>
+        <p data-i18n="contact_p">If you have an idea, a tool you need or want to collaborate, write to me. I reply as soon as I can.</p>
+        <a class="email-big" href="mailto:xatodev.contacto@gmail.com">xatodev.contacto@gmail.com</a>
+        <div class="contact-list">
+          <a class="btn btn-primary" href="mailto:xatodev.contacto@gmail.com" data-i18n="contact_btn">Send an email</a>
+          <a class="btn btn-ghost" href="https://github.com/XatoDevelopment" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.09.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.85.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05a9.36 9.36 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z" fill="currentColor" stroke="none"/></svg>
+            GitHub
+          </a>
+          <a class="btn btn-ghost" href="https://www.reddit.com/user/Legitimate_Toe_4344" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="9.5" cy="12.5" r="1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="12.5" r="1" fill="currentColor" stroke="none"/><path d="M9 15.5c.9.7 2 1 3 1s2.1-.3 3-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="9" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="9" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 6.5v-3l3 .8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            Reddit
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year"></span> XatoDev · <span data-i18n="footer_rights">All rights reserved over the code and the brand.</span></span>
+    <span><a href="https://github.com/XatoDevelopment" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.reddit.com/user/Legitimate_Toe_4344" target="_blank" rel="noopener">Reddit</a> · <a href="mailto:xatodev.contacto@gmail.com">xatodev.contacto@gmail.com</a></span>
+  </div>
+</footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
+
+<script>
+(function () {
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var T = {
+    en: {
+      skip: "Skip to content", nav_what: "What I do", nav_projects: "Projects", nav_about: "About", nav_contact: "Contact",
+      hero_lead: "I design and build software end to end: web applications, analysis tools, installable apps and my own systems. From the idea to deployment.",
+      avail: "Available for projects", scroll: "scroll",
+      cta_projects: "See projects", cta_contact: "Get in touch", chip_sys: "Systems",
+      what_eyebrow: "What I do", what_title: "I build complete tools, not just prototypes",
+      what_lead: "I cover the whole process: interface design, logic, database, testing, deployment and documentation.",
+      s1_t: "Web applications", s1_d: "Flask backends, relational databases, authentication, roles and well-organised APIs.",
+      s2_t: "Responsive interfaces and PWAs", s2_d: "Designs that work on mobile and desktop, with offline mode and browser installation.",
+      s3_t: "Analysis tools", s3_d: "Calculations, simulations and data processing, with interfaces to explore and review them.",
+      s4_t: "Management systems", s4_d: "Point of sale, inventory, profits and expenses for small and medium businesses.",
+      s5_t: "Deployment and maintenance", s5_d: "Docker, HTTPS, automated backups and documentation so the project keeps running.",
+      s6_t: "Open source and collaboration", s6_d: "Documented repositories, contribution guides, issue templates and CI with automated tests.",
+      proj_eyebrow: "Projects", proj_title: "What I've built",
+      proj_lead: "Two very different projects: a poker study suite and a point-of-sale system for businesses.",
+      st_live: "Available", st_wip: "In development",
+      rl_desc: "Poker study suite with eight tools: Monte Carlo equity, preflop ranges, bankroll control, hand history review, tournament analysis and practice against bots. It runs on your own server, in English and Spanish, and can be installed as an app.",
+      rl_1: "Flask application with SQLite, per-user data and login lockout after failed attempts.",
+      rl_2: "Hand history import for CoinPoker, PokerStars and ACR, using my own parsers.",
+      rl_3: "PWA with a service worker for offline use, and Docker deployment.",
+      rl_4: "Source available under a non-commercial license.", rl_btn: "View on GitHub",
+      xp_desc: "Point-of-sale system designed for small and medium businesses. It manages sales, inventory, profits and expenses in one place, with clear reports to track how the business is doing.",
+      xp_1: "Point of sale with cart, checkout and receipt generation.",
+      xp_2: "Inventory management: stock, low-stock alerts and stock intake.",
+      xp_3: "Profit and expense tracking with summaries by period.",
+      xp_4: "User roles so each employee has the permissions they need.",
+      xp_note: "This project is in development. It is not yet available for general download.",
+      more_note: "I have more ideas in progress. If you have a project that needs a custom tool, get in touch.",
+      about_eyebrow: "About me", about_title: "A developer who finishes what he starts",
+      about_p1: "I'm XatoDev, an independent developer. I work alone on my projects: design, backend, interface, testing and documentation.",
+      about_p2: "I want to build things that really work: fast, clear and honest about their limits. That's why I document every project and publish the code when I can.",
+      about_p3: "I'm open to collaborating with other people and to custom projects.",
+      p1_t: "I finish it.", p1_d: "Every project reaches a usable, documented state.",
+      p2_t: "I test it.", p2_d: "Automated tests and checks on different devices.",
+      p3_t: "I explain it.", p3_d: "Clear documentation for users and for anyone who wants to contribute.",
+      p4_t: "Bilingual.", p4_d: "I work and publish in English and Spanish.",
+      tech_eyebrow: "Tech", tech_title: "Tools I use",
+      tech_p1: "Python and Flask on the server, SQLite for data, framework-free JavaScript on the client and Docker for deployment. For management systems, I work with relational databases and role-based control.",
+      tech_p2: "Basic security from the start: hashed passwords, security headers and per-user data separation.",
+      contact_eyebrow: "Contact", contact_title: "Shall we talk about your project?",
+      contact_p: "If you have an idea, a tool you need or want to collaborate, write to me. I reply as soon as I can.",
+      contact_btn: "Send an email",
+      footer_rights: "All rights reserved over the code and the brand."
+    },
+    es: {
+      skip: "Ir al contenido", nav_what: "Qué hago", nav_projects: "Proyectos", nav_about: "Sobre mí", nav_contact: "Contacto",
+      hero_lead: "Diseño y desarrollo software de principio a fin: aplicaciones web, herramientas de análisis, apps instalables y sistemas propios. Desde la idea hasta el despliegue.",
+      avail: "Disponible para proyectos", scroll: "baja",
+      cta_projects: "Ver proyectos", cta_contact: "Contactar", chip_sys: "Sistemas",
+      what_eyebrow: "Qué hago", what_title: "Puedo crear herramientas completas, no solo prototipos",
+      what_lead: "Cubro el proceso entero: diseño de la interfaz, lógica, base de datos, pruebas, despliegue y documentación.",
+      s1_t: "Aplicaciones web", s1_d: "Backends con Flask, bases de datos relacionales, autenticación, roles y APIs bien organizadas.",
+      s2_t: "Interfaces responsive y PWA", s2_d: "Diseño que funciona en móvil y PC, con modo sin conexión e instalación desde el navegador.",
+      s3_t: "Herramientas de análisis", s3_d: "Cálculos, simulaciones y procesamiento de datos, con interfaces para explorarlos y revisarlos.",
+      s4_t: "Sistemas de gestión", s4_d: "Puntos de venta, inventario, ganancias y gastos para negocios pequeños y medianos.",
+      s5_t: "Despliegue y mantenimiento", s5_d: "Docker, HTTPS, copias de seguridad automáticas y documentación para que el proyecto siga funcionando.",
+      s6_t: "Código abierto y colaboración", s6_d: "Repositorios documentados, guías para contribuir, plantillas de issues y CI con pruebas automáticas.",
+      proj_eyebrow: "Proyectos", proj_title: "Lo que he construido",
+      proj_lead: "Dos proyectos muy distintos: una suite de estudio de póker y un sistema de punto de venta para negocios.",
+      st_live: "Disponible", st_wip: "En desarrollo",
+      rl_desc: "Suite de estudio de póker con ocho herramientas: equity por Monte Carlo, rangos preflop, control de bankroll, revisión de historiales, análisis de torneos y práctica contra bots. Funciona en tu propio servidor, en español e inglés, y se puede instalar como app.",
+      rl_1: "Aplicación Flask con SQLite, datos separados por usuario y acceso con bloqueo tras intentos fallidos.",
+      rl_2: "Importación de historiales de CoinPoker, PokerStars y ACR mediante parsers propios.",
+      rl_3: "PWA con service worker para uso sin conexión, y despliegue con Docker.",
+      rl_4: "Código fuente disponible con licencia de uso no comercial.", rl_btn: "Ver en GitHub",
+      xp_desc: "Sistema de punto de venta pensado para negocios pequeños y medianos. Gestiona ventas, inventario, ganancias y gastos desde un mismo lugar, con informes claros para saber cómo va el negocio.",
+      xp_1: "Punto de venta con carrito, cobros y generación de tickets.",
+      xp_2: "Gestión de inventario: stock, alertas de bajo stock y entradas de mercancía.",
+      xp_3: "Registro de ganancias y gastos con resúmenes por periodo.",
+      xp_4: "Roles de usuario para que cada empleado tenga los permisos que necesita.",
+      xp_note: "Es un proyecto en desarrollo. Aún no está disponible para descarga general.",
+      more_note: "Tengo más ideas en marcha. Si tienes un proyecto que necesita una herramienta a medida, escríbeme.",
+      about_eyebrow: "Sobre mí", about_title: "Un desarrollador que termina lo que empieza",
+      about_p1: "Soy XatoDev, desarrollador independiente. Trabajo solo en mis proyectos: diseño, backend, interfaz, pruebas y documentación.",
+      about_p2: "Me interesa construir cosas que funcionen de verdad: rápidas, claras y honestas sobre sus límites. Por eso documento cada proyecto y publico el código cuando puedo.",
+      about_p3: "Estoy abierto a colaborar con otras personas y a proyectos a medida.",
+      p1_t: "Lo termino.", p1_d: "Cada proyecto llega a un estado usable y documentado.",
+      p2_t: "Lo pruebo.", p2_d: "Pruebas automáticas y verificaciones en distintos dispositivos.",
+      p3_t: "Lo explico.", p3_d: "Documentación clara para usuarios y para quien quiera contribuir.",
+      p4_t: "Bilingüe.", p4_d: "Trabajo y publico en español e inglés.",
+      tech_eyebrow: "Tecnología", tech_title: "Herramientas que uso",
+      tech_p1: "Python y Flask en el servidor, SQLite para los datos, JavaScript sin frameworks en el cliente y Docker para el despliegue. Para sistemas de gestión, trabajo con bases de datos relacionales y control de roles.",
+      tech_p2: "Seguridad básica desde el principio: contraseñas con hash, cabeceras de seguridad y datos de cada usuario separados.",
+      contact_eyebrow: "Contacto", contact_title: "¿Hablamos de tu proyecto?",
+      contact_p: "Si tienes una idea, una herramienta que necesitas o quieres colaborar, escríbeme. Respondo lo antes que puedo.",
+      contact_btn: "Enviar correo",
+      footer_rights: "Todos los derechos reservados sobre el código y la marca."
+    }
+  };
+
+  var PROMPTS = {
+    en: { hero: ['whoami', 'ls ~/projects', 'cat stack.json', 'echo "let\'s build"'],
+      services: 'cat services.json', projects: 'ls ~/projects',
+      about: 'cat about.md', tech: 'cat stack.txt', contact: 'mail -s "hello"' },
+    es: { hero: ['quien_soy', 'ls ~/proyectos', 'cat stack.json', 'echo "construyamos"'],
+      services: 'cat servicios.json', projects: 'ls ~/proyectos',
+      about: 'cat sobre_mi.md', tech: 'cat stack.txt', contact: 'mail -s "hola"' }
+  };
+
+  var TITLE_PARTS = {
+    en: { greet: "Hi, I'm ", name: "XatoDev", period: "." },
+    es: { greet: "Hola, soy ", name: "XatoDev", period: "." }
+  };
+
+  var lang = (navigator.language || "en").toLowerCase().indexOf("es") === 0 ? "es" : "en";
+  var current = lang;
+
+  var state = {
+    heroCycleActive: false,
+    heroCycleTimeout: null,
+    titleToken: null,
+    sectionTokens: {}
+  };
+
+  var heroGreet = document.getElementById("heroGreet");
+  var heroName = document.getElementById("heroName");
+  var heroPeriod = document.getElementById("heroPeriod");
+  var titleCursor = document.getElementById("titleCursor");
+  var heroTitleEl = document.getElementById("heroTitle");
+  var terminalText = document.getElementById("terminalText");
+
+  function getTitleParts() { return TITLE_PARTS[current]; }
+
+  function showFullTitle() {
+    state.titleToken = null;
+    var parts = getTitleParts();
+    heroGreet.textContent = parts.greet;
+    heroName.textContent = parts.name;
+    heroPeriod.textContent = parts.period;
+    titleCursor.classList.add("done");
+    heroTitleEl.setAttribute("aria-label", parts.greet + parts.name + parts.period);
+  }
+
+  function typeHeroTitle(onDone) {
+    var token = Math.random();
+    state.titleToken = token;
+    var parts = getTitleParts();
+    heroGreet.textContent = "";
+    heroName.textContent = "";
+    heroPeriod.textContent = "";
+    titleCursor.classList.remove("done");
+    heroTitleEl.setAttribute("aria-label", parts.greet + parts.name + parts.period);
+
+    if (reduceMotion) { showFullTitle(); if (onDone) onDone(); return; }
+
+    function typeInto(el, text, speed, done) {
+      var i = 0;
+      function step() {
+        if (state.titleToken !== token) return;
+        if (i < text.length) {
+          el.textContent += text.charAt(i);
+          i++;
+          setTimeout(step, speed);
+        } else if (done) { done(); }
+      }
+      step();
+    }
+
+    typeInto(heroGreet, parts.greet, 50, function () {
+      typeInto(heroName, parts.name, 70, function () {
+        typeInto(heroPeriod, parts.period, 50, function () {
+          if (state.titleToken !== token) return;
+          setTimeout(function () {
+            if (state.titleToken !== token) return;
+            titleCursor.classList.add("done");
+            if (onDone) onDone();
+          }, 200);
+        });
+      });
+    });
+  }
+
+  function stopHeroCycle() {
+    state.heroCycleActive = false;
+    if (state.heroCycleTimeout) {
+      clearTimeout(state.heroCycleTimeout);
+      state.heroCycleTimeout = null;
+    }
+  }
+
+  function startHeroCycle() {
+    stopHeroCycle();
+    state.heroCycleActive = true;
+    var phrases = PROMPTS[current].hero;
+    var pi = 0;
+    terminalText.textContent = phrases[0];
+    if (reduceMotion) return;
+
+    function hold() {
+      if (!state.heroCycleActive) return;
+      state.heroCycleTimeout = setTimeout(del, 1600);
+    }
+    function del() {
+      if (!state.heroCycleActive) return;
+      if (terminalText.textContent.length > 0) {
+        terminalText.textContent = terminalText.textContent.slice(0, -1);
+        state.heroCycleTimeout = setTimeout(del, 28);
+      } else {
+        pi = (pi + 1) % phrases.length;
+        type();
+      }
+    }
+    function type() {
+      if (!state.heroCycleActive) return;
+      var target = phrases[pi];
+      if (terminalText.textContent.length < target.length) {
+        terminalText.textContent = target.slice(0, terminalText.textContent.length + 1);
+        state.heroCycleTimeout = setTimeout(type, 65);
+      } else { hold(); }
+    }
+    hold();
+  }
+
+  function startupHeroSequence() {
+    stopHeroCycle();
+    if (state.titleToken !== null) state.titleToken = null;
+
+    if (reduceMotion) { showFullTitle(); startHeroCycle(); return; }
+
+    terminalText.textContent = "";
+    var whoami = PROMPTS[current].hero[0];
+    var token = Math.random();
+    state.titleToken = token;
+    var i = 0;
+
+    function typeWhoami() {
+      if (state.titleToken !== token) return;
+      if (i < whoami.length) {
+        terminalText.textContent += whoami.charAt(i);
+        i++;
+        state.heroCycleTimeout = setTimeout(typeWhoami, 70);
+      } else {
+        state.titleToken = null;
+        state.heroCycleTimeout = setTimeout(function () {
+          typeHeroTitle(startHeroCycle);
+        }, 350);
+      }
+    }
+    typeWhoami();
+  }
+
+  var sectionPromptEls = {};
+  var sectionPromptDone = {};
+  var sectionPromptIO = null;
+
+  function typePromptOnce(el, text, speed) {
+    if (!el) return;
+    if (reduceMotion) { el.textContent = text; return; }
+    var key = el.getAttribute("data-prompt-key");
+    var token = Math.random();
+    state.sectionTokens[key] = token;
+    el.textContent = "";
+    var i = 0;
+    function step() {
+      if (state.sectionTokens[key] !== token) return;
+      if (i <= text.length) {
+        el.textContent = text.slice(0, i++);
+        setTimeout(step, speed);
+      }
+    }
+    step();
+  }
+
+  function setupSectionPrompts() {
+    var keys = ['services', 'projects', 'about', 'tech', 'contact'];
+    if (!sectionPromptIO) {
+      sectionPromptIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            var key = entry.target.getAttribute("data-prompt-key");
+            if (key && !sectionPromptDone[key]) {
+              sectionPromptDone[key] = true;
+              typePromptOnce(entry.target, PROMPTS[current][key], 45);
+            }
+          }
+        });
+      }, { threshold: 0.25 });
+    }
+    keys.forEach(function (key) {
+      var el = document.querySelector('[data-prompt-key="' + key + '"]');
+      if (el) {
+        sectionPromptEls[key] = el;
+        sectionPromptIO.observe(el);
+      }
+    });
+  }
+
+  function retypeSections() {
+    Object.keys(sectionPromptEls).forEach(function (key) {
+      if (sectionPromptDone[key]) {
+        typePromptOnce(sectionPromptEls[key], PROMPTS[current][key], 22);
+      }
+    });
+  }
+
+  function applyLanguage(lang, withIntro) {
+    var dict = T[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var key = el.getAttribute("data-i18n");
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.getElementById("langBtn").textContent = lang === "en" ? "ES" : "EN";
+    var mob = document.getElementById("langBtnMobile");
+    if (mob) mob.textContent = lang === "en" ? "ES" : "EN";
+    document.querySelector('meta[name="description"]').setAttribute("content", lang === "en"
+      ? "XatoDev, independent developer. I build web applications, analysis tools, PWAs and my own systems."
+      : "XatoDev, desarrollador independiente. Creo aplicaciones web, herramientas de análisis, PWA y sistemas propios.");
+    current = lang;
+
+    if (withIntro) {
+      startupHeroSequence();
+    } else {
+      stopHeroCycle();
+      if (state.titleToken !== null) state.titleToken = null;
+      showFullTitle();
+      startHeroCycle();
+    }
+    retypeSections();
+  }
+
+  function toggleLang() { applyLanguage(current === "en" ? "es" : "en", false); }
+  document.getElementById("langBtn").addEventListener("click", toggleLang);
+  document.getElementById("langBtnMobile").addEventListener("click", toggleLang);
+
+  // ===== DRAWER MENU =====
+  var hamburger = document.getElementById("hamburgerBtn");
+  var drawer = document.getElementById("drawer");
+  var drawerOverlay = document.getElementById("drawerOverlay");
+  var drawerClose = document.getElementById("drawerClose");
+  var drawerLinks = drawer.querySelectorAll(".drawer-nav a");
+
+  function openDrawer() {
+    hamburger.classList.add("active");
+    hamburger.setAttribute("aria-expanded", "true");
+    hamburger.setAttribute("aria-label", "Close menu");
+    drawer.classList.add("open");
+    drawer.setAttribute("aria-hidden", "false");
+    drawerOverlay.classList.add("open");
+    document.body.classList.add("menu-open");
+    setTimeout(function () { drawerClose.focus(); }, 300);
+  }
+  function closeDrawer() {
+    hamburger.classList.remove("active");
+    hamburger.setAttribute("aria-expanded", "false");
+    hamburger.setAttribute("aria-label", "Open menu");
+    drawer.classList.remove("open");
+    drawer.setAttribute("aria-hidden", "true");
+    drawerOverlay.classList.remove("open");
+    document.body.classList.remove("menu-open");
+    hamburger.focus();
+  }
+
+  hamburger.addEventListener("click", function () {
+    if (drawer.classList.contains("open")) closeDrawer();
+    else openDrawer();
+  });
+  drawerClose.addEventListener("click", closeDrawer);
+  drawerOverlay.addEventListener("click", closeDrawer);
+  drawerLinks.forEach(function (link) { link.addEventListener("click", closeDrawer); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
+  });
+
+  // ===== HEADER / PROGRESS / BACK TO TOP =====
+  var header = document.getElementById("siteHeader");
+  var progress = document.getElementById("progress");
+  var toTop = document.getElementById("toTop");
+
+  function onScroll() {
+    var y = window.scrollY || document.documentElement.scrollTop;
+    header.classList.toggle("scrolled", y > 8);
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.width = (h > 0 ? (y / h) * 100 : 0) + "%";
+    toTop.classList.toggle("show", y > 500);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  toTop.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
+  // ===== SCROLL REVEAL =====
+  var reveals = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    reveals.forEach(function (el) {
+      if (el.closest(".hero")) return;
+      io.observe(el);
+    });
+  } else {
+    reveals.forEach(function (el) { el.classList.add("is-visible"); });
+  }
+
+  // ===== CHIPS STAGGER =====
+  var chipsEl = document.getElementById("chipsContainer");
+  if (chipsEl) {
+    if (reduceMotion) {
+      chipsEl.classList.add("chips-visible");
+    } else if ("IntersectionObserver" in window) {
+      var chipsIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            chipsEl.classList.add("chips-visible");
+            chipsIO.disconnect();
+          }
+        });
+      }, { threshold: 0.15 });
+      chipsIO.observe(chipsEl);
+    } else {
+      chipsEl.classList.add("chips-visible");
+    }
+  }
+
+  // ===== CODE WINDOW LINE REVEAL =====
+  var codeEl = document.querySelector('[data-code-lines]');
+  if (codeEl) {
+    var lines = codeEl.querySelectorAll('.code-line');
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      lines.forEach(function (l) { l.classList.add('visible'); });
+    } else {
+      var codeIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            lines.forEach(function (line, idx) {
+              setTimeout(function () { line.classList.add('visible'); }, idx * 150);
+            });
+            codeIO.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+      codeIO.observe(codeEl);
+    }
+  }
+
+  // ===== CARD SPOTLIGHT =====
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    document.querySelectorAll(".card").forEach(function (card) {
+      card.addEventListener("mousemove", function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      });
+    });
+  }
+
+  // ===== INIT =====
+  document.getElementById("year").textContent = new Date().getFullYear();
+  applyLanguage(current, true);
+  setupSectionPrompts();
+})();
+</script>
+</body>
+</html>
