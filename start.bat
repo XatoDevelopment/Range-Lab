@@ -9,7 +9,7 @@ set "BASE=%~dp0"
 set "PYTHON=%BASE%Python_Embedded\python.exe"
 set "APP=%BASE%app.py"
 set "LOGDIR=%BASE%logs"
-set "PIDFILE=%BASE%ranglab_server.pid"
+set "PIDFILE=%BASE%rangelab_server.pid"
 set "URL=http://127.0.0.1:5000/login"
 
 if not exist "%PYTHON%" (

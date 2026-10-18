@@ -14,4 +14,4 @@ Python_Embedded/
 .venv/
 venv/
 data/
-ranglab_server.pid
+rangelab_server.pid

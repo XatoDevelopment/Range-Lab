@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 
-set "PIDFILE=%~dp0ranglab_server.pid"
+set "PIDFILE=%~dp0rangelab_server.pid"
 
 if not exist "%PIDFILE%" (
     echo RangeLab no tiene un PID registrado.

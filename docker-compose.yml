@@ -1,7 +1,7 @@
 services:
   rangelab:
     build: .
-    image: rangelab:1.1.0
+    image: rangelab:1.4.1
     container_name: rangelab
     restart: unless-stopped
     ports:

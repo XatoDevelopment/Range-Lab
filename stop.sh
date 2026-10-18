@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")"
-PIDFILE="ranglab_server.pid"
+PIDFILE="rangelab_server.pid"
 
 if [[ ! -f "$PIDFILE" ]]; then
   echo "RangeLab no tiene un PID registrado."

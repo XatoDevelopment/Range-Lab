@@ -16,3 +16,20 @@ venv/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Servidor local (PID y procesos)
+*.pid
+
+# Entornos y herramientas de desarrollo
+.vscode/
+.idea/
+*.swp
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Distribución Windows con Python embebido (no es parte del repo)
+Python_Embedded/

@@ -1,3 +1,5 @@
-flask>=3.0.0
-werkzeug>=3.0.0
-gunicorn>=22.0.0
+# Dependencias de producción. Versiones con límite de versión mayor
+# para evitar cambios incompatibles al actualizar.
+flask>=3.0,<4
+werkzeug>=3.0,<4
+gunicorn>=22.0,<24

@@ -7,7 +7,7 @@ export PYTHONUTF8=1
 PORT="${RANGELAB_PORT:-5000}"
 HOST="${RANGELAB_HOST:-127.0.0.1}"
 URL="http://${HOST}:${PORT}/login"
-PIDFILE="ranglab_server.pid"
+PIDFILE="rangelab_server.pid"
 LOGDIR="logs"
 
 mkdir -p "$LOGDIR"
